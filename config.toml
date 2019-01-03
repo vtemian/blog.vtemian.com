@@ -1,8 +1,0 @@
-baseURL = "https://vtemian.com/"
-languageCode = "en-us"
-title = "Vlad Temian"
-theme = "basics"
-
-[params]
-    author = "Vlad Temian"
-    github = "vtemian"
