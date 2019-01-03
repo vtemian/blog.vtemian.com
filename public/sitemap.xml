@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://vtemian.com/post/interviews/</loc>
+    <lastmod>2019-01-03T22:02:12+02:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://vtemian.com/post/2019/</loc>
     <lastmod>2019-01-02T21:36:57+02:00</lastmod>
   </url>
@@ -14,7 +19,7 @@
   
   <url>
     <loc>https://vtemian.com/post/</loc>
-    <lastmod>2019-01-02T21:36:57+02:00</lastmod>
+    <lastmod>2019-01-03T22:02:12+02:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -25,7 +30,7 @@
   
   <url>
     <loc>https://vtemian.com/</loc>
-    <lastmod>2019-01-02T21:36:57+02:00</lastmod>
+    <lastmod>2019-01-03T22:02:12+02:00</lastmod>
     <priority>0</priority>
   </url>
   
