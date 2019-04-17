@@ -1,0 +1,40 @@
+.articles {
+  margin: 0 0 50px;
+
+  article {
+    display: flex;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    justify-items: center;
+    border-bottom: 1px solid var(--grey-lighter);
+
+    &:last-child {
+      margin-bottom: 0px;
+    }
+
+    h2 {
+      font-weight: 600;
+      font-size: var(--font-size-medium);
+    }
+
+    a {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      color: var(--black);
+      justify-content: space-between;
+
+      &:hover {
+        color: var(--pink);
+
+        time {
+          color: var(--black);
+        }
+      }
+    }
+
+    time {
+      color: var(--grey);
+    }
+  }
+}

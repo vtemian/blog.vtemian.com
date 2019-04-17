@@ -1,8 +1,8 @@
 baseURL = "https://vtemian.com/"
 languageCode = "en-us"
-title = "Vlad Temian"
-theme = "basics"
+title = "vtemian - blog"
 
 [params]
-    author = "Vlad Temian"
-    github = "vtemian"
+	author = "Vlad Temian"
+	github = "vtemian"
+	description = "favorite superpower: having awesome friends"

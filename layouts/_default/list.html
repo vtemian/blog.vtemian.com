@@ -1,0 +1,27 @@
+{{ define "content" }}
+
+{{ $avatar := resources.Get "output/avatar@2x.9d6360be.jpg" }}
+
+<div class="container">
+    <aside class="author">
+        <img src="{{ $avatar.Permalink | relURL }}" />
+        <h1>{{ .Site.Params.author }} </h1>
+        <p>{{ .Site.Params.description }}</p>
+    </aside>
+
+    <main class="articles">
+    {{ range where .Pages.ByDate.Reverse "Section" "post" }}
+    <article>
+        <a href="{{ .URL }}">
+            <h2>{{ .Title }}</h2>
+            <time>{{ .Date.Format "02 Jan 2006" }}</time>
+        </a>
+    </article>
+    {{ end }}
+    </main>
+
+    {{ partial "footer" .}}
+
+</div>
+
+{{ end }}

@@ -1,0 +1,18 @@
+:root {
+  --black: #1a1a1a;
+  --grey: #a5a5a5;
+  --grey-lighter: #d1d7de;
+  --blue: #5694f1;
+  --pink: #eb298c;
+
+  --font-family-heading: "Rubik", sans-serif;
+  --font-family-body: "Karla", sans-serif;
+
+  --font-size-base: 16px;
+  --font-size-small: 14px;
+  --font-size-medium: 18px;
+  --font-size-large: 32px;
+
+  --container-width: 550px;
+  --container-width-large: 690px;
+}
