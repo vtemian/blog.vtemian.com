@@ -2,11 +2,33 @@
 
 {{ $avatar := resources.Get "output/avatar@2x.9d6360be.jpg" }}
 
+{{ $github := resources.Get "output/github.945aaa3a.png" }}
+{{ $linkedin := resources.Get "output/linkedin.07a5ae33.png" }}
+{{ $twitter := resources.Get "output/twitter.6f040fea.png" }}
+{{ $rss := resources.Get "output/rss.7f71fc08.png" }}
+
 <div class="container">
     <aside class="author">
-        <img src="{{ $avatar.Permalink | relURL }}" />
+        <img src="{{ $avatar.Permalink | relURL }}" alt="Avatar" />
+
         <h1>{{ .Site.Params.author }} </h1>
-        <p>{{ .Site.Params.description }}</p>
+        <p class="social">
+            <a href="https://github.com/vtemian">
+                <img src="{{ $github.Permalink | relURL }}" alt="github" />
+            </a>
+
+            <a href="https://www.linkedin.com/in/vtemian">
+                <img src="{{ $linkedin.Permalink | relURL }}" alt="linkedin" />
+            </a>
+
+            <a href="https://www.twitter.com/vtemian">
+                <img src="{{ $twitter.Permalink | relURL }}" alt="twitter" />
+            </a>
+
+            <a href="index.xml">
+                <img src="{{ $rss.Permalink | relURL }}" alt="rss" />
+            </a>
+        </p>
     </aside>
 
     <main class="articles">

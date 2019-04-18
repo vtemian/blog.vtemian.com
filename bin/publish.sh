@@ -6,6 +6,7 @@ credentials.sh
 
 cp -R public/ /tmp/
 
+git stash
 git log -1 --pretty=%B > /tmp/msg
 git checkout master
 
