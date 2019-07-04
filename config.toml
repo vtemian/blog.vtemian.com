@@ -1,6 +1,8 @@
 baseURL = "https://vtemian.com/"
 languageCode = "en-us"
 title = "vtemian - blog"
+enableRobotsTXT = true
+canonifyURLs = true
 
 [params]
 	author = "Vlad Temian"
