@@ -1,6 +1,13 @@
 ---
 title: "Interviews"
 date: 2019-01-03T22:02:12+02:00
+description: "A short interviewing statement for 2019"
+tags:
+    - interviewing
+    - plan
+keywords:
+    - interviewing
+    - plan
 ---
 
 I’m really nervous, only thinking of them. I had only one or two real interviews and conducted a few. Usually, I’m pretty lucky when it comes to job finding. The companies I like or want to work with contacted me, and it’s really flattering. No interview, just a small discussion, a beer and I’ll start next Monday.

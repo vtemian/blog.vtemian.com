@@ -3,8 +3,11 @@ languageCode = "en-us"
 title = "vtemian - blog"
 enableRobotsTXT = true
 canonifyURLs = true
+metaDataFormat = "yaml"
 
 [params]
 	author = "Vlad Temian"
 	github = "vtemian"
 	description = "favorite superpower: having awesome friends"
+    keywords = ["vtemian", "blog", "python", "interviews"]
+    tags = ["vtemian", "blog", "python", "interviews"]
