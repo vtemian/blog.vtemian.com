@@ -234,6 +234,8 @@ Grandparent
 ```
 
 Multiple inheritance can get messy and for the full story please take a look at https://www.python.org/download/releases/2.3/mro/.
-It can be really fun to play with, but on the long run it can be a real trouble maker.
+It can be really fun to play with, but in the long run it can be a real trouble maker.
 
 Cheers 🍺!
+
+Thanks [@catileptic](https://twitter.com/catileptic) for the awesome illustrations!
