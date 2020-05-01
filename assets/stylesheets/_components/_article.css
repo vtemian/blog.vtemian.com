@@ -33,7 +33,8 @@
   ul,
   hr,
   img,
-  blockquote {
+  blockquote,
+  pre {
     margin-bottom: 25px;
   }
 

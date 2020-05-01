@@ -296,7 +296,8 @@ a:hover {
   .article ul,
   .article hr,
   .article img,
-  .article blockquote {
+  .article blockquote,
+  .article pre {
     margin-bottom: 25px;
   }
 
