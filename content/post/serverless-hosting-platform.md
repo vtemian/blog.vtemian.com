@@ -1453,6 +1453,18 @@ simple-django-app-d2n6n-deployment-77c664bf4f-pz6hg               2/2     Runnin
 simple-django-app-hcmpl-deployment-7687b96b5f-pv2wz               2/2     Running     0          67m
 ```
 
-Since the article is getting too long, we'll leave [routing](https://knative.dev/development/serving/using-subroutes/) and [blue-green deployments](https://knative.dev/development/serving/samples/blue-green-deployment/) for another one.
-
 ## Conclusions
+
+In the end, we've managed to configure a bare-metal infrastructure, install Knative and have a CI/CD that builds and deploys 
+new versions of our application, on git push. It's a little bit of a hassle and we left behind some details regarding
+revisions, [routing](https://knative.dev/development/serving/using-subroutes/) and 
+[blue-green deployments](https://knative.dev/development/serving/samples/blue-green-deployment/).
+
+Platforms like [Vercel](https://vercel.com/), [Heroku](https://www.heroku.com/), [Google Cloud Run](https://cloud.google.com/run)
+and [AWS ECS](https://aws.amazon.com/ecs/) are truly remarkable, from an engineering point of view and because they lift
+the burden of deploying you application and manage your infrastructure.
+Kudos to Knative and Tekton for bringing such platforms closer to our reach.
+
+Cheers 🍺!
+
+Thanks [@catileptic](https://twitter.com/catileptic) for the awesome illustrations!
