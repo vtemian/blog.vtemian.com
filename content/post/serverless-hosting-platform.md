@@ -190,7 +190,7 @@ For each calico peer config (worker), we'll put node's private IP.
 Next, we'll install the latest metalLB manifest:
 
 ```
-kubectl apply -f [https://raw.githubusercontent.com/google/metallb/v0.8.1/manifests/metallb.yaml](https://raw.githubusercontent.com/google/metallb/v0.8.1/manifests/metallb.yaml)
+kubectl apply -f https://raw.githubusercontent.com/google/metallb/v0.8.1/manifests/metallb.yaml
 ```
 
 Followed by the metalLB's config map, in `metallb-system` namespace:
@@ -769,7 +769,7 @@ We now can continue with mysql-operator:
 
 ```bash
 ╰─>$ helm repo add presslabs https://presslabs.github.io/charts
-╰─>$helm install presslabs/mysql-operator --name mysql-operator --set orchestrator.persistence.storageClass=standard
+╰─>$ helm install presslabs/mysql-operator --name mysql-operator --set orchestrator.persistence.storageClass=standard
 ```
 
 Furthermore, we'll need a secret with the credentials we want for our mysql cluster
@@ -888,7 +888,7 @@ spec:
         - "/workspace/git-source/${inputs.params.pathToYamlFile}"
 ```
 
-A [TaskRu](https://tekton.dev/docs/pipelines/taskruns/)n is a running instance of a Task. It executes all the steps of a task, in order, until all of them are completed. Example from [https://github.com/knative-sample/tekton-knative](https://github.com/knative-sample/tekton-knativehttps://github.com/knative-sample/tekton-knative/blob/master/tekton-cicd/tasks/deploy-using-kubectl.yaml)
+A [TaskRun](https://tekton.dev/docs/pipelines/taskruns/) is a running instance of a Task. It executes all the steps of a task, in order, until all of them are completed. Example from [https://github.com/knative-sample/tekton-knative](https://github.com/knative-sample/tekton-knativehttps://github.com/knative-sample/tekton-knative/blob/master/tekton-cicd/tasks/deploy-using-kubectl.yaml)
 
 ```yaml
 apiVersion: tekton.dev/v1alpha1
