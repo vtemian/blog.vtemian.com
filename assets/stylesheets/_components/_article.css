@@ -23,6 +23,11 @@
     font-size: var(--font-size-large);
   }
 
+  h2 {
+    font-weight: 600;
+    font-size: var(--font-size-large);
+  }
+
   h3 {
     font-weight: 600;
     font-size: var(--font-size-medium);
@@ -30,7 +35,6 @@
 
   p,
   h3,
-  ul,
   hr,
   img,
   blockquote,
@@ -38,18 +42,14 @@
     margin-bottom: 25px;
   }
 
-  p:has(> a) {
-        color: red;
-        margin-bottom: 0px;
-  }
-
   ul {
     list-style: disc;
     padding-left: 50px;
+    margin-bottom: 10px;
   }
 
   li {
-    margin-bottom: 15px;
+    margin-bottom: 10px;
   }
 
   hr {
@@ -73,5 +73,10 @@
     font-style: italic;
     font-size: var(--font-size-medium);
     border-left: 5px solid var(--black);
+  }
+
+  li:not(:last-of-type) a:only-child {
+    margin-bottom: -10px;
+    display: block;
   }
 }

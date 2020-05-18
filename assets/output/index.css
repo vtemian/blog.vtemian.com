@@ -286,6 +286,11 @@ a:hover {
     font-size: var(--font-size-large);
   }
 
+  .article h2 {
+    font-weight: 600;
+    font-size: var(--font-size-large);
+  }
+
   .article h3 {
     font-weight: 600;
     font-size: var(--font-size-medium);
@@ -293,7 +298,6 @@ a:hover {
 
   .article p,
   .article h3,
-  .article ul,
   .article hr,
   .article img,
   .article blockquote,
@@ -301,18 +305,14 @@ a:hover {
     margin-bottom: 25px;
   }
 
-  .article p:has(> a) {
-        color: red;
-        margin-bottom: 0px;
-  }
-
   .article ul {
     list-style: disc;
     padding-left: 50px;
+    margin-bottom: 10px;
   }
 
   .article li {
-    margin-bottom: 15px;
+    margin-bottom: 10px;
   }
 
   .article hr {
@@ -336,6 +336,11 @@ a:hover {
     font-style: italic;
     font-size: var(--font-size-medium);
     border-left: 5px solid var(--black);
+  }
+
+  .article li:not(:last-of-type) a:only-child {
+    margin-bottom: -10px;
+    display: block;
   }
 
 .social {
