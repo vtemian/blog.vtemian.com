@@ -115,13 +115,13 @@ Because when I was setting up my cluster, kubespray didn't fully supported Ubunt
 
 Next, we just need to run ansible and let it do the magic.
 
-```
+```bash
 ansible-playbook --become -i inventory/rabbit/inventory.ini cluster.yml
 ```
 
 If everything worked as intended, we'll have a new cluster, up and running. In order to access it, we can grab the admin credentials, from the kube-master node.
 
-```
+```bash
 scp root@rabbit-1.vtemian.com:/etc/kubernetes/admin.conf .
 ```
 
