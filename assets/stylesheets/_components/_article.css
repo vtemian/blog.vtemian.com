@@ -38,6 +38,11 @@
     margin-bottom: 25px;
   }
 
+  p:has(> a) {
+        color: red;
+        margin-bottom: 0px;
+  }
+
   ul {
     list-style: disc;
     padding-left: 50px;
