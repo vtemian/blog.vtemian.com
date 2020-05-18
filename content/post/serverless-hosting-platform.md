@@ -1462,7 +1462,7 @@ revisions, [routing](https://knative.dev/development/serving/using-subroutes/) a
 
 Platforms like [Vercel](https://vercel.com/), [Heroku](https://www.heroku.com/), [Google Cloud Run](https://cloud.google.com/run)
 and [AWS ECS](https://aws.amazon.com/ecs/) are truly remarkable, from an engineering point of view and because they lift
-the burden of deploying you application and manage your infrastructure.
+the burden of deploying your application and manage your infrastructure.
 Kudos to Knative and Tekton for bringing such platforms closer to our reach.
 
 Cheers 🍺!
