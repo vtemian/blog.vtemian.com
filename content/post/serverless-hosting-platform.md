@@ -18,7 +18,8 @@ Deploying a 3-tier application (with the presentation layer, business logic, and
 
 [Introduction]({{< ref "#introduction" >}})
 
-  * [Serving component]({{< ref "#serving-component" >}})
+[Serving component]({{< ref "#serving-component" >}})
+
   * [Packet component]({{< ref "#packet" >}})
   * [Kubernetes on bare-metal]({{< ref "#kubernetes-on-bare-metal" >}})
   * [MetalLB]({{< ref "#metallb" >}})
@@ -41,7 +42,7 @@ Deploying a 3-tier application (with the presentation layer, business logic, and
 
 In order to achieve that, we'll need two main components: one component that will take our code and prepare it to be published, namely the CI/CD component, and another one that will expose the changes to the Internet, namely the serving component. We can add a third component to hold some state for our application, like database and storage, but we'll add it to the serving component.
 
-![/serverless/](/serverless/Untitled.png)
+![/](/Untitled.png)
 
 ## Serving component
 
@@ -55,15 +56,15 @@ In order to move forward with Knative, we'll need a Kubernetes cluster. For the 
 
 We can choose from 3 deployment types: on-demand, reserved and spot. Let's try the spot instances since those can be really cheap.
 
-![/serverless/Screenshot_2020-05-09_at_12.19.28.png](/serverless/Screenshot_2020-05-09_at_12.19.28.png)
+![/Screenshot_2020-05-09_at_12.19.28.png](/Screenshot_2020-05-09_at_12.19.28.png)
 
 Once a spot market request was created, it will check for available machines that comply with your bid, and start provisioning them. For a max bid of $0.10 / h, we get a [c1.small.x86](https://www.packet.com/cloud/servers/c1-small/) instance, with 4 physical cores running at 3.4Ghz ([Intel E3-1240 v3](https://ark.intel.com/content/www/us/en/ark/products/75055/intel-xeon-processor-e3-1240-v3-8m-cache-3-40-ghz.html)), 32GB RAM, 2 x 120GB SSD and 2 Gigabit NICs. 
 
-![/serverless/Screenshot_2020-05-09_at_12.33.00.png](/serverless/Screenshot_2020-05-09_at_12.33.00.png)
+![/Screenshot_2020-05-09_at_12.33.00.png](/Screenshot_2020-05-09_at_12.33.00.png)
 
 I've updated the hostname for each of one and now we're ready to install Kubernetes.
 
-![/serverless/Screenshot_2020-05-09_at_13.05.54.png](/serverless/Screenshot_2020-05-09_at_13.05.54.png)
+![/Screenshot_2020-05-09_at_13.05.54.png](/Screenshot_2020-05-09_at_13.05.54.png)
 
 ### Kubernetes on bare-metal
 
@@ -161,11 +162,11 @@ The instructions from Packet's BGP - Kubernetes [integration](https://github.com
 
 A global IP `147.75.40.130/32` and a Public IPv4 `147.75.80.160/30`.
 
-![/serverless/Screenshot_2020-05-09_at_16.27.30.png](/serverless/Screenshot_2020-05-09_at_16.27.30.png)
+![/Screenshot_2020-05-09_at_16.27.30.png](/Screenshot_2020-05-09_at_16.27.30.png)
 
 [For security reason](https://www.packet.com/developers/docs/network/basic/elastic-ips/)s, you'll need to manually configure the IPs, for each server. Its fairly easy to do it and well documented. For each server, attach them an IP from the `Network` section:
 
-![/serverless/Screenshot_2020-05-09_at_16.36.03.png](/serverless/Screenshot_2020-05-09_at_16.36.03.png)
+![/Screenshot_2020-05-09_at_16.36.03.png](/Screenshot_2020-05-09_at_16.36.03.png)
 
 And that, on each server manually (or via ansible), an example for Ubuntu/Debian, if you just want to play around with, run:
 
@@ -410,7 +411,7 @@ simple-django-app   http://simple-django-app.default.147.75.80.160.xip.io   simp
 
 Going to the generated URL
 
-![/serverless/Screenshot_2020-05-09_at_18.28.18.png](/serverless/Screenshot_2020-05-09_at_18.28.18.png)
+![/Screenshot_2020-05-09_at_18.28.18.png](/Screenshot_2020-05-09_at_18.28.18.png)
 
 Now this...this is pretty damn cool! There's no database and we still need to build our containers, but it looks pretty damn cool!
 
@@ -483,15 +484,15 @@ Wait until a new pod is started and you can port-forward it
 Forwarding from 127.0.0.1:3000 -> 3000
 ```
 
-![/serverless/Screenshot_2020-05-10_at_13.29.25.png](/serverless/Screenshot_2020-05-10_at_13.29.25.png)
+![/Screenshot_2020-05-10_at_13.29.25.png](/Screenshot_2020-05-10_at_13.29.25.png)
 
 All of those default dashboards are interesting, but I found the most useful the `Knative Serving - Revision HTTP Requests`, that describes current running applications.
 
-![/serverless/Screenshot_2020-05-10_at_15.47.39.png](/serverless/Screenshot_2020-05-10_at_15.47.39.png)
+![/Screenshot_2020-05-10_at_15.47.39.png](/Screenshot_2020-05-10_at_15.47.39.png)
 
 And the `Kubernetes Capacity Planning` that gives an overview over the entire cluster.
 
-![/serverless/Screenshot_2020-05-10_at_15.48.07.png](/serverless/Screenshot_2020-05-10_at_15.48.07.png)
+![/Screenshot_2020-05-10_at_15.48.07.png](/Screenshot_2020-05-10_at_15.48.07.png)
 
 Moving to logs, we'll need to configure ElasticSearch and Kibana. We'll need to edit the `config-observability` ConfigMap and set the `logging.request-log-template` to 
 
@@ -554,15 +555,15 @@ spec:
 
 Create a new index and wait until is processed.
 
-![/serverless/Screenshot_2020-05-10_at_16.27.12.png](/serverless/Screenshot_2020-05-10_at_16.27.12.png)
+![/Screenshot_2020-05-10_at_16.27.12.png](/Screenshot_2020-05-10_at_16.27.12.png)
 
 Set it as the default index
 
-![/serverless/Screenshot_2020-05-10_at_16.45.24.png](/serverless/Screenshot_2020-05-10_at_16.45.24.png)
+![/Screenshot_2020-05-10_at_16.45.24.png](/Screenshot_2020-05-10_at_16.45.24.png)
 
 And the logs should flow
 
-![/serverless/Screenshot_2020-05-10_at_16.59.57.png](/serverless/Screenshot_2020-05-10_at_16.59.57.png)
+![/Screenshot_2020-05-10_at_16.59.57.png](/Screenshot_2020-05-10_at_16.59.57.png)
 
 ### Autoscaling
 
@@ -710,15 +711,15 @@ simple-django-app-ns6fm-deployment-85cff985d5-xv9sw   2/2     Running     0     
 
 Requests leaving the local machine 
 
-![/serverless/Screenshot_2020-05-11_at_19.23.16.png](/serverless/Screenshot_2020-05-11_at_19.23.16.png)
+![/Screenshot_2020-05-11_at_19.23.16.png](/Screenshot_2020-05-11_at_19.23.16.png)
 
 Requests for this current revision
 
-![/serverless/Screenshot_2020-05-11_at_19.28.30.png](/serverless/Screenshot_2020-05-11_at_19.28.30.png)
+![/Screenshot_2020-05-11_at_19.28.30.png](/Screenshot_2020-05-11_at_19.28.30.png)
 
 Resource consumption
 
-![/serverless/Screenshot_2020-05-11_at_19.25.23.png](/serverless/Screenshot_2020-05-11_at_19.25.23.png)
+![/Screenshot_2020-05-11_at_19.25.23.png](/Screenshot_2020-05-11_at_19.25.23.png)
 
 For now, we have a running Kubernetes cluster, on bare-metal (on top of Packet), with 3 nodes, a running Knative installation that serves and scales Docker images.
 
@@ -1033,7 +1034,7 @@ Right now, we manually have to trigger the build by deleting and re-creating the
 
 The setup for that is not too complex, nor too simple. When a github hook arrives, it lands in an `[EventListener](https://tekton.dev/docs/triggers/eventlisteners/)` pod (that will need to be exposed to the Internet via Istio). From its payload, we'll need to extract relevant parameters, like commit information. For that, we'll be using [TriggerBindings](https://tekton.dev/docs/triggers/triggerbindings/). The parameters are then used by [TriggerTemplate](https://tekton.dev/docs/triggers/triggertemplates/) to generate our pipeline run. The following configurations are inspired by [@nikhilthomas1](https://medium.com/@nikhilthomas1/cloud-native-cicd-on-openshift-with-openshift-pipelines-tektoncd-pipelines-part-3-github-1db6dd8e8ca7). 
 
-![/serverless/Untitled%201.png](/serverless/Untitled%201.png)
+![/Untitled%201.png](/Untitled%201.png)
 
 Let's create the a role, service account and the role binding for this process.
 
@@ -1430,7 +1431,7 @@ spec:
   serviceAccountName: tekton-triggers-createwebhook
 ```
 
-![](/serverless/Screenshot_2020-05-16_at_20.23.20.png)
+![](/Screenshot_2020-05-16_at_20.23.20.png)
 
 Now, each time we push new changes, a new build is being trigger:
 
