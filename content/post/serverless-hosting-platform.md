@@ -20,7 +20,7 @@ Deploying a 3-tier application (with the presentation layer, business logic, and
 
 [Serving component]({{< ref "#serving-component" >}})
 
-  * [Packet component]({{< ref "#packet" >}})
+  * [Packet]({{< ref "#packet" >}})
   * [Kubernetes on bare-metal]({{< ref "#kubernetes-on-bare-metal" >}})
   * [MetalLB]({{< ref "#metallb" >}})
   * [Istio]({{< ref "#istio" >}})
@@ -29,7 +29,7 @@ Deploying a 3-tier application (with the presentation layer, business logic, and
   * [Autoscaling]({{< ref "#autoscaling" >}})
   * [Mysql]({{< ref "#mysql" >}})
 
-[CI/CD]({{< ref "#ci/cd" >}})
+[CI/CD]({{< ref "#ci-cd" >}})
 
   * [Tekton]({{< ref "#tekton" >}})
   * [How does Tekton work?]({{< ref "#how-does-tekton-work" >}})
