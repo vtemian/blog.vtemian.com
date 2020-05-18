@@ -22,8 +22,8 @@ rabbit-3.vtemian.com
 kube-master
 kube-node
 calico-rr
-</code></pre><p>Because when I was setting up my cluster, kubespray didn&rsquo;t fully supported Ubuntu 20.04, I had to update the tasks a little bit. I&rsquo;ve replaced <code>python-minimal</code> with <code>python2-minimal</code> and install Docker from Ubuntu 19.10 (Eoan) repositories.</p><p>Next, we just need to run ansible and let it do the magic.</p><pre><code>ansible-playbook --become -i inventory/rabbit/inventory.ini cluster.yml
-</code></pre><p>If everything worked as intended, we&rsquo;ll have a new cluster, up and running. In order to access it, we can grab the admin credentials, from the kube-master node.</p><pre><code>scp root@rabbit-1.vtemian.com:/etc/kubernetes/admin.conf .
+</code></pre><p>Because when I was setting up my cluster, kubespray didn&rsquo;t fully supported Ubuntu 20.04, I had to update the tasks a little bit. I&rsquo;ve replaced <code>python-minimal</code> with <code>python2-minimal</code> and install Docker from Ubuntu 19.10 (Eoan) repositories.</p><p>Next, we just need to run ansible and let it do the magic.</p><pre><code class=language-bash>ansible-playbook --become -i inventory/rabbit/inventory.ini cluster.yml
+</code></pre><p>If everything worked as intended, we&rsquo;ll have a new cluster, up and running. In order to access it, we can grab the admin credentials, from the kube-master node.</p><pre><code class=language-bash>scp root@rabbit-1.vtemian.com:/etc/kubernetes/admin.conf .
 </code></pre><p>Next, add those into our local kubectl config (usually located at <code>~/.kube/config</code>) and we&rsquo;ll be able to access the cluster, using <code>kubectl</code>.</p><pre><code class=language-bash>╰─&gt;$ kubectl get pod --all-namespaces -o wide
 NAMESPACE     NAME                                           READY   STATUS    RESTARTS   AGE     IP              NODE                   NOMINATED NODE   READINESS GATES
 kube-system   calico-kube-controllers-5679c8548f-rffvp       1/1     Running   0          2m46s   10.80.204.133   rabbit-3.vtemian.com   &lt;none&gt;           &lt;none&gt;
