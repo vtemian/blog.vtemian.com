@@ -1,0 +1,912 @@
+<html><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width,minimum-scale=1"><meta content="serverless hosting platforma,knative on bare metal,kubernetes on bare metal,tekton and knative" name=keywords><link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.1/styles/atom-one-light.min.css><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.1/highlight.min.js></script><meta itemprop=name content="Building a serverless hosting platform"><meta itemprop=description content="Deploying a 3-tier application (with the presentation layer, business logic, and storage) can get a little tricky these days. Let&rsquo;s say that we have a simple Django application, poll&rsquo;s app from the tutorial. It runs perfect on our local machine, we added a requirements.txt to hold our dependencies. As for the database, we can use SQLite, since we&rsquo;re developing only locally. The purpose of this project is to build a system that will allow us to push on a branch and deploy our changes in a separate environment, giving us a unique URL, to check them."><meta itemprop=datePublished content=2020-05-18T13:06:21&#43;02:00><meta itemprop=dateModified content=2020-05-18T13:06:21&#43;02:00><meta itemprop=wordCount content=5620><meta itemprop=keywords content=knative,kubernetes,serverless,><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.vtemian.com/"},"articleSection":"post","name":"Building a serverless hosting platform","headline":"Building a serverless hosting platform","description":"Deploying a 3-tier application (with the presentation layer, business logic, and storage) can get a little tricky these days. Let&rsquo;s say that we have a simple Django application, poll&rsquo;s app from the tutorial. It runs perfect on our local machine, we added a requirements.txt to hold our dependencies. As for the database, we can use SQLite, since we&rsquo;re developing only locally. The purpose of this project is to build a system that will allow us to push on a branch and deploy our changes in a separate environment, giving us a unique URL, to check them.","inLanguage":"en-US","author":"","creator":"","publisher":"","accountablePerson":"","copyrightHolder":"","copyrightYear":"2020","datePublished":"2020-05-18 13:06:21 &#43;0200 &#43;0200","dateModified":"2020-05-18 13:06:21 &#43;0200 &#43;0200","url":"https://blog.vtemian.com/post/serverless-hosting-platform/","wordCount":"5620","keywords":["knative","kubernetes","serverless","Blog"]}</script><title>Building a serverless hosting platform</title><link href="https://fonts.googleapis.com/css?family=Karla:700,Rubik:400,400i" rel=stylesheet><link rel=stylesheet href=https://blog.vtemian.com/output/index.b7f7f557f5d9a11931db38092fa2aaee78bea53a3c606e329e820e2cfb84709a.css integrity="sha256-t/f1V/XZoRkx2zgJL6Kq7ni&#43;pTo8YG4ynoIOLPuEcJo=" crossorigin=anonymous><script type=text/javascript src=https://blog.vtemian.com/output/index.aad5319fa68d4ffea7c51f2994cd36ba8a8fb9a460f3a9f54e49efa059e47d3b.js integrity="sha256-qtUxn6aNT/6nxR8plM02uoqPuaRg86n1TknvoFnkfTs=" crossorigin=anonymous defer></script><meta name=google-site-verification content=2qk_e0y84NNSVpaorKgeNURYF9Ni3UyJvPq9GZdGEgs></head><body><div class="container container--is-large"><main class=article><article><header><a href=https://blog.vtemian.com/>&larr; Go back</a><h1>Building a serverless hosting platform</h1><aside class="author author--is-small"><img src=https://blog.vtemian.com/output/avatar@2x.9d6360be.jpg><div><h4>Vlad Temian</h4><p>18 May 2020</p></div></aside></header><p><p>Deploying a 3-tier application (with the presentation layer, business logic, and storage) can get a little tricky these days. Let&rsquo;s say that we have a simple Django application, <a href=https://github.com/vtemian/simple-django-app/tree/basic>poll&rsquo;s app</a> from the tutorial. It runs perfect on our local machine, we added a requirements.txt to hold our dependencies. As for the database, we can use SQLite, since we&rsquo;re developing only locally. The purpose of this project is to build a system that will allow us to push on a branch and deploy our changes in a separate environment, giving us a unique URL, to check them. Similarly to how <a href=http://now.sh>now.sh</a> and <a href=http://heorku.com>heroku.com</a> are doing. We&rsquo;ll need a mechanism that will package our code and dependencies and will deploy it, but also it needs to consider multiple versions, upgrades, load-balacing, scaling and our stateful part (database).</p><p><a href=#introduction>Introduction</a></p><ul><li><a href=#serving-component>Serving component</a></li><li><a href=#packet>Packet component</a></li><li><a href=#kubernetes-on-bare-metal>Kubernetes on bare-metal</a></li><li><a href=#metallb>MetalLB</a></li><li><a href=#istio>Istio</a></li><li><a href=#first-knative-service>First Knative service</a></li><li><a href=#elasticsearch-and-kibana>ElasticSearch and Kibana</a></li><li><a href=#autoscaling>Autoscaling</a></li><li><a href=#mysql>Mysql</a></li></ul><p><a href=#ci/cd>CI/CD</a></p><ul><li><a href=#tekton>Tekton</a></li><li><a href=#how-does-tekton-work>How does Tekton work?</a></li><li><a href=#pipeline-setup>Pipeline Setup</a></li><li><a href=#github-webhook-trigger>Github webhook trigger</a></li></ul><p><a href=#conclusions>Conclusions</a></p><h2 id=introduction>Introduction</h2><p>In order to achieve that, we&rsquo;ll need two main components: one component that will take our code and prepare it to be published, namely the CI/CD component, and another one that will expose the changes to the Internet, namely the serving component. We can add a third component to hold some state for our application, like database and storage, but we&rsquo;ll add it to the serving component.</p><p><img src=https://blog.vtemian.com/serverless/Untitled.png alt=/serverless/></p><h2 id=serving-component>Serving component</h2><p>For the serving component, we can use <a href=https://knative.dev/>Knative</a>. It leverages Kubernetes and integrates components that are already built on top of Kubernetes. At it&rsquo;s very basic, it runs and exposes a Docker image to the Internet, without any fuss. You&rsquo;ll just have to define a <code>service</code> that describe your image and its environment and Knative will take care of everything else (from routing, logging, monitoring to managing different versions of your application and autoscaling, including 0 scaling for no use).</p><p>As you can imagine, <a href=https://knative.dev/>Knative</a> is way more complex than it can be described in a paragraph and currently, we&rsquo;ll not dissect it.</p><h3 id=packet>Packet</h3><p>In order to move forward with Knative, we&rsquo;ll need a Kubernetes cluster. For the sake of over-engineering it and trying something new, let&rsquo;s try to install Kubernetes on bare-metal. It sounds a little overwhelming, but in the end, it is way simpler than anticipated. I&rsquo;ve always wanted to try <a href=https://www.packet.com/>packet.com</a>, since they have automated their deployment (it can be controlled via an API, thus allowing tools like Terraform to shine), they have a marketplace on which you can bid for machine&rsquo;s usage per hour (called <a href=https://www.packet.com/developers/docs/getting-started/deployment-options/spot-market/>Spot Market</a>, accessible via their API) and neat networking features (like <a href=https://www.packet.com/developers/docs/network/advanced/local-and-global-bgp/>BGP</a> - Border Gateway Protocol, which will need further).</p><p>We can choose from 3 deployment types: on-demand, reserved and spot. Let&rsquo;s try the spot instances since those can be really cheap.</p><p><img src=https://blog.vtemian.com/serverless/Screenshot_2020-05-09_at_12.19.28.png alt=/serverless/Screenshot_2020-05-09_at_12.19.28.png></p><p>Once a spot market request was created, it will check for available machines that comply with your bid, and start provisioning them. For a max bid of $0.10 / h, we get a <a href=https://www.packet.com/cloud/servers/c1-small/>c1.small.x86</a> instance, with 4 physical cores running at 3.4Ghz (<a href=https://ark.intel.com/content/www/us/en/ark/products/75055/intel-xeon-processor-e3-1240-v3-8m-cache-3-40-ghz.html>Intel E3-1240 v3</a>), 32GB RAM, 2 x 120GB SSD and 2 Gigabit NICs.</p><p><img src=https://blog.vtemian.com/serverless/Screenshot_2020-05-09_at_12.33.00.png alt=/serverless/Screenshot_2020-05-09_at_12.33.00.png></p><p>I&rsquo;ve updated the hostname for each of one and now we&rsquo;re ready to install Kubernetes.</p><p><img src=https://blog.vtemian.com/serverless/Screenshot_2020-05-09_at_13.05.54.png alt=/serverless/Screenshot_2020-05-09_at_13.05.54.png></p><h3 id=kubernetes-on-bare-metal>Kubernetes on bare-metal</h3><p>There are tons of guides out there on how to install Kubernetes on bare metal, from installing all the components manually to using scripts or other tools. The most popular choices are <a href=https://github.com/kubernetes/kops>kops</a>, <a href=https://github.com/kubernetes/kubeadm>kubeadm</a> and <a href=https://github.com/kubernetes-sigs/kubespray>kubespray</a>. I went with kubespray since, for me, it was easier to understand and it was the path with the least resistance to follow since I have some ansible experience. <a href=https://github.com/kubernetes-sigs/kubespray/blob/master/docs/comparisons.md>Here</a> you can find a small comparison between kops, kubeadm, and kubespray.</p><p>Kubespray is easy to install and to use. We just need to clone the <a href=https://github.com/kubernetes-sigs/kubespray>repository</a> and install it using</p><pre><code class=language-bash>sudo pip3 install -r requirements.txt
+</code></pre><p>We can also install it in a separate virtual environment if we have different versions of ansible running on your machine.</p><p>Next, we need to define an inventory of servers. It comes with pre-defined inventory examples. We can use Packet&rsquo;s API to list all your servers, but I decided to use a static one. Just copy the <code>sample</code> inventory into a separate one (I&rsquo;ve called it <code>rabbit</code>).</p><pre><code class=language-bash>cd kubespray
+cp -R inventory/sample/ intentory/rabbit
+</code></pre><p>Now add our servers in <code>inventory.ini</code></p><pre><code>[all]
+rabbit-1.vtemian.com ansible_host=147.75.84.27 ansible_user=root ip=10.80.204.129 etcd_member_name=etcd1
+rabbit-2.vtemian.com ansible_host=147.75.100.161 ansible_user=root ip=10.80.204.131 etcd_member_name=etcd2
+rabbit-3.vtemian.com ansible_host=147.75.100.215 ansible_user=root ip=10.80.204.133 etcd_member_name=etcd3
+
+[kube-master]
+rabbit-1.vtemian.com
+
+[etcd]
+rabbit-1.vtemian.com
+
+[kube-node]
+rabbit-2.vtemian.com
+rabbit-3.vtemian.com
+
+[calico-rr]
+
+[k8s-cluster:children]
+kube-master
+kube-node
+calico-rr
+</code></pre><p>Because when I was setting up my cluster, kubespray didn&rsquo;t fully supported Ubuntu 20.04, I had to update the tasks a little bit. I&rsquo;ve replaced <code>python-minimal</code> with <code>python2-minimal</code> and install Docker from Ubuntu 19.10 (Eoan) repositories.</p><p>Next, we just need to run ansible and let it do the magic.</p><pre><code>ansible-playbook --become -i inventory/rabbit/inventory.ini cluster.yml
+</code></pre><p>If everything worked as intended, we&rsquo;ll have a new cluster, up and running. In order to access it, we can grab the admin credentials, from the kube-master node.</p><pre><code>scp root@rabbit-1.vtemian.com:/etc/kubernetes/admin.conf .
+</code></pre><p>Next, add those into our local kubectl config (usually located at <code>~/.kube/config</code>) and we&rsquo;ll be able to access the cluster, using <code>kubectl</code>.</p><pre><code class=language-bash>╰─&gt;$ kubectl get pod --all-namespaces -o wide
+NAMESPACE     NAME                                           READY   STATUS    RESTARTS   AGE     IP              NODE                   NOMINATED NODE   READINESS GATES
+kube-system   calico-kube-controllers-5679c8548f-rffvp       1/1     Running   0          2m46s   10.80.204.133   rabbit-3.vtemian.com   &lt;none&gt;           &lt;none&gt;
+kube-system   calico-node-6wt2p                              1/1     Running   1          3m12s   10.80.204.129   rabbit-1.vtemian.com   &lt;none&gt;           &lt;none&gt;
+kube-system   calico-node-98cnq                              1/1     Running   1          3m12s   10.80.204.131   rabbit-2.vtemian.com   &lt;none&gt;           &lt;none&gt;
+kube-system   calico-node-kh9k8                              1/1     Running   1          3m12s   10.80.204.133   rabbit-3.vtemian.com   &lt;none&gt;           &lt;none&gt;
+kube-system   coredns-76798d84dd-75tz6                       1/1     Running   0          2m21s   10.233.82.1     rabbit-1.vtemian.com   &lt;none&gt;           &lt;none&gt;
+kube-system   coredns-76798d84dd-bqt66                       1/1     Running   0          2m17s   10.233.80.1     rabbit-3.vtemian.com   &lt;none&gt;           &lt;none&gt;
+kube-system   dns-autoscaler-85f898cd5c-nskgf                1/1     Running   0          2m18s   10.233.82.2     rabbit-1.vtemian.com   &lt;none&gt;           &lt;none&gt;
+kube-system   kube-apiserver-rabbit-1.vtemian.com            1/1     Running   0          4m58s   10.80.204.129   rabbit-1.vtemian.com   &lt;none&gt;           &lt;none&gt;
+kube-system   kube-controller-manager-rabbit-1.vtemian.com   1/1     Running   0          4m58s   10.80.204.129   rabbit-1.vtemian.com   &lt;none&gt;           &lt;none&gt;
+kube-system   kube-proxy-4ktbs                               1/1     Running   0          3m34s   10.80.204.131   rabbit-2.vtemian.com   &lt;none&gt;           &lt;none&gt;
+kube-system   kube-proxy-kd6n2                               1/1     Running   0          3m34s   10.80.204.133   rabbit-3.vtemian.com   &lt;none&gt;           &lt;none&gt;
+kube-system   kube-proxy-ts8nw                               1/1     Running   0          3m34s   10.80.204.129   rabbit-1.vtemian.com   &lt;none&gt;           &lt;none&gt;
+kube-system   kube-scheduler-rabbit-1.vtemian.com            1/1     Running   0          4m58s   10.80.204.129   rabbit-1.vtemian.com   &lt;none&gt;           &lt;none&gt;
+kube-system   kubernetes-dashboard-77475cf576-7sdr6          1/1     Running   0          2m15s   10.233.83.2     rabbit-2.vtemian.com   &lt;none&gt;           &lt;none&gt;
+kube-system   kubernetes-metrics-scraper-747b4fd5cd-k96pn    1/1     Running   0          2m15s   10.233.83.1     rabbit-2.vtemian.com   &lt;none&gt;           &lt;none&gt;
+kube-system   nginx-proxy-rabbit-2.vtemian.com               1/1     Running   0          3m35s   10.80.204.131   rabbit-2.vtemian.com   &lt;none&gt;           &lt;none&gt;
+kube-system   nginx-proxy-rabbit-3.vtemian.com               1/1     Running   0          3m36s   10.80.204.133   rabbit-3.vtemian.com   &lt;none&gt;           &lt;none&gt;
+kube-system   nodelocaldns-9l6vf                             1/1     Running   0          2m17s   10.80.204.133   rabbit-3.vtemian.com   &lt;none&gt;           &lt;none&gt;
+kube-system   nodelocaldns-blbcb                             1/1     Running   0          2m17s   10.80.204.131   rabbit-2.vtemian.com   &lt;none&gt;           &lt;none&gt;
+kube-system   nodelocaldns-vrspt                             1/1     Running   0          2m17s   10.80.204.129   rabbit-1.vtemian.com   &lt;none&gt;           &lt;none&gt; 
+</code></pre><h3 id=metallb>MetalLB</h3><p>Going further, we should be able to install Knative. A big step in Knative&rsquo;s installation is the routing component. It supports multiple networking layers (Ambassador, Contour, Gloo, Istio, and Kourier). The only problem is that those layers need a load balancer that will be exposed to the Internet (an external <a href=https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/>LoadBalancer</a>). Kubernetes doesn&rsquo;t have native support for that. Basically, the current implementations are vendor-specific (AWS, GCP, Azure etc.) and because we&rsquo;re on bare-metal, we can&rsquo;t afford the luxury of using one of those.</p><p>Luckily, there&rsquo;s an implementation for bare-metal, called <a href=https://metallb.universe.tf/>MetalLB</a>. It can do that in two ways: at <a href=https://metallb.universe.tf/concepts/layer2/>layer 2</a> using ARP/NDP or by leveraging <a href=https://metallb.universe.tf/concepts/bgp/>BGP</a>. Because Packet has support for <a href=https://www.packet.com/developers/docs/network/advanced/local-and-global-bgp/>BGP</a> and they also provide a useful example on how to configure <a href=https://github.com/packet-labs/kubernetes-bgp>MetalLB</a>, we&rsquo;ll give them a try.</p><p>The instructions from Packet&rsquo;s BGP - Kubernetes <a href=https://github.com/packet-labs/kubernetes-bgp#calico>integration</a> are well documented and easy to follow. We just need to be careful with the IPPools. Before defining them, I&rsquo;ve configured 2 sets of elastic IPs:</p><p>A global IP <code>147.75.40.130/32</code> and a Public IPv4 <code>147.75.80.160/30</code>.</p><p><img src=https://blog.vtemian.com/serverless/Screenshot_2020-05-09_at_16.27.30.png alt=/serverless/Screenshot_2020-05-09_at_16.27.30.png></p><p><a href=https://www.packet.com/developers/docs/network/basic/elastic-ips/>For security reason</a>s, you&rsquo;ll need to manually configure the IPs, for each server. Its fairly easy to do it and well documented. For each server, attach them an IP from the <code>Network</code> section:</p><p><img src=https://blog.vtemian.com/serverless/Screenshot_2020-05-09_at_16.36.03.png alt=/serverless/Screenshot_2020-05-09_at_16.36.03.png></p><p>And that, on each server manually (or via ansible), an example for Ubuntu/Debian, if you just want to play around with, run:</p><pre><code>sudo ip addr add &lt;elastic-ip&gt; dev lo
+</code></pre><p>To make it permanent, we&rsquo;ll need to edit <code>/etc/network/interfaces</code></p><pre><code class=language-bash>auto lo:0
+iface lo:0 inet static
+    address &lt;elastic-ip&gt;
+    netmask 255.255.255.255
+</code></pre><p>Continuing with the IPPools configuration, for <code>metallb-ewr1-public</code> will have <code>147.75.80.160/30</code>, for <code>metallb-global-ips</code> will have <code>147.75.40.130/32</code> and for <code>metallb-private</code> will have our private nodes subnet, which in the current case should be <code>10.80.204.128/29</code>. You can play around with the node&rsquo;s private ips and a CIDR-IP conversion <a href=https://www.ipaddressguide.com/cidr>tool</a>.</p><p>For each calico peer config (worker), we&rsquo;ll put node&rsquo;s private IP.</p><p>Next, we&rsquo;ll install the latest metalLB manifest:</p><pre><code>kubectl apply -f [https://raw.githubusercontent.com/google/metallb/v0.8.1/manifests/metallb.yaml](https://raw.githubusercontent.com/google/metallb/v0.8.1/manifests/metallb.yaml)
+</code></pre><p>Followed by the metalLB&rsquo;s config map, in <code>metallb-system</code> namespace:</p><pre><code class=language-yaml>apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: metallb-system
+  name: config
+data:
+  config: |
+    peers:
+    - peer-address: 127.0.0.1
+      peer-asn: 65000
+      my-asn: 65480
+    address-pools:
+    - name: ewr1-public
+      protocol: bgp
+      addresses:
+      - 147.75.80.160/30
+    - name: ewr1-private
+      protocol: bgp
+      addresses:
+      - 10.80.204.128/29
+    - name: global-ip
+      protocol: bgp
+      addresses:
+      - 147.75.40.130/32
+</code></pre><p>We can check if everything is configured correctly, by running <code>calicoctl node status</code> in our master node:</p><pre><code class=language-bash>root@rabbit-1:~# calicoctl node status
+Calico process is running.
+
+IPv4 BGP status
++----------------+-------------------+-------+----------+-------------+
+|  PEER ADDRESS  |     PEER TYPE     | STATE |  SINCE   |    INFO     |
++----------------+-------------------+-------+----------+-------------+
+| 147.75.100.215 | node-to-node mesh | up    | 13:46:38 | Established |
+| 127.0.0.1      | global            | up    | 13:51:44 | Established |
+| 147.75.100.161 | node-to-node mesh | up    | 13:47:27 | Established |
++----------------+-------------------+-------+----------+-------------+
+</code></pre><p>And other kubectl commands:</p><pre><code class=language-bash>╰─&gt;$ kubectl get pod -n kube-system -o wide | grep calico-node
+
+calico-node-479fz                              1/1     Running   0          8m25s   10.80.204.133   rabbit-3.vtemian.com   &lt;none&gt;           &lt;none&gt;
+calico-node-846gr                              1/1     Running   0          7m18s   10.80.204.131   rabbit-2.vtemian.com   &lt;none&gt;           &lt;none&gt;
+calico-node-tpnjc                              1/1     Running   0          8m8s    10.80.204.129   rabbit-1.vtemian.com   &lt;none&gt;           &lt;none&gt;
+</code></pre><pre><code class=language-bash>╰─&gt;$ kubectl get pod -n metallb-system -o wide
+
+NAME                          READY   STATUS    RESTARTS   AGE    IP              NODE                   NOMINATED NODE   READINESS GATES
+controller-6bcfdfd677-nxnw8   1/1     Running   0          5m4s   10.233.65.193   rabbit-3.vtemian.com   &lt;none&gt;           &lt;none&gt;
+speaker-d6kks                 1/1     Running   0          5m4s   10.80.204.131   rabbit-2.vtemian.com   &lt;none&gt;           &lt;none&gt;
+speaker-kk85w                 1/1     Running   0          5m4s   10.80.204.133   rabbit-3.vtemian.com   &lt;none&gt;           &lt;none&gt;
+speaker-p4lc7                 1/1     Running   0          5m4s   10.80.204.129   rabbit-1.vtemian.com   &lt;none&gt;           &lt;none&gt;
+</code></pre><h3 id=istio>Istio</h3><p>Now that we have the MetalLB up and running we can continue with the last routing component. Between all those networking components that Knative supports, I&rsquo;ve chosen <a href=https://istio.io/>Istio</a>, because it is the only one compatible with the Knative operator (which will be mention further).</p><p>We just need to follow the instructions from the main install <a href=https://knative.dev/development/install/installing-istio/#downloading-istio-and-installing-crds>page</a> and if everything worked, we&rsquo;ll have a load balancer, with an external IP.</p><pre><code class=language-bash>╰─&gt;$ kubectl get service --all-namespaces
+NAMESPACE      NAME                        TYPE           CLUSTER-IP      EXTERNAL-IP     PORT(S)                                                                                                                                      AGE
+default        kubernetes                  ClusterIP      10.233.0.1      &lt;none&gt;          443/TCP                                                                                                                                      101m
+istio-system   istio-ingressgateway        LoadBalancer   10.233.24.125   147.75.80.160   15020:30935/TCP,80:31380/TCP,443:31390/TCP,31400:31400/TCP,15029:31350/TCP,15030:31699/TCP,15031:32315/TCP,15032:31519/TCP,15443:32542/TCP   55s
+istio-system   istio-pilot                 ClusterIP      10.233.48.55    &lt;none&gt;          15010/TCP,15011/TCP,8080/TCP,15014/TCP                                                                                                       55s
+kube-system    coredns                     ClusterIP      10.233.0.3      &lt;none&gt;          53/UDP,53/TCP,9153/TCP                                                                                                                       98m
+kube-system    dashboard-metrics-scraper   ClusterIP      10.233.61.223   &lt;none&gt;          8000/TCP                                                                                                                                     97m
+kube-system    kubernetes-dashboard        ClusterIP      10.233.16.174   &lt;none&gt;          443/TCP                                                                                                                                      97m
+</code></pre><h3 id=knative>Knative</h3><p>We&rsquo;re ready to install Knative. I found that the easier path is to install the common operator that will further install all the components. I&rsquo;ve tried installing each component manually, but it can get really tricky.</p><p>For now, we need to install the operator in the <code>default</code> namespace, since it will look for a ConfigMap called <code>config-loggin</code> in the <code>default</code> namespace.</p><pre><code class=language-bash>╰─&gt;$ kubens default
+╰─&gt;$ kubectl apply -f https://github.com/knative-sandbox/operator/releases/download/v0.14.1/operator.yaml
+</code></pre><p>Once the CRDs are installed and the operator&rsquo;s pods are running</p><pre><code class=language-bash>╰─&gt;$ kubectl get pods
+NAME                                         READY   STATUS    RESTARTS   AGE
+knative-eventing-operator-5847fcc5d5-d4cb4   1/1     Running   0          53s
+knative-serving-operator-587dcd9f85-zlx7v    1/1     Running   0          53s
+</code></pre><p>We can create the <code>KnativeServing</code> and <code>KnativeEventing</code> resources:</p><pre><code class=language-bash>╰─&gt;$ cat &lt;&lt;-EOF | kubectl apply -f -
+apiVersion: operator.knative.dev/v1alpha1
+kind: KnativeServing
+metadata:
+  name: ks
+EOF
+
+╰─&gt;$ cat &lt;&lt;-EOF | kubectl apply -f -
+apiVersion: v1
+kind: Namespace
+metadata:
+ name: knative-eventing
+---
+apiVersion: operator.knative.dev/v1alpha1
+kind: KnativeEventing
+metadata:
+  name: ke
+  namespace: knative-eventing
+EOF
+</code></pre><p>New pods and resources are being installed in the <code>default</code> and <code>knative-eventing</code> namespaces</p><pre><code class=language-bash>╰─&gt;$ kubectl get pods --all-namespaces -o wide
+NAMESPACE          NAME                                           READY   STATUS      RESTARTS   AGE     IP              NODE                   NOMINATED NODE   READINESS GATES
+default            activator-65fc4d666-7bwst                      1/1     Running     0          39s     10.233.125.68   rabbit-2.vtemian.com   &lt;none&gt;           &lt;none&gt;
+default            autoscaler-74b4bb97bd-ghj59                    1/1     Running     0          38s     10.233.65.195   rabbit-3.vtemian.com   &lt;none&gt;           &lt;none&gt;
+default            autoscaler-hpa-594f68d5c4-8qtg4                1/1     Running     0          30s     10.233.65.198   rabbit-3.vtemian.com   &lt;none&gt;           &lt;none&gt;
+default            controller-6b6978c965-rqb2z                    1/1     Running     0          37s     10.233.65.196   rabbit-3.vtemian.com   &lt;none&gt;           &lt;none&gt;
+default            istio-webhook-856d84fbf9-wvpph                 1/1     Running     0          26s     10.233.125.71   rabbit-2.vtemian.com   &lt;none&gt;           &lt;none&gt;
+default            knative-eventing-operator-5847fcc5d5-d4cb4     1/1     Running     0          3m18s   10.233.125.67   rabbit-2.vtemian.com   &lt;none&gt;           &lt;none&gt;
+default            knative-serving-operator-587dcd9f85-zlx7v      1/1     Running     0          3m18s   10.233.125.66   rabbit-2.vtemian.com   &lt;none&gt;           &lt;none&gt;
+default            networking-istio-6845f7cf59-bsqc2              1/1     Running     0          26s     10.233.125.69   rabbit-2.vtemian.com   &lt;none&gt;           &lt;none&gt;
+default            webhook-577576647-wrw56                        1/1     Running     0          36s     10.233.65.197   rabbit-3.vtemian.com   &lt;none&gt;           &lt;none&gt;
+istio-system       istio-ingressgateway-75694cd848-l6zfh          1/1     Running     0          64m     10.233.125.65   rabbit-2.vtemian.com   &lt;none&gt;           &lt;none&gt;
+istio-system       istio-pilot-576d858689-zxv76                   1/1     Running     0          64m     10.233.65.194   rabbit-3.vtemian.com   &lt;none&gt;           &lt;none&gt;
+knative-eventing   broker-controller-854447b8d7-vdmdz             1/1     Running     0          18s     10.233.65.200   rabbit-3.vtemian.com   &lt;none&gt;           &lt;none&gt;
+knative-eventing   broker-filter-b54b58854-w9jvw                  1/1     Running     0          17s     10.233.125.72   rabbit-2.vtemian.com   &lt;none&gt;           &lt;none&gt;
+knative-eventing   broker-ingress-75b6b8df8d-mlppj                1/1     Running     0          16s     10.233.65.201   rabbit-3.vtemian.com   &lt;none&gt;           &lt;none&gt;
+knative-eventing   eventing-controller-694594fdd7-gj2br           1/1     Running     0          26s     10.233.125.70   rabbit-2.vtemian.com   &lt;none&gt;           &lt;none&gt;
+knative-eventing   eventing-webhook-6c6b675b6f-t4ntx              1/1     Running     0          26s     10.233.65.199   rabbit-3.vtemian.com   &lt;none&gt;           &lt;none&gt;
+knative-eventing   imc-controller-7bb9bd7c6d-q2tsz                1/1     Running     0          10s     10.233.125.73   rabbit-2.vtemian.com   &lt;none&gt;           &lt;none&gt;
+knative-eventing   imc-dispatcher-6cc5c74c7f-kdj7v                1/1     Running     0          10s     10.233.125.74   rabbit-2.vtemian.com   &lt;none&gt;           &lt;none&gt;
+knative-eventing   mt-broker-controller-75ddc75d57-rg6jd          1/1     Running     0          15s     10.233.65.202   rabbit-3.vtemian.com   &lt;none&gt;           &lt;none&gt;
+knative-eventing   v0.14.0-upgrade-4sv89                          0/1     Completed   0          9s      10.233.65.203   rabbit-3.vtemian.com   &lt;none&gt;           &lt;none&gt;
+</code></pre><p>Before we actually test it, let&rsquo;s configure the DNS component. We&rsquo;ll want to have a unique URL generated each time a new deployment is created. Knative can do that using <a href=http://xip.io>xip.io</a> and we just need to create a job (we&rsquo;ll need to install it in the <code>default</code> namespace):</p><pre><code class=language-bash>╰─&gt;$ kubectl apply --filename https://storage.googleapis.com/knative-nightly/serving/latest/serving-default-domain.yaml
+</code></pre><h3 id=first-knative-service>First Knative service</h3><p>Within our initial application, I&rsquo;ve created a simple <a href=https://github.com/vtemian/simple-django-app/tree/docker>Dockerfile</a>:</p><pre><code class=language-bash>FROM python:3.7-slim
+
+WORKDIR /app
+
+COPY requirements.txt ./
+RUN pip install -r requirements.txt
+
+COPY app ./
+
+CMD exec gunicorn app.wsgi --bind :$PORT --workers 1 --threads 8 --timeout 0
+</code></pre><p>And published the image, publicly, under <code>vtemian/simple-django-app</code>.</p><pre><code class=language-bash>╰─&gt;$ docker push vtemian/simple-django-app
+The push refers to repository [docker.io/vtemian/simple-django-app]
+7aa16540cfca: Pushed
+2e02cc50aabc: Pushed
+768f0318f857: Pushed
+663045c38f65: Pushed
+715414420313: Mounted from vtemian/helloworld-python
+dba4fa00b93a: Mounted from vtemian/helloworld-python
+9f690547ed37: Mounted from vtemian/helloworld-python
+6376837eded8: Mounted from vtemian/helloworld-python
+c2adabaecedb: Mounted from vtemian/helloworld-python
+latest: digest: sha256:78799d85949e31728c70ef3dbf3a492d932fc94c140cf1047d948c89141f55ab size: 2205
+</code></pre><p>To publish it on our Knative installation, we just need to define a service:</p><pre><code class=language-yaml>apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: simple-django-app
+  namespace: default
+spec:
+  template:
+    spec:
+      containers:
+      - image: docker.io/vtemian/simple-django-app
+</code></pre><p>Aaaaaand <code>kubectl get ksvc</code>:</p><pre><code class=language-bash>╰─&gt;$ kubectl get ksvc
+NAME                URL                                                     LATESTCREATED             LATESTREADY   READY     REASON
+simple-django-app   http://simple-django-app.default.147.75.80.160.xip.io   simple-django-app-hc2qv                 Unknown   RevisionMissing
+</code></pre><p>Going to the generated URL</p><p><img src=https://blog.vtemian.com/serverless/Screenshot_2020-05-09_at_18.28.18.png alt=/serverless/Screenshot_2020-05-09_at_18.28.18.png></p><p>Now this&hellip;this is pretty damn cool! There&rsquo;s no database and we still need to build our containers, but it looks pretty damn cool!</p><h3 id=elasticsearch-and-kibana>ElasticSearch and Kibana</h3><p>Before we move further to test it more, let&rsquo;s configure some observability tools, like ElasticSearch + Kibana for logs and Prometheus + Grafana for metrics.</p><p>Let&rsquo;s start with the metrics component. We&rsquo;ll follow the <a href=https://knative.dev/development/serving/installing-logging-metrics-traces/>guide</a> and we&rsquo;ll just need to edit the <code>config-observability</code> config map. It already provides us with an config example, we&rsquo;ll be using it. Just unindent the exemple, for now. Next, we&rsquo;ll need to create the <code>knative-monitoring</code> namespace, and apply the manifests:</p><pre><code class=language-bash>╰─&gt;$ kubectl apply --filename https://storage.googleapis.com/knative-nightly/serving/latest/monitoring-metrics-prometheus.yaml
+</code></pre><p>The pods should be up and running in the <code>knative-monitoring</code> namespace:</p><pre><code class=language-bash>╰─&gt;$ kubectl get pod -n knative-monitoring -o wide
+NAME                                 READY   STATUS    RESTARTS   AGE    IP              NODE                   NOMINATED NODE   READINESS GATES
+grafana-c9c94bdff-5f77v              1/1     Running   0          2m3s   10.233.65.210   rabbit-3.vtemian.com   &lt;none&gt;           &lt;none&gt;
+kube-state-metrics-b6bcff8f4-tvp46   1/1     Running   0          2m7s   10.233.65.209   rabbit-3.vtemian.com   &lt;none&gt;           &lt;none&gt;
+node-exporter-9wkpn                  2/2     Running   0          2m4s   10.80.204.131   rabbit-2.vtemian.com   &lt;none&gt;           &lt;none&gt;
+node-exporter-lfjss                  2/2     Running   0          2m4s   10.80.204.129   rabbit-1.vtemian.com   &lt;none&gt;           &lt;none&gt;
+node-exporter-zjl7b                  2/2     Running   0          2m4s   10.80.204.133   rabbit-3.vtemian.com   &lt;none&gt;           &lt;none&gt;
+prometheus-system-0                  1/1     Running   0          2m1s   10.233.65.211   rabbit-3.vtemian.com   &lt;none&gt;           &lt;none&gt;
+prometheus-system-1                  1/1     Running   0          2m1s   10.233.125.75   rabbit-2.vtemian.com   &lt;none&gt;           &lt;none&gt;
+</code></pre><p>By default, Grafana comes with some really nice dashboards and with Prometheus configured as a data source. The only problem is that the Prometheus configured, is not the currently running service. We&rsquo;ll need to get all currently running services and check Prometheus service name, which in this case is <code>prometheus-system-discovery</code>.</p><pre><code class=language-bash>╰─&gt;$ kubectl -n knative-monitoring get service
+NAME                          TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)             AGE
+kube-controller-manager       ClusterIP   None            &lt;none&gt;        10252/TCP           5m36s
+kube-state-metrics            ClusterIP   10.233.56.244   &lt;none&gt;        8080/TCP,8081/TCP   5m41s
+node-exporter                 ClusterIP   None            &lt;none&gt;        9100/TCP            5m38s
+prometheus-system-discovery   ClusterIP   None            &lt;none&gt;        9090/TCP            5m36s
+</code></pre><p>We&rsquo;ll have to edit Grafana&rsquo;s config map and replace Prometheus&rsquo; URL with <code>[http://prometheus-system-discovery.knative-monitoring.svc:9090](http://prometheus-system-discovery.knative-monitoring.svc:9090/)</code>.</p><pre><code class=language-bash>╰─&gt;$ kubectl -n knative-monitoring edit cm grafana-datasources
+apiVersion: v1
+data:
+  prometheus.yaml: |
+    datasources:
+     - name: prometheus
+       type: prometheus
+       access: proxy
+       org_id: 1
+       url: http://prometheus-system-discovery.knative-monitoring.svc:9090
+       version: 1
+       editable: false
+</code></pre><p>Delete the current running Grafana pod</p><pre><code class=language-bash>╰─&gt;$ kubectl delete po -n knative-monitoring --selector=app=grafana
+pod &quot;grafana-c9c94bdff-rkvrg&quot; deleted
+</code></pre><p>Wait until a new pod is started and you can port-forward it</p><pre><code class=language-bash>╰─&gt;$ kubectl port-forward --namespace knative-monitoring \
+     (kubectl get pods --namespace knative-monitoring \
+     --selector=app=grafana --output=jsonpath=&quot;{.items..metadata.name}&quot;) \
+     3000
+Forwarding from 127.0.0.1:3000 -&gt; 3000
+</code></pre><p><img src=https://blog.vtemian.com/serverless/Screenshot_2020-05-10_at_13.29.25.png alt=/serverless/Screenshot_2020-05-10_at_13.29.25.png></p><p>All of those default dashboards are interesting, but I found the most useful the <code>Knative Serving - Revision HTTP Requests</code>, that describes current running applications.</p><p><img src=https://blog.vtemian.com/serverless/Screenshot_2020-05-10_at_15.47.39.png alt=/serverless/Screenshot_2020-05-10_at_15.47.39.png></p><p>And the <code>Kubernetes Capacity Planning</code> that gives an overview over the entire cluster.</p><p><img src=https://blog.vtemian.com/serverless/Screenshot_2020-05-10_at_15.48.07.png alt=/serverless/Screenshot_2020-05-10_at_15.48.07.png></p><p>Moving to logs, we&rsquo;ll need to configure ElasticSearch and Kibana. We&rsquo;ll need to edit the <code>config-observability</code> ConfigMap and set the <code>logging.request-log-template</code> to</p><pre><code class=language-bash>╰─&gt;$ kubectl edit cm config-observability
+logging.request-log-template: '{&quot;httpRequest&quot;: {&quot;requestMethod&quot;: &quot;{{.Request.Method}}&quot;, &quot;requestUrl&quot;: &quot;{{js .Request.RequestURI}}&quot;, &quot;requestSize&quot;: &quot;{{.Request.ContentLength}}&quot;, &quot;status&quot;: {{.Response.Code}}, &quot;responseSize&quot;: &quot;{{.Response.Size}}&quot;, &quot;userAgent&quot;: &quot;{{js .Request.UserAgent}}&quot;, &quot;remoteIp&quot;: &quot;{{js .Request.RemoteAddr}}&quot;, &quot;serverIp&quot;: &quot;{{.Revision.PodIP}}&quot;, &quot;referer&quot;: &quot;{{js .Request.Referer}}&quot;, &quot;latency&quot;: &quot;{{.Response.Latency}}s&quot;, &quot;protocol&quot;: &quot;{{.Request.Proto}}&quot;}, &quot;traceId&quot;: &quot;{{index .Request.Header &quot;X-B3-Traceid&quot;}}&quot;}'
+</code></pre><p>Apply the manifest</p><pre><code class=language-bash>╰─&gt;$ kubectl apply --filename https://storage.googleapis.com/knative-nightly/serving/latest/monitoring-logs-elasticsearch.yaml
+</code></pre><p>We&rsquo;ll set <code>[beta.kubernetes.io/fluentd-ds-ready=&quot;true&quot;](http://beta.kubernetes.io/fluentd-ds-ready=%22true%22)</code> label for our nodes</p><pre><code class=language-bash>╰─&gt;$ kubectl label nodes --all beta.kubernetes.io/fluentd-ds-ready=&quot;true&quot;
+node/rabbit-1.vtemian.com labeled
+node/rabbit-2.vtemian.com labeled
+node/rabbit-3.vtemian.com labeled
+</code></pre><p>And check if the fluentd daemon set is running on our nodes</p><pre><code class=language-bash>╰─&gt;$ kubectl get daemonset fluentd-ds --namespace knative-monitoring
+NAME         DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR                              AGE
+fluentd-ds   2         2         2       2            2           beta.kubernetes.io/fluentd-ds-ready=true   5m37s
+</code></pre><p>In this point, on each node a Fluentd daemon is running, collecting logs and send them to ElasticSearch. Furthermore, we&rsquo;ll need to configure Kibana to access those logs.</p><p>We&rsquo;ll start the local proxy</p><pre><code class=language-bash>╰─&gt;$kubectl proxy
+</code></pre><p>And visit <a href=http://localhost:8001/api/v1/namespaces/knative-monitoring/services/kibana-logging/proxy/app/kibana>Kibana UI</a>. If the service doesn&rsquo;t start, you can create one with the following configuration</p><pre><code class=language-yaml>apiVersion: v1
+kind: Service
+metadata:
+  name: kibana-logging
+  namespace: knative-monitoring
+  labels:
+    app: kibana-logging
+    kubernetes.io/cluster-service: &quot;true&quot;
+    kubernetes.io/name: &quot;Kibana&quot;
+spec:
+  ports:
+  - port: 5601
+    protocol: TCP
+    targetPort: ui
+  selector:
+    app: kibana-logging
+</code></pre><p>Create a new index and wait until is processed.</p><p><img src=https://blog.vtemian.com/serverless/Screenshot_2020-05-10_at_16.27.12.png alt=/serverless/Screenshot_2020-05-10_at_16.27.12.png></p><p>Set it as the default index</p><p><img src=https://blog.vtemian.com/serverless/Screenshot_2020-05-10_at_16.45.24.png alt=/serverless/Screenshot_2020-05-10_at_16.45.24.png></p><p>And the logs should flow</p><p><img src=https://blog.vtemian.com/serverless/Screenshot_2020-05-10_at_16.59.57.png alt=/serverless/Screenshot_2020-05-10_at_16.59.57.png></p><h3 id=autoscaling>Autoscaling</h3><p>Now that we can really see what is happening in the cluster, let&rsquo;s configure the autoscaling and 0 scaling. For that, we&rsquo;ll need to edit the <code>config-autoscaler</code> ConfigMap. All options are already described in the comments, and for testing purpose, this is the configuration I&rsquo;m using:</p><pre><code class=language-yaml>  activator-capacity: &quot;100.0&quot;
+  container-concurrency-target-default: &quot;100&quot;
+  container-concurrency-target-percentage: &quot;70&quot;
+  enable-graceful-scaledown: &quot;true&quot;
+  enable-scale-to-zero: &quot;true&quot;
+  max-scale-down-rate: &quot;2.0&quot;
+  max-scale-up-rate: &quot;1000.0&quot;
+  panic-threshold-percentage: &quot;20.0&quot;
+  panic-window-percentage: &quot;5.0&quot;
+  pod-autoscaler-class: kpa.autoscaling.knative.dev
+  requests-per-second-target-default: &quot;20&quot;
+  scale-to-zero-grace-period: 30s
+  stable-window: 60s
+  target-burst-capacity: &quot;10&quot;
+  tick-interval: 2s 
+</code></pre><p>All those options are explained in the <a href=https://knative.dev/docs/serving/configuring-autoscaling/>docs</a>, but maybe what we&rsquo;re most interested are the 0 scaling</p><pre><code class=language-yaml># specifies the time an inactive revision is left running before it is scaled to zero (min: 6s).
+scale-to-zero-grace-period: 30s
+# enables scale to zero
+enable-scale-to-zero: &quot;true&quot;
+</code></pre><p>And the autoscaling trasholds</p><pre><code class=language-yaml># defines how many concurrent requests are wanted at a given time (soft limit) and is the recommended configuration for autoscaling.
+container-concurrency-target-default: &quot;100&quot;
+</code></pre><p>Those are the configuration applied for each revision, but you can control independently, using annotations. Let&rsquo;s configure the Horizontal Pod Autoscaler to follow the CPU metric and scale if the current consumed CPU is 30% of the limit.</p><pre><code class=language-yaml>apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: simple-django-app
+  namespace: default
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/metric: cpu
+        autoscaling.knative.dev/target: &quot;70&quot;
+        autoscaling.knative.dev/class: hpa.autoscaling.knative.dev
+    spec:
+      containers:
+      - image: docker.io/vtemian/simple-django-app
+        resources:
+          requests:
+            cpu: 100m
+</code></pre><p>Let&rsquo;s start a curl in background</p><pre><code class=language-bash>╰─&gt;$ watch -n 0.1 curl -SI http://simple-django-app.default.147.75.80.160.xip.io/polls/
+</code></pre><p>And we have 2 running pods</p><pre><code class=language-bash>╰─&gt;$ kubectl get po -l serving.knative.dev/service=simple-django-app
+NAME                                                  READY   STATUS    RESTARTS   AGE
+simple-django-app-g9zf5-deployment-5b76fdf7fc-mtlwt   2/2     Running   0          3m25s
+simple-django-app-mg96q-deployment-7db5bb6b9c-29ffw   2/2     Running   0          4m18s
+</code></pre><p>Let&rsquo;s go further and start a <a href=https://locust.io/>Locust</a> test. We&rsquo;ll follow the instructions from <a href=https://github.com/zalando-incubator/docker-locust>zalando-incubator</a> and start for replicas that will hit our service:</p><pre><code class=language-bash>_________________________________________________________________________________
+
+                         L O C A L - D E P L O Y M E N T
+_________________________________________________________________________________
+Target url: http://simple-django-app.default.147.75.80.160.xip.io/polls
+Where load test script is stored (e.g. https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py): https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py
+Number of slave(s): 4
+Run type [automatic/manual]: manual
+----------------------------------------------
+                   VARIABLES
+----------------------------------------------
+TARGET_URL: http://simple-django-app.default.147.75.80.160.xip.io/polls
+LOCUST_FILE: https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py
+SLAVES NUMBER: 4
+RUN_TYPE: manual || automatic=false
+NUMBER OF USERS:
+HATCH_RATE:
+DURATION [in seconds]:
+COMPOSE: false
+SEND_ANONYMOUS_USAGE_INFO: true
+----------------------------------------------
+</code></pre><p>And the results are pretty cool</p><pre><code class=language-bash>╰─&gt;$ kubectl get po -l serving.knative.dev/service=simple-django-app
+NAME                                                  READY   STATUS      RESTARTS   AGE
+simple-django-app-ns6fm-deployment-85cff985d5-249rj   2/2     Running     0          41s
+simple-django-app-ns6fm-deployment-85cff985d5-2c6m9   2/2     Running     0          41s
+simple-django-app-ns6fm-deployment-85cff985d5-2m6kk   2/2     Running     0          86s
+simple-django-app-ns6fm-deployment-85cff985d5-2mm7t   2/2     Running     0          41s
+simple-django-app-ns6fm-deployment-85cff985d5-2q7f8   2/2     Running     0          41s
+simple-django-app-ns6fm-deployment-85cff985d5-5xcxf   2/2     Running     0          71s
+simple-django-app-ns6fm-deployment-85cff985d5-6jxfw   2/2     Running     0          41s
+simple-django-app-ns6fm-deployment-85cff985d5-77v6w   2/2     Running     0          41s
+simple-django-app-ns6fm-deployment-85cff985d5-8qk5s   2/2     Running     0          56s
+simple-django-app-ns6fm-deployment-85cff985d5-9n4h6   2/2     Running     0          41s
+simple-django-app-ns6fm-deployment-85cff985d5-b466k   2/2     Running     0          7m57s
+simple-django-app-ns6fm-deployment-85cff985d5-b8qbf   2/2     Running     0          25s
+simple-django-app-ns6fm-deployment-85cff985d5-bkt66   2/2     Running     0          71s
+simple-django-app-ns6fm-deployment-85cff985d5-bxbzf   2/2     Running     0          56s
+simple-django-app-ns6fm-deployment-85cff985d5-d5xt5   2/2     Running     0          41s
+simple-django-app-ns6fm-deployment-85cff985d5-jrchv   2/2     Running     0          41s
+simple-django-app-ns6fm-deployment-85cff985d5-mtrvh   2/2     Running     0          56s
+simple-django-app-ns6fm-deployment-85cff985d5-mzz7g   2/2     Running     0          41s
+simple-django-app-ns6fm-deployment-85cff985d5-p7wvx   2/2     Running     0          41s
+simple-django-app-ns6fm-deployment-85cff985d5-pbmzb   2/2     Running     0          25s
+simple-django-app-ns6fm-deployment-85cff985d5-pzb92   2/2     Running     0          56s
+simple-django-app-ns6fm-deployment-85cff985d5-pzkrr   2/2     Running     0          41s
+simple-django-app-ns6fm-deployment-85cff985d5-qhjxq   2/2     Running     0          41s
+simple-django-app-ns6fm-deployment-85cff985d5-rc2xx   2/2     Running     0          41s
+simple-django-app-ns6fm-deployment-85cff985d5-s7lzm   2/2     Running     0          25s
+simple-django-app-ns6fm-deployment-85cff985d5-sdpmf   2/2     Running     0          41s
+simple-django-app-ns6fm-deployment-85cff985d5-ss66c   2/2     Running     0          6m27s
+simple-django-app-ns6fm-deployment-85cff985d5-ssrzg   2/2     Running     0          56s
+simple-django-app-ns6fm-deployment-85cff985d5-t424m   2/2     Running     0          56s
+simple-django-app-ns6fm-deployment-85cff985d5-tjlsz   2/2     Running     0          71s
+simple-django-app-ns6fm-deployment-85cff985d5-tzcjw   2/2     Running     0          56s
+simple-django-app-ns6fm-deployment-85cff985d5-w2tsp   2/2     Running     0          71s
+simple-django-app-ns6fm-deployment-85cff985d5-x9626   2/2     Running     0          41s
+simple-django-app-ns6fm-deployment-85cff985d5-xm5pk   2/2     Running     0          86s
+simple-django-app-ns6fm-deployment-85cff985d5-xv9sw   2/2     Running     0          56s
+</code></pre><p>Requests leaving the local machine</p><p><img src=https://blog.vtemian.com/serverless/Screenshot_2020-05-11_at_19.23.16.png alt=/serverless/Screenshot_2020-05-11_at_19.23.16.png></p><p>Requests for this current revision</p><p><img src=https://blog.vtemian.com/serverless/Screenshot_2020-05-11_at_19.28.30.png alt=/serverless/Screenshot_2020-05-11_at_19.28.30.png></p><p>Resource consumption</p><p><img src=https://blog.vtemian.com/serverless/Screenshot_2020-05-11_at_19.25.23.png alt=/serverless/Screenshot_2020-05-11_at_19.25.23.png></p><p>For now, we have a running Kubernetes cluster, on bare-metal (on top of Packet), with 3 nodes, a running Knative installation that serves and scales Docker images.</p><h3 id=mysql>Mysql</h3><p>Finally, let&rsquo;s add some state to this setup. At <a href=https://www.presslabs.com/>Presslabs</a>, the company I&rsquo;m currently working for, we&rsquo;ve built an operator for M<a href=https://github.com/presslabs/mysql-operator>y</a>SQL. It takes care of replication, backups, and other tedious operations. The installation and its configuration are fairly straight forward, but first, we need to configure some persistent volumes:</p><pre><code class=language-yaml>apiVersion: v1
+kind: PersistentVolume
+metadata:
+  labels:
+    type: local
+  name: rabbit-1.vtemian.com
+spec:
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: 11Gi
+  hostPath:
+    path: /mnt/data
+    type: &quot;&quot;
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - rabbit-1.vtemian.com
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: standard
+  volumeMode: Filesystem
+</code></pre><p>Let&rsquo;s create one for each node:</p><pre><code class=language-bash>╰─&gt;$ kubectl get pv
+NAME                   CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS      CLAIM                           STORAGECLASS   REASON   AGE
+rabbit-1.vtemian.com   11Gi       RWO            Retain           Available                                   standard                2m58s
+rabbit-2.vtemian.com   11Gi       RWO            Retain           Bound       default/data-mysql-operator-0   standard                3m9s
+rabbit-3.vtemian.com   11Gi       RWO            Retain           Available                                   standard                3m19s
+</code></pre><p>We now can continue with mysql-operator:</p><pre><code class=language-bash>╰─&gt;$ helm repo add presslabs https://presslabs.github.io/charts
+╰─&gt;$helm install presslabs/mysql-operator --name mysql-operator --set orchestrator.persistence.storageClass=standard
+</code></pre><p>Furthermore, we&rsquo;ll need a secret with the credentials we want for our mysql cluster</p><pre><code class=language-yaml>apiVersion: v1
+kind: Secret
+metadata:
+  name: my-secret
+type: Opaque
+data:
+  ROOT_PASSWORD: bXlwYXNz
+  DATABASE: cmFiYml0Cg==
+  USER: cmFiYml0Cg==
+  PASSWORD: bXlwYXNz
+</code></pre><p>And create the cluster with 2 replicas</p><pre><code class=language-yaml>apiVersion: mysql.presslabs.org/v1alpha1
+kind: MysqlCluster
+metadata:
+  name: my-cluster
+spec:
+  replicas: 2
+  secretName: my-secret
+</code></pre><p>Now we have our 2 replicas:</p><pre><code class=language-bash>╰─&gt;$ kubectl get po -l app.kubernetes.io/name=mysql
+NAME                 READY   STATUS    RESTARTS   AGE
+my-cluster-mysql-0   4/4     Running   0          3m11s
+my-cluster-mysql-1   4/4     Running   0          4m37s
+</code></pre><p>And a service on which we can connect:</p><pre><code class=language-bash>╰─&gt;$ kubectl get service -l app.kubernetes.io/name=mysql
+NAME                      TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)             AGE
+my-cluster-mysql          ClusterIP   10.233.50.17    &lt;none&gt;        3306/TCP            10m
+my-cluster-mysql-master   ClusterIP   10.233.29.255   &lt;none&gt;        3306/TCP            10m
+</code></pre><p>At this point, the serving component is up and running and tested with a dummy application. Let&rsquo;s move further with the building component.</p><h2 id=ci-cd>CI/CD</h2><h3 id=tekton>Tekton</h3><p>Knative used to have a build <a href=https://github.com/knative/build/>component</a>, which now is <a href=https://github.com/knative/build/issues/614>deprecated</a> in favour of <a href=https://tekton.dev/>Tekton</a>. There are some nice guides on how to configure Tekton and integrate it with Knative, but first, let&rsquo;s install it:</p><pre><code class=language-bash>╰─&gt;$ kubectl apply --filename https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml
+</code></pre><p>Finally, we just need to edit the <code>config-artifact-pvc</code> ConfigMap, in order to allow Tekton to save artifacts in a PVC.</p><pre><code class=language-yaml>data:
+  size: 5Gi
+  storageClassName: default
+</code></pre><p>Taking a look at Tekton pod&rsquo;s we can see that it&rsquo;s running properly:</p><pre><code class=language-bash>╰─&gt;$ kubectl get po -n tekton-pipelines
+NAME                                           READY   STATUS    RESTARTS   AGE
+tekton-pipelines-controller-5c44bcfc44-gfhdx   1/1     Running   0          85m
+tekton-pipelines-webhook-7bd568f6c6-vll6v      1/1     Running   0          85m
+</code></pre><h3 id=how-does-tekton-work>How does Tekton work?</h3><p>Before setting up the pipeline, let&rsquo;s explore Tekton a little bit. Tekton leverages CRDs and allow us to describe pipelines by defining Kubernetes resources. I&rsquo;ll resume the information from <a href=https://www.alibabacloud.com/blog/first-knative-attempt-a-quick-guide-to-continuous-integration-and-continuous-delivery_595803>this guide</a> and their official <a href=https://tekton.dev/docs/pipelines/>docs</a>.</p><p><a href=https://tekton.dev/docs/pipelines/tasks/>Tasks</a> are a template for defining an actual working unit. It&rsquo;s like defining a function, with its parameters and behavior. It defines one or more steps and at each step, a container is executed. Example from <a href=https://github.com/knative-sample/tekton-knativehttps://github.com/knative-sample/tekton-knative/blob/master/tekton-cicd/tasks/deploy-using-kubectl.yaml>https://github.com/knative-sample/tekton-knative</a></p><pre><code class=language-yaml>apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: deploy-using-kubectl
+spec:
+  inputs:
+    resources:
+      - name: git-source
+        type: git
+    params:
+      - name: pathToYamlFile
+        description: The path to the yaml file to deploy within the git source
+      - name: imageUrl
+        description: Url of image repository
+      - name: imageTag
+        description: Tag of the images to be used.
+        default: &quot;latest&quot;
+  steps:
+    - name: update-yaml
+      image: alpine
+      command: [&quot;sed&quot;]
+      args:
+        - &quot;-i&quot;
+        - &quot;-e&quot;
+        - &quot;s;__IMAGE__;${inputs.params.imageUrl}:${inputs.params.imageTag};g&quot;
+        - &quot;/workspace/git-source/${inputs.params.pathToYamlFile}&quot;
+    - name: run-kubectl
+      image: registry.cn-hangzhou.aliyuncs.com/knative-sample/kubectl:v0.5.0
+      command: [&quot;kubectl&quot;]
+      args:
+        - &quot;apply&quot;
+        - &quot;-f&quot;
+        - &quot;/workspace/git-source/${inputs.params.pathToYamlFile}&quot;
+</code></pre><p>A <a href=https://tekton.dev/docs/pipelines/taskruns/>TaskRu</a>n is a running instance of a Task. It executes all the steps of a task, in order, until all of them are completed. Example from <a href=https://github.com/knative-sample/tekton-knativehttps://github.com/knative-sample/tekton-knative/blob/master/tekton-cicd/tasks/deploy-using-kubectl.yaml>https://github.com/knative-sample/tekton-knative</a></p><pre><code class=language-yaml>apiVersion: tekton.dev/v1alpha1
+kind: TaskRun
+metadata:
+  name: source-to-image
+spec:
+  taskRef:
+    name: source-to-image
+  params:
+    - name: pathToContext
+      value: &quot;${params.pathToContext}&quot;
+    - name: imageUrl
+      value: &quot;${params.imageUrl}&quot;
+    - name: imageTag
+      value: &quot;${params.imageTag}&quot;
+  resources:
+    inputs:
+      - name: git-source
+        resource: git-source
+</code></pre><p>A <a href=https://tekton.dev/docs/pipelines/pipelines/>Pipeline</a> allows us to define multiple tasks. Using TaskRun we could run only one task. Each Task in a Pipeline executes as a Pod. Example from <a href=https://github.com/knative-sample/tekton-knativehttps://github.com/knative-sample/tekton-knative/blob/master/tekton-cicd/tasks/deploy-using-kubectl.yaml>https://github.com/knative-sample/tekton-knative</a></p><pre><code class=language-yaml>apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: build-and-deploy-pipeline
+spec:
+  resources:
+    - name: git-source
+      type: git
+  params:
+    - name: pathToContext
+      description: The path to the build context, used by Kaniko - within the workspace
+      default: src
+    - name: pathToYamlFile
+      description: The path to the yaml file to deploy within the git source
+    - name: imageUrl
+      description: Url of image repository
+    - name: imageTag
+      description: Tag to apply to the built image
+  tasks:
+  - name: source-to-image
+    taskRef:
+      name: source-to-image
+    params:
+      - name: pathToContext
+        value: &quot;${params.pathToContext}&quot;
+      - name: imageUrl
+        value: &quot;${params.imageUrl}&quot;
+      - name: imageTag
+        value: &quot;${params.imageTag}&quot;
+    resources:
+      inputs:
+        - name: git-source
+          resource: git-source
+  - name: deploy-to-cluster
+    taskRef:
+      name: deploy-using-kubectl
+    runAfter:
+      - source-to-image
+    params:
+      - name: pathToYamlFile
+        value:  &quot;${params.pathToYamlFile}&quot;
+      - name: imageUrl
+        value: &quot;${params.imageUrl}&quot;
+      - name: imageTag
+        value: &quot;${params.imageTag}&quot;
+    resources:
+      inputs:
+        - name: git-source
+          resource: git-source
+</code></pre><p>Similar to TaskRun, <a href=https://tekton.dev/docs/pipelines/pipelineruns/>PipelineRun</a> executes all the tasks defined in a Pipeline. Example from <a href=https://github.com/knative-sample/tekton-knativehttps://github.com/knative-sample/tekton-knative/blob/master/tekton-cicd/tasks/deploy-using-kubectl.yaml>https://github.com/knative-sample/tekton-knative</a></p><pre><code class=language-yaml>apiVersion: tekton.dev/v1alpha1
+kind: PipelineRun
+metadata:
+  generateName: tekton-kn-sample-
+spec:
+  pipelineRef:
+    name: build-and-deploy-pipeline
+  resources:
+    - name: git-source
+      resourceRef:
+        name: tekton-knative-git
+  params:
+    - name: pathToContext
+      value: &quot;src&quot;
+    - name: pathToYamlFile
+      value: &quot;knative/helloworld-go.yaml&quot;
+    - name: imageUrl
+      value: &quot;registry.cn-hangzhou.aliyuncs.com/knative-sample/tekton-knative-helloworld&quot;
+    - name: imageTag
+      value: &quot;1.0&quot;
+  trigger:
+    type: manual
+  serviceAccount: pipeline-account
+</code></pre><p><a href=https://tekton.dev/docs/pipelines/resources/>PipelineResources</a> allows us to define objects that are used by tasks&rsquo; inputs and outputs. Example from <a href=https://github.com/knative-sample/tekton-knativehttps://github.com/knative-sample/tekton-knative/blob/master/tekton-cicd/tasks/deploy-using-kubectl.yaml>https://github.com/knative-sample/tekton-knative</a></p><pre><code class=language-yaml>apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: tekton-knative-git
+spec:
+  type: git
+  params:
+    - name: revision
+      value: master
+    - name: url
+      value: https://github.com/knative-sample/tekton-knative
+</code></pre><h3 id=pipeline-setup>Pipeline setup</h3><p>Those are all the major components that we&rsquo;ll play with.</p><p>Let&rsquo;s create a new namespace called <code>ci</code> and install the above manifests, adapted for our needs. I&rsquo;ve commited the changes in the example <a href=https://github.com/vtemian/simple-django-app/tree/tekton>app</a>.</p><pre><code class=language-bash>╰─&gt;$ kubectl get po
+NAME                                                           READY   STATUS      RESTARTS   AGE
+tekton-simple-django-app-1-deploy-to-cluster-982xv-pod-kkmpw   0/3     Completed   0          3m18s
+tekton-simple-django-app-1-source-to-image-8c47t-pod-ccc44     0/3     Completed   0          3m44s
+</code></pre><pre><code class=language-bash>╰─&gt;$ kubectl get pipelinerun
+NAME                         SUCCEEDED   REASON      STARTTIME   COMPLETIONTIME
+tekton-simple-django-app-1   True        Succeeded   2m14s       95s
+</code></pre><h3 id=github-webhook-trigger>Github webhook trigger</h3><p>Right now, we manually have to trigger the build by deleting and re-creating the <code>Pipelinerun</code> resource. Let&rsquo;s try to automate it, by configuring a Github webhook that will ping the building process each time a new commit is made.</p><p>The setup for that is not too complex, nor too simple. When a github hook arrives, it lands in an <code>[EventListener](https://tekton.dev/docs/triggers/eventlisteners/)</code> pod (that will need to be exposed to the Internet via Istio). From its payload, we&rsquo;ll need to extract relevant parameters, like commit information. For that, we&rsquo;ll be using <a href=https://tekton.dev/docs/triggers/triggerbindings/>TriggerBindings</a>. The parameters are then used by <a href=https://tekton.dev/docs/triggers/triggertemplates/>TriggerTemplate</a> to generate our pipeline run. The following configurations are inspired by <a href=https://medium.com/@nikhilthomas1/cloud-native-cicd-on-openshift-with-openshift-pipelines-tektoncd-pipelines-part-3-github-1db6dd8e8ca7>@nikhilthomas1</a>.</p><p><img src=https://blog.vtemian.com/serverless/Untitled%201.png alt=/serverless/Untitled%201.png></p><p>Let&rsquo;s create the a role, service account and the role binding for this process.</p><pre><code class=language-yaml>---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+rules:
+- apiGroups:
+  - triggers.tekton.dev
+  resources:
+  - eventlisteners
+  - triggerbindings
+  - triggertemplates
+  - pipelineresources
+  verbs:
+  - get
+- apiGroups:
+  - triggers.tekton.dev
+  resources:
+  - pipelineruns
+  - pipelineresources
+  verbs:
+  - create
+- apiGroups:
+  - &quot;&quot;
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - create
+  - update
+  - delete
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tekton-triggers-sa
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: tekton-triggers-rolebinding
+subjects:
+- kind: ServiceAccount
+  name: tekton-triggers-sa
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: tekton-triggers-role⏎
+</code></pre><p>TriggerTemplate is very basic. It describes some parameters that can be used, from the binding and it patches them together with PipelineRun and other resources:</p><pre><code class=language-yaml>apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: tekton-triggertemplate
+spec:
+  params:
+  - name: gitrevision
+    description: The git revision
+    default: master
+  - name: gitrepositoryurl
+    description: The git repository url
+  - name: namespace
+    description: The namespace to create the resources
+  - name: gitrepositoryname
+    description: The name of the deployment to be created / patched
+  resourcetemplates:
+  - apiVersion: tekton.dev/v1alpha1
+    kind: PipelineResource
+    metadata:
+      name: source-repo-$(params.gitrepositoryname)-$(uid)
+      namespace: $(params.namespace)
+    spec:
+      type: git
+      params:
+      - name: revision
+        value: $(params.gitrevision)
+      - name: url
+        value: $(params.gitrepositoryurl)
+  - apiVersion: tekton.dev/v1alpha1
+    kind: PipelineRun
+    metadata:
+      name: teokton-build-$(params.gitrepositoryname)-$(uid)
+      namespace: $(params.namespace)
+    spec:
+      pipelineRef:
+        name: build-and-deploy-pipeline
+      serviceAccountName: pipeline-account
+      resources:
+      - name: git-source
+        resourceRef:
+          name: source-repo-$(params.gitrepositoryname)-$(uid)
+      params:
+      - name: pathToContext
+        value: &quot;&quot;
+      - name: pathToDockerFile
+        value: Dockerfile
+      - name: pathToYamlFile
+        value: knative.yaml
+      - name: imageUrl
+        value: docker.io/vtemian/$(params.gitrepositoryname)
+      - name: imageTag
+        value: latest
+</code></pre><p>Our TriggerBinding will also be pretty simple. Just a mapping from Github&rsquo;s payload to the parameters used in TriggerTemplate</p><pre><code class=language-yaml>apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: tekton-pipelinebinding
+spec:
+  params:
+  - name: gitrevision
+    value: $(body.head_commit.id)
+  - name: namespace
+    value: default
+  - name: gitrepositoryurl
+    value: $(body.repository.url)
+  - name: gitrepositoryname
+    value: $(body.repository.name)
+</code></pre><p>Finally, we&rsquo;ll need the EventListener, with binds a TemplateTrigger with a TemplateBinding</p><pre><code class=language-yaml>apiVersion: triggers.tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: el-tekton-listener
+spec:
+  serviceAccountName: tekton-triggers-sa
+  triggers:
+  - bindings:
+      - name: tekton-pipelinebinding
+    template:
+      name: tekton-triggertemplate
+</code></pre><pre><code class=language-bash>╰─&gt;$ kubectl get service | grep tek
+el-tekton-listener                ClusterIP      10.233.47.3     &lt;none&gt;                                                 8080/TCP                             114m
+</code></pre><p>Now that we have the service, we&rsquo;ll just need to expose it using Istio&rsquo;s primitives. Let&rsquo;s use Tekton&rsquo;s tools for that, using a separate service account:</p><pre><code class=language-yaml>kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: tekton-triggers-createwebhook
+rules:
+- apiGroups:
+  - &quot;&quot;
+  resources:
+  - secrets
+  verbs:
+  - get
+  - list
+  - create
+  - update
+  - delete
+- apiGroups:
+  - tekton.dev
+  resources:
+  - eventlisteners
+  verbs:
+  - get
+  - list
+  - create
+  - update
+  - delete
+- apiGroups:
+  - extensions
+  resources:
+  - ingresses
+  verbs:
+  - create
+  - get
+  - list
+  - delete
+  - update
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tekton-triggers-createwebhook
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: tekton-triggers-createwebhook
+subjects:
+- kind: ServiceAccount
+  name: tekton-triggers-createwebhook
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: tekton-triggers-createwebhook⏎
+</code></pre><p>Following by the task itself:</p><pre><code class=language-yaml>apiVersion: tekton.dev/v1beta1
+kind: Task
+spec:
+  params:
+  - description: The external domain for the EventListener
+    name: ExternalDomain
+    type: string
+  - description: The name of the Service used in the VirtualService
+    name: Service
+    type: string
+  - description: The service port that the VirtualService is being created on
+    name: ServicePort
+    type: string
+  steps:
+  - args:
+    - -ce
+    - |
+      set -ex
+      cat &lt;&lt; EOF | kubectl create -f -
+      apiVersion: networking.istio.io/v1alpha3
+      kind: Gateway
+      metadata:
+        name: $(inputs.params.Service)-gateway
+      spec:
+        selector:
+          istio: ingressgateway
+        servers:
+        - port:
+            number: 80
+            name: http-$(inputs.params.Service)
+            protocol: HTTP
+          hosts:
+          - $(inputs.params.ExternalDomain)
+      ---
+      apiVersion: networking.istio.io/v1alpha3
+      kind: VirtualService
+      metadata:
+        name: $(inputs.params.Service)-virtual-service
+      spec:
+        hosts:
+        - $(inputs.params.ExternalDomain)
+        gateways:
+        - $(inputs.params.Service)-gateway
+        http:
+        - route:
+          - destination:
+              host: $(inputs.params.Service)
+              port:
+                number: $(inputs.params.ServicePort)
+      EOF
+    command:
+    - sh
+    image: lachlanevenson/k8s-kubectl:latest
+    name: create-istio-gateway-virtualservice
+    resources: {}
+  volumes:
+  - emptyDir: {}
+    name: work
+</code></pre><p>And ending with it&rsquo;s initialisation:</p><pre><code class=language-yaml>apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+spec:
+  params:
+  - name: ExternalDomain
+    value: simple-django-app-event-listner.default.147.75.80.160.xip.io
+  - name: Service
+    value: el-tekton-listener
+  - name: ServicePort
+    value: &quot;8080&quot;
+  serviceAccountName: tekton-triggers-createwebhook
+  taskRef:
+    kind: Task
+    name: create-istio-gateway-virtualservice
+  timeout: 1h0m0s
+</code></pre><p>And let&rsquo;s check the result:</p><pre><code class=language-bash>╰─&gt;$ kubectl get VirtualService
+NAME                                 GATEWAYS                                                          HOSTS                                                                                                                                                  AGE
+el-tekton-listener-virtual-service   [el-tekton-listener-gateway]                                      [simple-django-app-event-listner.default.147.75.80.160.xip.io]
+</code></pre><p>Now that we have the tools up and running in our cluster, we can create the webhook. For that, we&rsquo;ll need a Github personal token, stored in a secret</p><pre><code class=language-yaml>apiVersion: v1
+kind: Secret
+metadata:
+  name: webhook-secret
+stringData:
+  #https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line#creating-a-token
+  token: &lt;token&gt;
+  secret: random-string-data
+</code></pre><p>The task that will actually create the webhook</p><pre><code class=language-yaml>apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: create-webhook
+spec:
+  volumes:
+  - name: github-secret
+    secret:
+      secretName: $(inputs.params.GitHubSecretName)
+  inputs:
+    params:
+    - name: ExternalDomain
+      description: &quot;The external domain for the EventListener e.g. `$(inputs.params.EventListenerName).&lt;PROXYIP&gt;.nip.io`&quot;
+    - name: GitHubUser
+      description: &quot;The GitHub user&quot;
+    - name: GitHubRepo
+      description: &quot;The GitHub repo where the webhook will be created&quot;
+    - name: GitHubOrg
+      description: &quot;The GitHub organization where the webhook will be created&quot;
+    - name: GitHubSecretName
+      description: &quot;The Secret name for GitHub access token. This is always mounted and must exist&quot;
+    - name: GitHubAccessTokenKey
+      description: &quot;The GitHub access token key name&quot;
+    - name: GitHubSecretStringKey
+      description: &quot;The GitHub secret string key name&quot;
+    - name: GitHubDomain
+      description: &quot;The GitHub domain. Override for GitHub Enterprise&quot;
+      default: &quot;github.com&quot;
+    - name: WebhookEvents
+      description: &quot;List of events the webhook will send notifications for&quot;
+      default: '[\&quot;push\&quot;,\&quot;pull_request\&quot;]'
+  steps:
+  - name: create-webhook
+    image: pstauffer/curl:latest
+    volumeMounts:
+    - name: github-secret
+      mountPath: /var/secret
+    command:
+    - sh
+    args:
+    - -ce
+    - |
+      set -e
+      echo &quot;Create Webhook&quot;
+      if [ $(inputs.params.GitHubDomain) = &quot;github.com&quot; ];then
+        curl -v -d &quot;{\&quot;name\&quot;: \&quot;web\&quot;,\&quot;active\&quot;: true,\&quot;events\&quot;: $(inputs.params.WebhookEvents),\&quot;config\&quot;: {\&quot;url\&quot;: \&quot;$(inputs.params.ExternalDomain)\&quot;,\&quot;content_type\&quot;: \&quot;json\&quot;,\&quot;insecure_ssl\&quot;: \&quot;1\&quot; ,\&quot;secret\&quot;: \&quot;$(cat /var/secret/$(inputs.params.GitHubSecretStringKey))\&quot;}}&quot; -X POST -u $(inputs.params.GitHubUser):$(cat /var/secret/$(inputs.params.GitHubAccessTokenKey)) -L https://api.github.com/repos/$(inputs.params.GitHubOrg)/$(inputs.params.GitHubRepo)/hooks
+      else
+        curl -d &quot;{\&quot;name\&quot;: \&quot;web\&quot;,\&quot;active\&quot;: true,\&quot;events\&quot;: $(inputs.params.WebhookEvents),\&quot;config\&quot;: {\&quot;url\&quot;: \&quot;$(inputs.params.ExternalDomain)/\&quot;,\&quot;content_type\&quot;: \&quot;json\&quot;,\&quot;insecure_ssl\&quot;: \&quot;1\&quot; ,\&quot;secret\&quot;: \&quot;$(cat /var/secret/$(inputs.params.GitHubSecretStringKey))\&quot;}}&quot; -X POST -u $(inputs.params.GitHubUser):$(cat /var/secret/$(inputs.params.GitHubAccessTokenKey)) -L https://$(inputs.params.GitHubDomain)/api/v3/repos/$(inputs.params.GitHubOrg)/$(inputs.params.GitHubRepo)/hooks
+      fi
+</code></pre><p>And it&rsquo;s initialization</p><pre><code class=language-yaml>apiVersion: tekton.dev/v1alpha1
+kind: TaskRun
+metadata:
+  name: create-api-repo-webhook-run
+spec:
+  taskRef:
+    name: create-webhook
+  inputs:
+    params:
+    - name: GitHubOrg
+      value: &quot;vtemian&quot;
+    - name: GitHubUser
+      value: &quot;vtemian&quot;
+    - name: GitHubRepo
+      value: &quot;simple-django-app&quot;
+    - name: GitHubSecretName
+      value: webhook-secret
+    - name: GitHubAccessTokenKey
+      value: token
+    - name: GitHubSecretStringKey
+      value: secret
+    - name: ExternalDomain
+      value: http://simple-django-app-event-listner.default.147.75.80.160.xip.io
+  timeout: 1000s
+  serviceAccountName: tekton-triggers-createwebhook
+</code></pre><p><img src=https://blog.vtemian.com/serverless/Screenshot_2020-05-16_at_20.23.20.png alt></p><p>Now, each time we push new changes, a new build is being trigger:</p><pre><code class=language-bash>╰─&gt;$ kubectl get po | grep teo
+teokton-build-simple-django-app-2fcdr-source-to-image-v86-mwxhw   0/3     Error       0          71m
+teokton-build-simple-django-app-qlw5w-source-to-image-sz2-gpqdm   0/3     Error       0          73m
+teokton-build-simple-django-app-sl9zf-source-to-image-knl-tzxpk   1/3     Running     0          18s
+teokton-build-simple-django-app-xh54x-deploy-to-cluster-b-5p7r4   0/3     Completed   0          66m
+teokton-build-simple-django-app-xh54x-source-to-image-wv5-9bsdt   0/3     Completed   0          66m
+</code></pre><p>And the application is being deployed</p><pre><code class=language-bash>╰─&gt;$ kubectl get po | grep simple
+simple-django-app-cjx8b-deployment-7cd5c5999d-vwjhv               2/2     Running     0          4h3m
+simple-django-app-d2n6n-deployment-77c664bf4f-pz6hg               2/2     Running     0          4h29m
+simple-django-app-hcmpl-deployment-7687b96b5f-pv2wz               2/2     Running     0          67m
+</code></pre><p>Since the article is getting too long, we&rsquo;ll leave <a href=https://knative.dev/development/serving/using-subroutes/>routing</a> and <a href=https://knative.dev/development/serving/samples/blue-green-deployment/>blue-green deployments</a> for another one.</p><h2 id=conclusions>Conclusions</h2></p></article></main><script>hljs.initHighlightingOnLoad();</script><footer class=footer>&copy; 2020 <a href=https://github.com/vtemian>Vlad Temian</a>,
+powered by <a href=https://gohugo.io/ target=_blank>Hugo</a>,
+with help from <a href=https://github.com/balajmarius>&copy;balajmarius</a>.</footer></div></body></html>
