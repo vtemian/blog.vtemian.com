@@ -109,7 +109,7 @@ if RequestValidator(request).validate():
 # simple and concise, solves the issue is easy to read and to maintain
 if "foo" in request.POST.get("arg", ""):
     process()
-````
+```
 
 Avoid using classes as logical namespaces:
 
