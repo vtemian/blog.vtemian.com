@@ -69,12 +69,13 @@ Leverage Python's functional tooling over in-place processing:
 
 ```python
 def filter(items):
-    items.sort()  # faster, in-place
     new_items = []
 
     for item in items:
         if item.get("property"):
             new_items.append(item)
+
+    new_items.sort()  # faster, in-place
 
     return new_items
 
@@ -83,8 +84,10 @@ def filter(items, filters=None):
      if not filters:
          filters = [lambda item: item.get("property")]
 
-     return [item for item in sorted(items)  # slower, creates a new list
-             all(filter(item) for filter in filters)]
+     items = [item for item in items
+              if all([filter(item) for filter in filters])]
+
+     return sorted(items)  # slower, creates a new list
  ```
 
 Keep the levels of indirection small, avoid abusing metaclasses and complex OOP design:
