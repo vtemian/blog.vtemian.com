@@ -1,6 +1,2 @@
- {{/*  Use this method to have Parcel process CSS  */}}
-{{ $css := resources.Get "output/index.css" }}
-{{ with $css }}
-  {{ $securecss := . | resources.Fingerprint }}
-  <link rel="stylesheet" href="{{ $securecss.Permalink | relURL  }}" integrity="{{ $securecss.Data.Integrity }}" crossorigin="anonymous"> 
-{{ end }}
+{{ $styles := resources.Get "output/index.css" }}
+<link rel="stylesheet" href="{{ $styles.Permalink }}" media="screen">

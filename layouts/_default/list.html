@@ -1,11 +1,10 @@
 {{ define "content" }}
 
-{{ $avatar := resources.Get "output/avatar@2x.9d6360be.jpg" }}
-
-{{ $github := resources.Get "output/github.945aaa3a.png" }}
-{{ $linkedin := resources.Get "output/linkedin.07a5ae33.png" }}
-{{ $twitter := resources.Get "output/twitter.6f040fea.png" }}
-{{ $rss := resources.Get "output/rss.7f71fc08.png" }}
+{{ $avatar := resources.Get "output/avatar.png" }}
+{{ $github := resources.Get "output/github.png" }}
+{{ $linkedin := resources.Get "output/linkedin.png" }}
+{{ $twitter := resources.Get "output/twitter.png" }}
+{{ $rss := resources.Get "output/rss.png" }}
 
 <div class="container">
     <aside class="author">
@@ -38,14 +37,14 @@
     </aside>
 
     <main class="articles">
-    {{ range where .Pages.ByDate.Reverse "Section" "post" }}
-    <article>
-        <a href="{{ .URL }}">
-            <h2>{{ .Title }}</h2>
-            <time>{{ .Date.Format "02 Jan 2006" }}</time>
-        </a>
-    </article>
-    {{ end }}
+	    {{ range where (.Site.RegularPages.ByDate.Reverse) "Section" "post" }}
+	    <article>
+		<a href="{{ .RelPermalink }}">
+		    <h2>{{ .Title }}</h2>
+		    <time>{{ .Date.Format "02 Jan 2006" }}</time>
+		</a>
+	    </article>
+	    {{ end }}
     </main>
 
     {{ partial "footer" .}}

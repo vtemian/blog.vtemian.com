@@ -2,35 +2,41 @@
   "name": "hugo-pipes-parcel",
   "version": "2.0.0",
   "description": "Starter files for a Hugo project",
-  "main": "index.js",
   "repository": "https://github.com/theNewDynamic/hugo-starter.git",
   "author": "budparr <budparr@gmail.com>",
   "license": "MIT",
   "scripts": {
     "clean": "rimraf public/ assets/output static/output resources",
-    "build": "run-s deploy:assets build:hugo",
-    "start": "run-s build:assets dev",
+    "build": "run-s build:parcel build:hugo",
     "dev": "run-p dev:parcel dev:hugo",
-    "test": "cross-env NODE_ENV=development parcel ./assets/stylesheets/main.css --out-dir assets/output",
+    "test": "cross-env NODE_ENV=development parcel ./assets/stylesheets/main.css --dist-dir assets/output",
     "dev:hugo": "cross-env NODE_ENV=development hugo server --gc --disableFastRender --navigateToChanged",
-    "dev:parcel": "cross-env NODE_ENV=development parcel watch ./assets/index.js --out-dir assets/output",
-    "build:assets": "cross-env NODE_ENV=development parcel build ./assets/index.js --out-dir assets/output --experimental-scope-hoisting  --no-cache",
-    "deploy:assets": "cross-env NODE_ENV=production parcel build ./assets/index.js --out-dir assets/output --experimental-scope-hoisting --no-cache",
+    "dev:parcel": "cross-env NODE_ENV=development parcel watch",
+    "build:parcel": "cross-env NODE_ENV=development parcel build --no-cache --no-content-hash",
     "build:hugo": "cross-env NODE_ENV=production hugo --gc --minify"
   },
   "devDependencies": {
-    "@fullhuman/postcss-purgecss": "^1.1.0",
-    "autoprefixer": "^9.4.7",
-    "cross-env": "^5.2.0",
+    "@fullhuman/postcss-purgecss": "^6.0.0",
+    "cross-env": "^7.0.3",
     "npm-run-all": "^4.1.5",
-    "parcel": "^1.11.0",
-    "postcss-cli": "^6.1.1",
-    "postcss-import": "^12.0.1",
-    "postcss-modules": "^1.4.1",
-    "postcss-nested": "^4.1.1",
-    "rimraf": "^2.6.3",
-    "tailwindcss": "^0.7.4",
-    "typeface-roboto": "^0.0.54"
+    "parcel": "^2.12.0",
+    "parcel-namer-hashless": "^1.0.6",
+    "postcss-cli": "^11.0.0",
+    "postcss-import": "^16.1.0",
+    "postcss-modules": "^6.0.0",
+    "postcss-nested": "^6.2.0",
+    "rimraf": "^6.0.1",
+    "tailwindcss": "^3.4.14",
+    "typeface-roboto": "^1.1.13"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "targets": {
+    "default": {
+      "source": "./assets/index.js",
+      "distDir": "./assets/output/"
+    }
+  },
+  "parcel-namer-hashless": {
+    "exclude": []
+  }
 }
