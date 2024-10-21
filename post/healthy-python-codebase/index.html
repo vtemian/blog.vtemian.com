@@ -1,4 +1,5 @@
-<html><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width,minimum-scale=1"><meta content="python,codebase,consistency,explicit is better than implicit,end-to-end testing python,integration testing python,unit testing python,python refactoring example" name=keywords><link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.1/styles/atom-one-light.min.css><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.1/highlight.min.js></script><meta itemprop=name content="Healthy Python Codebase"><meta itemprop=description content="Healthy Python Codebase"><meta itemprop=datePublished content=2020-09-21T15:04:57&#43;02:00><meta itemprop=dateModified content=2020-09-21T15:04:57&#43;02:00><meta itemprop=wordCount content=1521><meta itemprop=keywords content=python,guide,refactoring,><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.vtemian.com/"},"articleSection":"post","name":"Healthy Python Codebase","headline":"Healthy Python Codebase","description":"Healthy Python Codebase","inLanguage":"en-US","author":"","creator":"","publisher":"","accountablePerson":"","copyrightHolder":"","copyrightYear":"2020","datePublished":"2020-09-21 15:04:57 &#43;0200 &#43;0200","dateModified":"2020-09-21 15:04:57 &#43;0200 &#43;0200","url":"https://blog.vtemian.com/post/healthy-python-codebase/","wordCount":"1521","keywords":["python","guide","refactoring","Blog"]}</script><title>Healthy Python Codebase</title><link href="https://fonts.googleapis.com/css?family=Karla:700,Rubik:400,400i,Inconsolata:400" rel=stylesheet><link rel=stylesheet href=https://blog.vtemian.com/output/index.36e518a0e85bbc302a00c0265a9c97fa4b381be7fcb920271206bc3a49ed0d5b.css integrity="sha256-NuUYoOhbvDAqAMAmWpyX&#43;ks4G&#43;f8uSAnEga8OkntDVs=" crossorigin=anonymous><script type=text/javascript src=https://blog.vtemian.com/output/index.aad5319fa68d4ffea7c51f2994cd36ba8a8fb9a460f3a9f54e49efa059e47d3b.js integrity="sha256-qtUxn6aNT/6nxR8plM02uoqPuaRg86n1TknvoFnkfTs=" crossorigin=anonymous defer></script><meta name=google-site-verification content=2qk_e0y84NNSVpaorKgeNURYF9Ni3UyJvPq9GZdGEgs></head><body><div class="container container--is-large"><main class=article><article><header><a href=https://blog.vtemian.com/>&larr; Go back</a><h1>Healthy Python Codebase</h1><aside class="author author--is-small"><img src=https://blog.vtemian.com/output/avatar@2x.9d6360be.jpg><div><h4>Vlad Temian</h4><p>21 Sep 2020</p></div></aside></header><p><p>The code is a living entity. For the majority of the time, it stays in silence and it&rsquo;s doing its job, without complaining.
+<html><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,minimum-scale=1"><meta content="python,codebase,consistency,explicit is better than implicit,end-to-end testing python,integration testing python,unit testing python,python refactoring example" name=keywords><link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.1/styles/atom-one-light.min.css><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.1/highlight.min.js></script><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/blog.vtemian.com\/"},"articleSection":"post","name":"Healthy Python Codebase","headline":"Healthy Python Codebase","description":"Healthy Python Codebase","inLanguage":"en-US","author":"","creator":"","publisher":"","accountablePerson":"","copyrightHolder":"","copyrightYear":"2020","datePublished":"2020-09-21 15:04:57 \u002b0200 \u002b0200","dateModified":"2020-09-21 15:04:57 \u002b0200 \u002b0200","url":"https:\/\/blog.vtemian.com\/post\/healthy-python-codebase\/","wordCount":"1521","keywords":["python","guide","refactoring","Blog"]}</script><title>Healthy Python Codebase</title>
+<link href="https://fonts.googleapis.com/css?family=Karla:700,Rubik:400,400i,Inconsolata:400" rel=stylesheet><link rel=stylesheet href=https://blog.vtemian.com/output/index.css media=screen><script type=text/javascript src=https://blog.vtemian.com/output/index.be2bf1e28ff3cbeea8f85056ff8994aa80e027b5c3ff3bcfbe0c4e525527151a.js integrity="sha256-vivx4o/zy+6o+FBW/4mUqoDgJ7XD/zvPvgxOUlUnFRo=" crossorigin=anonymous defer></script><meta name=google-site-verification content="2qk_e0y84NNSVpaorKgeNURYF9Ni3UyJvPq9GZdGEgs"></head><body><div class="container container--is-large"><main class=article><article><header><a href=https://blog.vtemian.com/>&larr; Go back</a><h1>Healthy Python Codebase</h1><aside class="author author--is-small"><img src=https://blog.vtemian.com/output/avatar.png><div><h4>Vlad Temian</h4><p>21 Sep 2020</p></div></aside></header><p><p>The code is a living entity. For the majority of the time, it stays in silence and it&rsquo;s doing its job, without complaining.
 But, there are these creatures, humanoid, that from time to time, will change it. Will try to fix it, adapt, or
 completely remove parts of it. Those creatures tend to conserve energy and they are using pattern recognition to do so.
 They observe patterns and take fast and easy decisions based on those patterns.
@@ -15,86 +16,86 @@ Don&rsquo;t be afraid to throw exceptions or stop the business logic. Failing fa
 and solve inconsistency issues.</p><h2 id=explicit-is-better-than-implicit>Explicit is better than implicit</h2><p>Python is magic and allows you to abuse it. Besides that, when designing certain components, make sure that those are well
 defined and their behavior is properly exposed and expected by their clients.</p><p>Avoid using generic components like Manager, Service, Data since they have a tendency of hiding complexity.
 Use specific and meaningful terminology for components that are responsible for doing just one thing.
-Favor small and well-defined logical units over complex ones (simple is better than complex).</p><p>Avoid implicit defaults and don&rsquo;t be afraid of exposing some implementation details:</p><pre><code class=language-python>def compute_interval(start):
-    return time.now() - start
-
-def compute_interval(start, end=None):
-    if end is None:
-        end = time.now()
-
-    return end - start
-</code></pre><p>Leverage Python&rsquo;s functional tooling over in-place processing:</p><pre><code class=language-python>def filter(items):
-    new_items = []
-
-    for item in items:
-        if item.get(&quot;property&quot;):
-            new_items.append(item)
-
-    new_items.sort()  # faster, in-place
-
-    return new_items
-
-
-def filter(items, filters=None):
-     if not filters:
-         filters = [lambda item: item.get(&quot;property&quot;)]
-
-     items = [item for item in items
-              if all([filter(item) for filter in filters])]
-
-     return sorted(items)  # slower, creates a new list
-</code></pre><p>Keep the levels of indirection small, avoid abusing metaclasses and complex OOP design:</p><pre><code class=language-python># abstractisation just for the sake of it adds more complexity than solves real issues
-class RequestValidator:
-    def __init__(self, request, validators=None):
-         self.request = request
-         self.validators = valiadtors or [
-             lambda request: &quot;foo&quot; in request.POST.get(&quot;arg&quot;)
-         ]
-
-    def validate(self):
-        return all([validator(self.request) for validator in self.validators])
-
-
-if RequestValidator(request).validate():
-    process()
-
-
-# simple and concise, solves the issue is easy to read and to maintain
-if &quot;foo&quot; in request.POST.get(&quot;arg&quot;, &quot;&quot;):
-    process()
-</code></pre><p>Avoid using classes as logical namespaces:</p><pre><code class=language-python>class Refresh:
-    @classmethod
-    def create_token(cls):
-        ...
-
-    @classmethod
-    def invalidate_token(cls, token):
-        ...
-
-    @classmethod
-    def refresh_token(cls, token):
-        ...
-</code></pre><h2 id=fail-fast-and-visible>Fail fast and visible</h2><p>Breaking the production can be terrifying and sometimes, we tend to &ldquo;hide&rdquo; or &ldquo;swallow&rdquo; user-facing errors just to
+Favor small and well-defined logical units over complex ones (simple is better than complex).</p><p>Avoid implicit defaults and don&rsquo;t be afraid of exposing some implementation details:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>compute_interval</span>(start):
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> time<span style=color:#f92672>.</span>now() <span style=color:#f92672>-</span> start
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>compute_interval</span>(start, end<span style=color:#f92672>=</span><span style=color:#66d9ef>None</span>):
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> end <span style=color:#f92672>is</span> <span style=color:#66d9ef>None</span>:
+</span></span><span style=display:flex><span>        end <span style=color:#f92672>=</span> time<span style=color:#f92672>.</span>now()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> end <span style=color:#f92672>-</span> start
+</span></span></code></pre></div><p>Leverage Python&rsquo;s functional tooling over in-place processing:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>filter</span>(items):
+</span></span><span style=display:flex><span>    new_items <span style=color:#f92672>=</span> []
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>for</span> item <span style=color:#f92672>in</span> items:
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> item<span style=color:#f92672>.</span>get(<span style=color:#e6db74>&#34;property&#34;</span>):
+</span></span><span style=display:flex><span>            new_items<span style=color:#f92672>.</span>append(item)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    new_items<span style=color:#f92672>.</span>sort()  <span style=color:#75715e># faster, in-place</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> new_items
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>filter</span>(items, filters<span style=color:#f92672>=</span><span style=color:#66d9ef>None</span>):
+</span></span><span style=display:flex><span>     <span style=color:#66d9ef>if</span> <span style=color:#f92672>not</span> filters:
+</span></span><span style=display:flex><span>         filters <span style=color:#f92672>=</span> [<span style=color:#66d9ef>lambda</span> item: item<span style=color:#f92672>.</span>get(<span style=color:#e6db74>&#34;property&#34;</span>)]
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>     items <span style=color:#f92672>=</span> [item <span style=color:#66d9ef>for</span> item <span style=color:#f92672>in</span> items
+</span></span><span style=display:flex><span>              <span style=color:#66d9ef>if</span> all([filter(item) <span style=color:#66d9ef>for</span> filter <span style=color:#f92672>in</span> filters])]
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>     <span style=color:#66d9ef>return</span> sorted(items)  <span style=color:#75715e># slower, creates a new list</span>
+</span></span></code></pre></div><p>Keep the levels of indirection small, avoid abusing metaclasses and complex OOP design:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#75715e># abstractisation just for the sake of it adds more complexity than solves real issues</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>RequestValidator</span>:
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> __init__(self, request, validators<span style=color:#f92672>=</span><span style=color:#66d9ef>None</span>):
+</span></span><span style=display:flex><span>         self<span style=color:#f92672>.</span>request <span style=color:#f92672>=</span> request
+</span></span><span style=display:flex><span>         self<span style=color:#f92672>.</span>validators <span style=color:#f92672>=</span> valiadtors <span style=color:#f92672>or</span> [
+</span></span><span style=display:flex><span>             <span style=color:#66d9ef>lambda</span> request: <span style=color:#e6db74>&#34;foo&#34;</span> <span style=color:#f92672>in</span> request<span style=color:#f92672>.</span>POST<span style=color:#f92672>.</span>get(<span style=color:#e6db74>&#34;arg&#34;</span>)
+</span></span><span style=display:flex><span>         ]
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>validate</span>(self):
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> all([validator(self<span style=color:#f92672>.</span>request) <span style=color:#66d9ef>for</span> validator <span style=color:#f92672>in</span> self<span style=color:#f92672>.</span>validators])
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>if</span> RequestValidator(request)<span style=color:#f92672>.</span>validate():
+</span></span><span style=display:flex><span>    process()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># simple and concise, solves the issue is easy to read and to maintain</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>if</span> <span style=color:#e6db74>&#34;foo&#34;</span> <span style=color:#f92672>in</span> request<span style=color:#f92672>.</span>POST<span style=color:#f92672>.</span>get(<span style=color:#e6db74>&#34;arg&#34;</span>, <span style=color:#e6db74>&#34;&#34;</span>):
+</span></span><span style=display:flex><span>    process()
+</span></span></code></pre></div><p>Avoid using classes as logical namespaces:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Refresh</span>:
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>@classmethod</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>create_token</span>(cls):
+</span></span><span style=display:flex><span>        <span style=color:#f92672>...</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>@classmethod</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>invalidate_token</span>(cls, token):
+</span></span><span style=display:flex><span>        <span style=color:#f92672>...</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>@classmethod</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>refresh_token</span>(cls, token):
+</span></span><span style=display:flex><span>        <span style=color:#f92672>...</span>
+</span></span></code></pre></div><h2 id=fail-fast-and-visible>Fail fast and visible</h2><p>Breaking the production can be terrifying and sometimes, we tend to &ldquo;hide&rdquo; or &ldquo;swallow&rdquo; user-facing errors just to
 avoid showing weakness and to give our user a sense of shaky/unfinished product.</p><p>Having bugs and errors in your codebase is a natural thing. That&rsquo;s how software grows and evolves.
 The catch is to see those bugs and errors as soon as possible and to fix them.
-The scariest bugs always starts with This thing just doesn&rsquo;t work. It says nothing.</p><p>Avoid catching all exceptions. Instead, try to handle as many exception paths as possible.</p><pre><code class=language-python>try:
-    content = requests.get()
-except Exception:
-    pass
-
-
-try:
-    content = requests.get()
-except ConnectTimeout:
-    ...
-except RequestException:
-    ...
-except RetryError:
-    ...
-</code></pre><p>Failing fast and visible allows you to identify the problem and fix it. But you&rsquo;ll need visibility over those exceptions. Just
+The scariest bugs always starts with This thing just doesn&rsquo;t work. It says nothing.</p><p>Avoid catching all exceptions. Instead, try to handle as many exception paths as possible.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#66d9ef>try</span>:
+</span></span><span style=display:flex><span>    content <span style=color:#f92672>=</span> requests<span style=color:#f92672>.</span>get()
+</span></span><span style=display:flex><span><span style=color:#66d9ef>except</span> <span style=color:#a6e22e>Exception</span>:
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>pass</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>try</span>:
+</span></span><span style=display:flex><span>    content <span style=color:#f92672>=</span> requests<span style=color:#f92672>.</span>get()
+</span></span><span style=display:flex><span><span style=color:#66d9ef>except</span> ConnectTimeout:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>...</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>except</span> RequestException:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>...</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>except</span> RetryError:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>...</span>
+</span></span></code></pre></div><p>Failing fast and visible allows you to identify the problem and fix it. But you&rsquo;ll need visibility over those exceptions. Just
 failing fast may not be enough. An exception without a traceback may not be so useful to find the root cause.</p><p><a href=https://sentry.io/>Sentry</a> is the way to go. Other logging and monitoring tools will help as much:
 <a href=https://www.datadoghq.com/>Datadog</a>, <a href=https://cloud.google.com/products/operations>Google Operations</a>, or
-<a href=https://newrelic.com/>NewRelic</a> are just a bunch of observability tools that will make your life easier.</p><h2 id=end-to-end-integration-unit-tests>End-to-End &gt; Integration &gt; Unit tests</h2><p>Testing is your safety net. It allows you a free state of mind in which changes can happen easily, without regression. In theory,
+<a href=https://newrelic.com/>NewRelic</a> are just a bunch of observability tools that will make your life easier.</p><h2 id=end-to-end--integration--unit-tests>End-to-End > Integration > Unit tests</h2><p>Testing is your safety net. It allows you a free state of mind in which changes can happen easily, without regression. In theory,
 at least. Most of the time, we trust too much this safety net. A close to 100% code coverage doesn&rsquo;t really mean that your changes
 are not breaking the current behavior. Some code paths can be purely understood and tested.</p><p>Multiple testing methodologies will create different safety nets. A really simple and fast to obtain is one using unit tests.
 Testing small and well-contained pieces of logic is easy and fast. The downside comes when those pieces are interacting with other
@@ -113,71 +114,71 @@ data migration be handled? Does it involve downtime? Should I announce my users?
 build reproducible. A clear and consistent pipeline helps users use your software and allows developers to contribute, with
 minimum pain. Don&rsquo;t be afraid to use helper scripts, Dockerfiles, Makefiles, or other tools to automate your job. Software is
 always changing, so allow for this pipeline/procedure to be changing as well.</p><h2 id=refactoring-example>Refactoring Example</h2><p>Those were some small guidelines from my experience. In the end, a healthy codebase is a codebase that is easy to change.</p><p>Making a codebase healthy is not a one-time thing. Is a long and tedious process, with small incremental progress. Small
-deployable changes are more sustainable, less invasive, and easier to understand.</p><pre><code class=language-python>import requests
-
-import os
-
-from django.conf import settings
-import time
-
-
-def a(b):
-    s = time.now()
-
-    try:
-        c = requests.get(b)
-    except:
-        return
-
-    if time.now() - s &gt; settings.TIME:
-        return &quot;it took too much&quot;
-    else:
-        return c.content, c.status_code
-</code></pre><pre><code class=language-python># Follow PEP-8 guidelines and sort imports.
-
-import os
-import time
-
-import requests
-from django.conf import settings
-from requests.exceptions import RequestException
-
-
-def validate_url(url: str) -&gt; bool:
-     if not url or not isinstance(url, str):
-         return False
-
-     rules = [
-         lambda url: url.startswith(&quot;https://&quot;),
-         lambda url: settings.VALID_HOST in url,
-         ...
-     ]
-
-     return not all([rule(url) for rule in rules])
-
-
-# Naming should be meaningful and consistent.
-def try_fetch(url: str) -&gt; str: # Type-hinting allows tools like mypy to detect bugs.
-    # Fail fast and visible.
-    if not validate_url(url):
-        raise ValueError(f&quot;Invalid or missing url: {url}&quot;)
-
-    start = time.now()
-
-    # Avoid swallowing exceptions. If not possible, log them.
-    response = response.get(url, raise_for_status=True)
-
-    # Group conditions and their context 
-    request_duration = time.now() - start
-    if request_duration &gt; settings.MAX_REQUEST_DURATION:
-        # Add more context to errors.
-        raise RuntimeError(f&quot;Request duration excided maximum duration: {request_duration}.&quot;)
-
-    # Check invalid usecases.
-    if response.status_code != 200:
-        raise RuntimeError(f&quot;Service responded with {response.status_code} instead of 200.&quot;)
-
-    return str(response.content) # Be consistent with returning type
-</code></pre><p>Cheers 🍺!</p></p></article></main><script>hljs.initHighlightingOnLoad();</script><footer class=footer>&copy; 2020 <a href=https://github.com/vtemian>Vlad Temian</a>,
+deployable changes are more sustainable, less invasive, and easier to understand.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#f92672>import</span> requests
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> os
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>from</span> django.conf <span style=color:#f92672>import</span> settings
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> time
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>a</span>(b):
+</span></span><span style=display:flex><span>    s <span style=color:#f92672>=</span> time<span style=color:#f92672>.</span>now()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>try</span>:
+</span></span><span style=display:flex><span>        c <span style=color:#f92672>=</span> requests<span style=color:#f92672>.</span>get(b)
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>except</span>:
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> time<span style=color:#f92672>.</span>now() <span style=color:#f92672>-</span> s <span style=color:#f92672>&gt;</span> settings<span style=color:#f92672>.</span>TIME:
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#e6db74>&#34;it took too much&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>else</span>:
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> c<span style=color:#f92672>.</span>content, c<span style=color:#f92672>.</span>status_code
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#75715e># Follow PEP-8 guidelines and sort imports.</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> os
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> time
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> requests
+</span></span><span style=display:flex><span><span style=color:#f92672>from</span> django.conf <span style=color:#f92672>import</span> settings
+</span></span><span style=display:flex><span><span style=color:#f92672>from</span> requests.exceptions <span style=color:#f92672>import</span> RequestException
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>validate_url</span>(url: str) <span style=color:#f92672>-&gt;</span> bool:
+</span></span><span style=display:flex><span>     <span style=color:#66d9ef>if</span> <span style=color:#f92672>not</span> url <span style=color:#f92672>or</span> <span style=color:#f92672>not</span> isinstance(url, str):
+</span></span><span style=display:flex><span>         <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>False</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>     rules <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>         <span style=color:#66d9ef>lambda</span> url: url<span style=color:#f92672>.</span>startswith(<span style=color:#e6db74>&#34;https://&#34;</span>),
+</span></span><span style=display:flex><span>         <span style=color:#66d9ef>lambda</span> url: settings<span style=color:#f92672>.</span>VALID_HOST <span style=color:#f92672>in</span> url,
+</span></span><span style=display:flex><span>         <span style=color:#f92672>...</span>
+</span></span><span style=display:flex><span>     ]
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>     <span style=color:#66d9ef>return</span> <span style=color:#f92672>not</span> all([rule(url) <span style=color:#66d9ef>for</span> rule <span style=color:#f92672>in</span> rules])
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Naming should be meaningful and consistent.</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>try_fetch</span>(url: str) <span style=color:#f92672>-&gt;</span> str: <span style=color:#75715e># Type-hinting allows tools like mypy to detect bugs.</span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e># Fail fast and visible.</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#f92672>not</span> validate_url(url):
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>raise</span> <span style=color:#a6e22e>ValueError</span>(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;Invalid or missing url: </span><span style=color:#e6db74>{</span>url<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    start <span style=color:#f92672>=</span> time<span style=color:#f92672>.</span>now()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e># Avoid swallowing exceptions. If not possible, log them.</span>
+</span></span><span style=display:flex><span>    response <span style=color:#f92672>=</span> response<span style=color:#f92672>.</span>get(url, raise_for_status<span style=color:#f92672>=</span><span style=color:#66d9ef>True</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e># Group conditions and their context </span>
+</span></span><span style=display:flex><span>    request_duration <span style=color:#f92672>=</span> time<span style=color:#f92672>.</span>now() <span style=color:#f92672>-</span> start
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> request_duration <span style=color:#f92672>&gt;</span> settings<span style=color:#f92672>.</span>MAX_REQUEST_DURATION:
+</span></span><span style=display:flex><span>        <span style=color:#75715e># Add more context to errors.</span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>raise</span> <span style=color:#a6e22e>RuntimeError</span>(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;Request duration excided maximum duration: </span><span style=color:#e6db74>{</span>request_duration<span style=color:#e6db74>}</span><span style=color:#e6db74>.&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e># Check invalid usecases.</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> response<span style=color:#f92672>.</span>status_code <span style=color:#f92672>!=</span> <span style=color:#ae81ff>200</span>:
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>raise</span> <span style=color:#a6e22e>RuntimeError</span>(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;Service responded with </span><span style=color:#e6db74>{</span>response<span style=color:#f92672>.</span>status_code<span style=color:#e6db74>}</span><span style=color:#e6db74> instead of 200.&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> str(response<span style=color:#f92672>.</span>content) <span style=color:#75715e># Be consistent with returning type</span>
+</span></span></code></pre></div><p>Cheers 🍺!</p></p></article></main><script>hljs.initHighlightingOnLoad()</script><footer class=footer>&copy; 2024 <a href=https://github.com/vtemian>Vlad Temian</a>,
 powered by <a href=https://gohugo.io/ target=_blank>Hugo</a>,
 with help from <a href=https://github.com/balajmarius>&copy;balajmarius</a>.</footer></div></body></html>
