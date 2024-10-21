@@ -1,8 +1,4 @@
-{{/*  We only want to run this process if there's a JS file  */}}
-{{ if (fileExists "./assets/output/index.js") }}
-  {{ $js := resources.Get "output/index.js" }}
-  {{ with $js }}
-    {{ $secureJS := . | resources.Fingerprint }}
-    <script type="text/javascript" src="{{ $secureJS.Permalink }}" integrity="{{ $secureJS.Data.Integrity }}" crossorigin="anonymous" defer></script>
-  {{ end }}
+{{ $js := resources.Get "output/index.js" }}
+{{ with $js }}
+  <script type="text/javascript" src="{{ $js.Permalink }}" crossorigin="anonymous" defer></script>
 {{ end }}
