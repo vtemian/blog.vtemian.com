@@ -11,3 +11,8 @@ metaDataFormat = "yaml"
 	description = "favorite superpower: having awesome friends"
 	keywords = ["vtemian", "blog", "python", "interviews"]
 	tags = ["vtemian", "blog", "python", "interviews"]
+
+[sitemap]
+  changefreq = "weekly"
+  filename = "sitemap.xml"
+  priority = 0.5

@@ -21,6 +21,9 @@ tags:
     - aptos
     - block-stm
     - state of parallel blockchains
+images:
+  - tx-parallel.png
+  - parallel-queues.png
 ---
 
 In the last couple of years, we have seen the rise of [infrastructure](https://www.shoal.gg/p/parallel-execution-the-next-generation) projects in the blockchain space. One exciting development is [parallel blockchains](https://www.recvc.com/part-i-design-space-for-parallel-blockchains/), specifically those that execute a batch of transactions in parallel.
@@ -42,7 +45,7 @@ We'll have a blockchain if we chain those bundles of state transitions. Those st
 
 We must be careful which transactions can be executed in parallel because we want to execute multiple transactions in parallel and replicate them across the network. Multiple transactions can be executed in parallel if they don’t mutate the same state in the same execution cycle.
 
-![blockchains](tx-parallel.png)
+![tx-parallel](tx-parallel.png)
 
 Given this, state access will be the key to running transactions in parallel safely. 
 
