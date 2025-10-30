@@ -19,7 +19,7 @@ tags:
     - tools
 ---
 
-It's hard to have a presentation about AI without speaking about the elephant in the room. Every single business is pushing AI. We're seeing it everywhere. Google Chrome. Slack. WhatsApp. Even our toothbrushes. A lot of businesses are trying to capitalize on this new tech. And it's raising a negative sentiment.
+It's hard to write about AI these days without speaking about the elephant in the room. Every single business is pushing AI. We're seeing it everywhere. Google Chrome. Slack. WhatsApp. Even our toothbrushes. A lot of businesses are trying to capitalize on this new tech. And it's raising a negative sentiment.
 
 ![AI-powered toothbrush](toothbrush.png)
 
