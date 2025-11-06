@@ -1,9 +1,17 @@
  table {
   border-collapse: collapse;
   width: 100%;
+  margin-bottom: 25px;
 }
+
+th,
 td {
-  border-top: 1px solid #ccc;
-  border-bottom: 1px solid #ccc;
+  border: 1px solid var(--grey-lighter);
   padding: 0.6rem;
+  text-align: left;
+}
+
+th {
+  font-weight: 700;
+  background: var(--grey-lighter);
 }

@@ -1,20 +1,22 @@
 .articles {
-  margin: 0 0 50px;
+  margin: 0 0 20px;
 
   article {
     display: flex;
-    margin-bottom: 20px;
-    padding-bottom: 20px;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
     justify-items: center;
-    border-bottom: 1px solid var(--grey-lighter);
+    border-bottom: 3px dotted var(--grey-lighter);
 
     &:last-child {
       margin-bottom: 0px;
+      border-bottom: none;
     }
 
     h2 {
-      font-weight: 600;
+      font-weight: 700;
       font-size: var(--font-size-medium);
+      line-height: 1.3;
     }
 
     a {
@@ -23,12 +25,14 @@
       align-items: center;
       color: var(--black);
       justify-content: space-between;
+      border-bottom: none;
 
       &:hover {
-        color: var(--pink);
+        color: var(--white);
+        background: var(--pink);
 
         time {
-          color: var(--black);
+          color: var(--white);
         }
       }
     }

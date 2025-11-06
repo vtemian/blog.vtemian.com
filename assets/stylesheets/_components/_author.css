@@ -1,10 +1,10 @@
 .author {
   display: flex;
   align-items: center;
-  margin-bottom: 70px;
-  padding-bottom: 50px;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
   flex-direction: column;
-  border-bottom: 1px solid var(--grey-lighter);
+  border-bottom: 3px dotted var(--black);
 
   p {
     color: var(--grey);
@@ -12,7 +12,7 @@
   }
 
   h1 {
-    font-weight: 600;
+    font-weight: 700;
     margin: 15px 0 10px;
     font-size: var(--font-size-large);
   }
