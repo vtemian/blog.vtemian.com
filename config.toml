@@ -8,7 +8,7 @@ metaDataFormat = "yaml"
 [params]
 	author = "Vlad Temian"
 	github = "vtemian"
-	description = "favorite superpower: having awesome friends"
+	description = "I build systems. Over 15 years helping startups scale production infrastructure. Former CTO of qed.builders (acquired by The Sandbox). Long-time open-source contributor with a systems caretaker mindset."
 	keywords = ["vtemian", "blog", "python", "interviews"]
 	tags = ["vtemian", "blog", "python", "interviews"]
 

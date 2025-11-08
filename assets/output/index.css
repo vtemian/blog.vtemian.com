@@ -123,21 +123,37 @@ code {
   margin-right: 15px;
 }
 
+.about {
+  font-size: var(--font-size-medium);
+  text-align: left;
+  margin-top: 25px;
+  margin-bottom: 10px;
+  padding: 0;
+  line-height: 1.7;
+}
+
+.about p {
+  color: var(--black);
+}
+
+.about strong {
+  font-weight: 700;
+}
+
 .articles {
-  margin: 0 0 20px;
+  margin: 0;
 }
 
 .articles article {
   border-bottom: 3px dotted var(--grey-lighter);
   justify-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 0;
   padding-bottom: 8px;
   display: flex;
 }
 
 .articles article:last-child {
   border-bottom: none;
-  margin-bottom: 0;
 }
 
 .articles article h2 {
@@ -271,7 +287,6 @@ code {
   border-top: 3px dotted var(--black);
   color: var(--grey);
   font-size: var(--font-size-small);
-  margin-top: 40px;
   padding-top: 40px;
 }
 
