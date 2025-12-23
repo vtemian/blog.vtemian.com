@@ -16,3 +16,14 @@ metaDataFormat = "yaml"
   changefreq = "weekly"
   filename = "sitemap.xml"
   priority = 0.5
+
+[outputFormats]
+  [outputFormats.llmstxt]
+    name = "llmstxt"
+    mediaType = "text/plain"
+    baseName = "llms"
+    isPlainText = true
+    notAlternative = true
+
+[outputs]
+  home = ["HTML", "RSS", "llmstxt"]

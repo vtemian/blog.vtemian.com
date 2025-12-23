@@ -1,0 +1,8 @@
+# {{ .Site.Params.author }}'s Blog
+
+> {{ .Site.Params.description }}
+
+## Posts
+{{ range where (.Site.RegularPages.ByDate.Reverse) "Section" "post" }}
+- [{{ .Title }}]({{ .Permalink }}){{ with .Description }}: {{ . }}{{ end }}
+{{- end }}
