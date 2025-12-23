@@ -1,0 +1,13 @@
+# Vlad Temian's Blog
+
+> I build systems. Over 15 years helping startups scale production infrastructure. Former CTO of qed.builders (acquired by The Sandbox). Long-time open-source contributor with a systems caretaker mindset.
+
+## Posts
+
+- [Technical Debt is Cheap](https://blog.vtemian.com/post/technical-debt-is-cheap/): How I refactored years of technical debt in 3 hours using Claude Code - a practitioner's reality check on AI hype vs actual results
+- [Parallel Transaction Execution in Blockchains](https://blog.vtemian.com/post/parallel-transaction-execution-in-blockchains/): This article explores parallel transaction execution in blockchain systems, explaining how blockchains like Solana, SUI, and Aptos handle transactions simultaneously to increase performance. It covers the differences between deterministic and optimistic methods, the challenges of conflict resolution, and how these approaches improve scalability and efficiency in blockchain technology.
+- [Healthy Python Codebase](https://blog.vtemian.com/post/healthy-python-codebase/): Healthy Python Codebase
+- [Building a serverless hosting platform](https://blog.vtemian.com/post/serverless-hosting-platform/)
+- [Python Multiple Inheritance](https://blog.vtemian.com/post/multiple-inheritance/): How multiple inheritance works in Python?
+- [Interviews](https://blog.vtemian.com/post/interviews/): A short interviewing statement for 2019
+- [2019](https://blog.vtemian.com/post/2019/): 2019 - the beging
