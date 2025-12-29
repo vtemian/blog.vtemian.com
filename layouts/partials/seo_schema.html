@@ -3,9 +3,8 @@
 <link rel="canonical" href="{{ .Permalink }}">
 
 {{/* Favicon */}}
-{{ $avatar := resources.Get "images/avatar.png" }}
-<link rel="icon" type="image/png" href="{{ $avatar.RelPermalink }}">
-<link rel="apple-touch-icon" href="{{ $avatar.RelPermalink }}">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/favicon.svg">
 
 {{/* Keywords */}}
 <meta name="keywords" content="{{ if .Params.Keywords }}{{ delimit .Params.Keywords ", " }}{{ else }}{{ delimit .Site.Params.keywords ", " }}{{ end }}">
