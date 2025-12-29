@@ -1,7 +1,7 @@
 ---
 title: "Building a serverless hosting platform"
 date: 2020-05-18T13:06:21+02:00
-description: ""
+description: "Building a serverless hosting platform using Knative, Tekton, and Kubernetes on bare metal - from cluster setup to automated CI/CD deployments"
 tags:
     - knative
     - kubernetes

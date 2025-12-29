@@ -1,7 +1,7 @@
 ---
 title: "Healthy Python Codebase"
 date: 2020-09-21T15:04:57+02:00
-description: "Healthy Python Codebase"
+description: "Guidelines for maintaining a healthy Python codebase: consistency, explicit code, fail-fast patterns, testing strategies, and practical refactoring examples"
 keywords:
     - python
     - codebase
