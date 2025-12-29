@@ -1,5 +1,4 @@
 {{ $css := resources.Get "stylesheets/main.css" }}
-{{ $css = $css | postCSS }}
 {{ if hugo.IsProduction }}
   {{ $css = $css | minify | fingerprint }}
 {{ end }}

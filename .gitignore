@@ -1,8 +1,5 @@
-.DS_STORE
+.DS_Store
 .idea/
-
-.parcel-cache/
-node_modules/
 
 public/
 .hugo_build.lock

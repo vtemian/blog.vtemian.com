@@ -2,18 +2,16 @@
 
 ## Overview
 
-Personal blog for Vlad Temian built with Hugo (static site generator) and Parcel (asset bundler). The site is deployed to GitHub Pages via GitHub Actions.
+Personal blog for Vlad Temian built with Hugo (static site generator). The site is deployed to GitHub Pages via GitHub Actions.
 
 ## Tech Stack
 
 | Category | Technology |
 |----------|------------|
 | Static Site Generator | Hugo 0.136.2 |
-| Asset Bundler | Parcel 2.16.1 |
-| CSS Processing | PostCSS with postcss-nested |
+| CSS Processing | Hugo Pipes (minify, fingerprint) |
 | Syntax Highlighting | highlight.js (CDN) |
-| Fonts | Google Fonts (Karla, Rubik, Inconsolata) |
-| Package Manager | Yarn (Berry) |
+| Fonts | Google Fonts (Roboto Mono) |
 | Hosting | GitHub Pages |
 | CI/CD | GitHub Actions |
 
@@ -21,14 +19,10 @@ Personal blog for Vlad Temian built with Hugo (static site generator) and Parcel
 
 ```
 blog.vtemian.com/
-├── assets/                    # Source assets (processed by Parcel)
+├── assets/                    # Source assets (processed by Hugo)
 │   ├── images/               # Source images (avatar, social icons)
-│   ├── javascript/           # JS source (currently empty main.js)
-│   ├── stylesheets/          # CSS source files
-│   │   ├── _globals/         # Variables, reset, base styles
-│   │   └── _components/      # Component-specific styles
-│   ├── output/               # Parcel output (bundled assets)
-│   └── index.js              # Parcel entry point
+│   └── stylesheets/          # CSS source
+│       └── main.css          # All styles in one file
 ├── content/                   # Blog content (Markdown)
 │   └── post/                 # Blog posts
 │       └── {post-name}/      # Post with images (page bundle)
@@ -42,43 +36,35 @@ blog.vtemian.com/
 ├── static/                    # Static files (copied as-is)
 ├── public/                    # Hugo output (generated site)
 ├── .github/workflows/         # CI/CD configuration
-├── config.toml               # Hugo configuration
-└── package.json              # Node.js dependencies and scripts
+└── config.toml               # Hugo configuration
 ```
 
 ## Build Pipeline
-
-The project uses a two-stage build process:
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                        BUILD PIPELINE                           │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│  Stage 1: Parcel                                                │
-│  ┌─────────────────┐      ┌─────────────────┐                  │
-│  │ assets/index.js │ ──▶  │ assets/output/  │                  │
-│  │ - main.css      │      │ - index.css     │                  │
-│  │ - images/*.png  │      │ - index.js      │                  │
-│  └─────────────────┘      │ - *.png         │                  │
-│                           └─────────────────┘                  │
-│                                  │                              │
-│  Stage 2: Hugo                   ▼                              │
+│  Hugo Build                                                     │
 │  ┌─────────────────┐      ┌─────────────────┐                  │
 │  │ content/        │      │                 │                  │
 │  │ layouts/        │ ──▶  │    public/      │                  │
-│  │ assets/output/  │      │                 │                  │
+│  │ assets/         │      │                 │                  │
 │  │ static/         │      └─────────────────┘                  │
 │  └─────────────────┘                                           │
+│                                                                 │
+│  Hugo Pipes processes CSS:                                      │
+│  - Minification (production)                                    │
+│  - Fingerprinting (cache busting)                              │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
 ### Key Configuration
 
-- **Parcel** uses `parcel-namer-hashless` to output files without content hashes for stable Hugo references
-- **PostCSS** enables nested CSS syntax via `postcss-nested`
 - **Hugo** uses YAML frontmatter format (`metaDataFormat = "yaml"`)
+- **CSS** is plain CSS with CSS custom properties (no preprocessor)
 
 ## Core Components
 
@@ -98,28 +84,23 @@ The project uses a two-stage build process:
 | `footer.html` | Copyright, highlight.js init |
 | `seo_schema.html` | OpenGraph and JSON-LD structured data |
 | `stylesheets.html` | CSS link tag |
-| `scripts.html` | JS script tag |
 | `get-page-images.html` | Extract images for OG tags |
 
 ### CSS Architecture
 
-CSS is organized in a modular structure:
+All CSS is in `assets/stylesheets/main.css`, organized into sections:
 
 ```
-stylesheets/
-├── main.css              # Entry point (imports all)
-├── _globals/
-│   ├── _variables.css    # CSS custom properties
-│   ├── _reset.css        # Meyer reset
-│   └── _base.css         # Base element styles
-└── _components/
-    ├── _author.css       # Author sidebar
-    ├── _about.css        # About section
-    ├── _articles.css     # Article list
-    ├── _article.css      # Single article
-    ├── _social.css       # Social links
-    ├── _footer.css       # Footer
-    └── _table.css        # Tables
+main.css
+├── Variables        # CSS custom properties
+├── Reset           # Modern CSS reset
+├── Base            # Body, links, container, code
+├── Author          # Author sidebar component
+├── Articles        # Article list component
+├── Article         # Single article component
+├── Social          # Social links component
+├── Footer          # Footer component
+└── Table           # Table styles
 ```
 
 ## Data Flow
@@ -131,7 +112,7 @@ stylesheets/
 2. GitHub Pages serves static HTML from public/
 3. Browser loads:
    - HTML (Hugo-generated)
-   - CSS (Parcel-bundled, from assets/output/)
+   - CSS (Hugo-processed, fingerprinted)
    - JS (highlight.js from CDN)
    - Fonts (Google Fonts CDN)
 ```
@@ -141,7 +122,7 @@ stylesheets/
 ```
 1. Author writes Markdown in content/post/
 2. Hugo processes Markdown with templates
-3. Templates reference bundled assets via resources.Get
+3. Hugo Pipes processes CSS (minify, fingerprint)
 4. Hugo outputs complete HTML to public/
 ```
 
@@ -150,7 +131,7 @@ stylesheets/
 | Service | Purpose |
 |---------|---------|
 | GitHub Pages | Static hosting |
-| Google Fonts | Typography (Karla, Rubik, Inconsolata) |
+| Google Fonts | Typography (Roboto Mono) |
 | Cloudflare CDN | highlight.js for syntax highlighting |
 | Google Search Console | Site verification |
 
@@ -172,29 +153,28 @@ None required. All configuration is file-based.
 ### Development
 
 ```bash
-yarn dev          # Start dev server (Hugo + Parcel watch)
+hugo server -D    # Start dev server with drafts
                   # Serves at http://localhost:1313
 ```
 
 ### Production Build
 
 ```bash
-yarn build        # Build for production
-                  # Output: public/
+hugo --gc --minify    # Build for production
+                      # Output: public/
 ```
 
 ### Deployment
 
 Automatic via GitHub Actions on push to `content` branch:
 1. Checkout code
-2. Setup Hugo 0.136.2 and Node.js 20.17.0
-3. Install dependencies (`yarn`)
-4. Build (`yarn build`)
-5. Deploy `public/` to `master` branch
-6. GitHub Pages serves from `master`
+2. Setup Hugo 0.136.2
+3. Build (`hugo --gc --minify`)
+4. Deploy `public/` to `master` branch
+5. GitHub Pages serves from `master`
 
 ### Clean
 
 ```bash
-yarn clean        # Remove public/, assets/output/, static/output/, resources/
+rm -rf public resources    # Remove generated directories
 ```
