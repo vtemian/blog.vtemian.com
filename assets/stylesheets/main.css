@@ -3,12 +3,23 @@
    ========================================================================== */
 
 :root {
+  /* Terminal color palette */
+  --background: #0a0a0a;
+  --foreground: #00ff00;
+  --foreground-dim: #00aa00;
+  --surface: #1a1a1a;
+  --border: #333333;
+  --accent: #00ffff;
+  --glow-green: rgba(0, 255, 0, 0.4);
+  --glow-cyan: rgba(0, 255, 255, 0.5);
+
+  /* Legacy aliases for compatibility */
   --white: #ffffff;
-  --black: #232333;
-  --grey: #a5a5a5;
-  --grey-lighter: #f2f2f2;
-  --blue: #5694f1;
-  --pink: #eb298c;
+  --black: var(--foreground);
+  --grey: var(--foreground-dim);
+  --grey-lighter: var(--surface);
+  --blue: var(--accent);
+  --pink: var(--accent);
 
   --font-family-mono: "Roboto Mono", "Courier New", monospace;
 
@@ -69,24 +80,41 @@ ol, ul {
    ========================================================================== */
 
 body {
-  background: var(--white);
-  color: var(--black);
+  background: var(--background);
+  color: var(--foreground);
   font-family: var(--font-family-mono);
   font-size: var(--font-size-base);
   font-weight: 550;
   line-height: 1.3;
+  letter-spacing: 0.02em;
+}
+
+/* Noise texture overlay for terminal grain effect */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
 }
 
 a {
-  color: var(--black);
+  color: var(--foreground);
   text-decoration: none;
-  border-bottom: 1px solid var(--blue);
+  border-bottom: 1px solid var(--accent);
+  transition: all 0.2s ease;
 }
 
 a:hover {
-  color: var(--white);
-  background: var(--pink);
-  border-bottom-color: var(--pink);
+  color: var(--accent);
+  background: transparent;
+  border-bottom-color: var(--accent);
+  text-shadow: 0 0 8px var(--glow-cyan);
 }
 
 .container {
@@ -100,8 +128,25 @@ a:hover {
 code {
   font-family: var(--font-family-mono);
   font-size: var(--font-size-small);
-  background: var(--grey-lighter);
-  padding: 2px 4px;
+  background: var(--surface);
+  padding: 2px 6px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--foreground);
+}
+
+pre {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 16px;
+  overflow-x: auto;
+}
+
+pre code {
+  background: transparent;
+  border: none;
+  padding: 0;
 }
 
 /* ==========================================================================
@@ -114,7 +159,7 @@ code {
   margin-bottom: 15px;
   padding-bottom: 15px;
   flex-direction: column;
-  border-bottom: 3px dotted var(--black);
+  border-bottom: 1px solid var(--border);
 }
 
 .author p {
@@ -126,12 +171,15 @@ code {
   font-weight: 700;
   margin: 15px 0 10px;
   font-size: var(--font-size-large);
+  text-shadow: 0 0 10px var(--glow-green);
 }
 
 .author img {
   width: 100px;
   height: 100px;
   border-radius: 100px;
+  border: 2px solid var(--border);
+  box-shadow: 0 0 15px var(--glow-green);
 }
 
 .author--is-small {
@@ -177,7 +225,7 @@ code {
   margin-bottom: 0;
   padding-bottom: 8px;
   justify-items: center;
-  border-bottom: 3px dotted var(--grey-lighter);
+  border-bottom: 1px solid var(--border);
 }
 
 .articles article:last-child {
@@ -194,18 +242,21 @@ code {
   flex: 1;
   display: flex;
   align-items: center;
-  color: var(--black);
+  color: var(--foreground);
   justify-content: space-between;
   border-bottom: none;
+  padding: 8px 0;
+  transition: all 0.2s ease;
 }
 
 .articles article a:hover {
-  color: var(--white);
-  background: var(--pink);
+  color: var(--accent);
+  background: transparent;
+  text-shadow: 0 0 8px var(--glow-cyan);
 }
 
 .articles article a:hover time {
-  color: var(--white);
+  color: var(--accent);
 }
 
 .articles article time {
@@ -240,6 +291,7 @@ code {
   font-weight: 700;
   margin-bottom: 0px;
   font-size: var(--font-size-large);
+  text-shadow: 0 0 10px var(--glow-green);
 }
 
 .article h2 {
@@ -247,6 +299,7 @@ code {
   font-size: var(--font-size-medium);
   margin-bottom: 15px;
   margin-top: 30px;
+  text-shadow: 0 0 6px var(--glow-green);
 }
 
 .article h3 {
@@ -277,7 +330,7 @@ code {
 .article hr {
   height: 1px;
   border: none;
-  background: var(--grey-lighter);
+  background: var(--border);
 }
 
 .article img {
@@ -294,7 +347,8 @@ code {
   padding-left: 25px;
   font-style: italic;
   font-size: var(--font-size-medium);
-  border-left: 5px solid var(--black);
+  border-left: 3px solid var(--accent);
+  color: var(--foreground-dim);
 }
 
 .article li:not(:last-of-type) a:only-child {
@@ -320,11 +374,24 @@ code {
   margin-top: 2px;
   font-weight: 600;
   font-size: 1.2rem;
+  color: var(--foreground);
+  border-bottom: 1px solid var(--accent);
+}
+
+.social a.resume:hover {
+  color: var(--accent);
+  text-shadow: 0 0 8px var(--glow-cyan);
 }
 
 .social img {
   width: 20px;
   height: 20px;
+  filter: invert(1) sepia(1) saturate(5) hue-rotate(85deg);
+  transition: filter 0.2s ease;
+}
+
+.social a:hover img {
+  filter: invert(1) sepia(1) saturate(5) hue-rotate(130deg);
 }
 
 /* ==========================================================================
@@ -333,9 +400,19 @@ code {
 
 .footer {
   padding-top: 40px;
-  border-top: 3px dotted var(--black);
-  color: var(--grey);
+  margin-top: 40px;
+  border-top: 1px solid var(--border);
+  color: var(--foreground-dim);
   font-size: var(--font-size-small);
+}
+
+.footer a {
+  color: var(--foreground-dim);
+  border-bottom-color: var(--border);
+}
+
+.footer a:hover {
+  color: var(--accent);
 }
 
 /* ==========================================================================
@@ -350,12 +427,13 @@ table {
 
 th,
 td {
-  border: 1px solid var(--grey-lighter);
+  border: 1px solid var(--border);
   padding: 0.6rem;
   text-align: left;
 }
 
 th {
   font-weight: 700;
-  background: var(--grey-lighter);
+  background: var(--surface);
+  color: var(--accent);
 }
