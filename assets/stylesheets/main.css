@@ -1,10 +1,10 @@
-@import "./_globals/_variables.css";
-@import "./_globals/_reset.css";
-@import "./_globals/_base.css";
+@import "_globals/_variables.css";
+@import "_globals/_reset.css";
+@import "_globals/_base.css";
 
-@import "./_components/_author.css";
-@import "./_components/_articles.css";
-@import "./_components/_article.css";
-@import "./_components/_social.css";
-@import "./_components/_footer.css";
-@import "./_components/_table.css";
+@import "_components/_author.css";
+@import "_components/_articles.css";
+@import "_components/_article.css";
+@import "_components/_social.css";
+@import "_components/_footer.css";
+@import "_components/_table.css";

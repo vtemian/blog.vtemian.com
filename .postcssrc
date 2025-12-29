@@ -1,6 +1,9 @@
 {
   "modules": false,
   "plugins": {
+    "postcss-import": {
+      "path": ["assets/stylesheets"]
+    },
     "postcss-nested": {
       "preserveEmpty": true
     }
