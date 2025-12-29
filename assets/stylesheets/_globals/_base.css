@@ -25,10 +25,6 @@ a {
   margin: 0 auto;
   box-sizing: border-box;
   max-width: var(--container-width);
-
-  &--is-large {
-    max-width: var(--container-width-large);
-  }
 }
 
 code {

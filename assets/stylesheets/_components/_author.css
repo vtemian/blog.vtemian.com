@@ -36,3 +36,20 @@
     }
   }
 }
+
+.about {
+  margin-top: 25px;
+  margin-bottom: 10px;
+  padding: 0;
+  font-size: var(--font-size-medium);
+  line-height: 1.7;
+  text-align: left;
+
+  p {
+    color: var(--black);
+  }
+
+  strong {
+    font-weight: 700;
+  }
+}
