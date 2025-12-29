@@ -1,56 +1,54 @@
 ---
 date: 2025-12-29
-topic: "Terminal Aesthetic Redesign"
+topic: "Modern Monospace Aesthetic Redesign"
 status: validated
 ---
 
 ## Problem Statement
 
-The current blog has a brutalist/developer minimalist design with a light theme. The goal is to transform it into a dark terminal aesthetic similar to nof1.ai - simple, professional, readable, with subtle terminal-inspired effects.
+The current blog has a solid brutalist/developer minimalist design. The goal is to refine it with a more modern "2026" aesthetic similar to nof1.ai's light mode - professional, clean, monospace, with subtle texture and muted colors.
 
 ## Constraints
 
 - Pure CSS changes only - no JavaScript, no build process changes
-- Must remain readable for long-form technical blog posts
+- Keep light/white background
 - Keep existing layout structure (single column, 720px max)
-- No theme toggle - dark mode only
-- No new dependencies
+- No new dependencies (except possibly a font swap)
 
 ## Approach
 
-Transform the existing CSS variables and add minimal new styles to achieve a terminal aesthetic. The key is restraint - enough visual interest to feel "terminal" without becoming gimmicky or hurting readability.
+Polish pass on existing design:
+1. Add subtle noise texture overlay for visual depth
+2. Switch from Roboto Mono to IBM Plex Mono (more refined)
+3. Replace pink accent with muted blue
+4. Add smooth transitions on hover states
+5. Clean up borders (solid instead of dotted)
 
 ## Architecture
 
-No structural changes. All modifications happen in `assets/stylesheets/`:
-- `_globals/_variables.css` - New color palette
-- `_globals/_base.css` - Background, noise texture, base typography
-- `_components/*` - Update colors to use new variables, add subtle effects
+No structural changes. All modifications happen in `assets/stylesheets/` and one partial.
 
 ## Components
 
 ### Color System
 
-Replace current palette with terminal colors:
-
 | Variable | Current | New | Purpose |
 |----------|---------|-----|---------|
-| `--background` | (implicit white) | `#000000` | Page background |
-| `--black` | `#232333` | `#00ff00` | Rename to `--foreground`, primary text |
-| `--grey` | `#a5a5a5` | `#00aa00` | Secondary text (dates, muted content) |
-| `--grey-lighter` | `#f2f2f2` | `#1a1a1a` | Borders, code backgrounds |
-| `--blue` | `#5694f1` | `#00ffff` | Link underlines (cyan accent) |
-| `--pink` | `#eb298c` | `#00ffff` | Hover states (cyan accent) |
+| `--white` | `#ffffff` | `#ffffff` | Keep |
+| `--black` | `#232333` | `#1e293b` | Slightly softer black (slate-800) |
+| `--grey` | `#a5a5a5` | `#64748b` | Muted slate grey |
+| `--grey-lighter` | `#f2f2f2` | `#f1f5f9` | Subtle warm grey |
+| `--blue` | `#5694f1` | `#3b82f6` | Keep similar blue for links |
+| `--pink` | `#eb298c` | `#1e293b` | Replace with dark text on hover (inverted) |
 
-New variables to add:
-- `--glow-color: rgba(0, 255, 0, 0.4)` - For text-shadow glow effects
+New variable:
 - `--noise-opacity: 0.03` - Subtle noise texture intensity
 
 ### Noise Texture Overlay
 
-Add SVG noise filter as pseudo-element on body:
+Add SVG noise filter as pseudo-element on body - same technique as nof1.ai but very subtle:
 
-```
+```css
 body::before {
   content: "";
   position: fixed;
@@ -58,52 +56,65 @@ body::before {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url("data:image/svg+xml,..."); /* inline SVG noise */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.03;
   pointer-events: none;
   z-index: 9999;
-  opacity: var(--noise-opacity);
 }
 ```
 
-This creates the subtle grain effect seen on nof1.ai without external assets.
+### Typography
 
-### Typography Adjustments
+Switch font family:
+- Current: `"Roboto Mono", "Courier New", monospace`
+- New: `"IBM Plex Mono", "Courier New", monospace`
 
-- Keep Roboto Mono (already terminal-appropriate)
-- Add subtle letter-spacing increase (`0.02em`) for terminal feel
-- Add text-shadow glow on headings: `0 0 10px var(--glow-color)`
+Add Google Font import in header partial or use system monospace fallback.
+
+Slight letter-spacing refinement: `0.01em` for body text.
 
 ### Link Behavior
 
 Current: Black text with blue underline, pink background on hover
-New: Green text with cyan underline, cyan glow on hover
+New: Black text with blue underline, blue text on hover (no background change)
 
-```
+```css
 a {
-  color: var(--foreground);
+  color: var(--black);
+  text-decoration: none;
   border-bottom: 1px solid var(--blue);
-  transition: all 0.2s ease;
+  transition: color 0.15s ease;
 }
 
 a:hover {
   color: var(--blue);
-  text-shadow: 0 0 8px var(--blue);
 }
 ```
 
-### Code Blocks
+### Article List Hover
 
-- Background: `--grey-lighter` (dark grey `#1a1a1a`)
-- Text: Bright green for contrast
-- Consider switching highlight.js theme from `atom-one-light` to a dark theme like `atom-one-dark` or `monokai`
+Current: Pink background, white text
+New: Subtle grey background, keep text colors
+
+```css
+.articles article:hover {
+  background-color: var(--grey-lighter);
+}
+```
 
 ### Borders
 
-Replace dotted borders with solid subtle ones:
-- Current: `3px dotted var(--grey-lighter)` 
-- New: `1px solid var(--grey-lighter)` or `1px solid #333`
+Replace dotted with solid:
+- Current: `3px dotted var(--grey-lighter)`
+- New: `1px solid var(--grey-lighter)`
 
-The dotted pattern feels more "cute minimalist" than "terminal".
+More refined, less playful.
+
+### Transitions
+
+Add smooth transitions throughout (currently none):
+- Links: `transition: color 0.15s ease`
+- Hover states: `transition: background-color 0.15s ease`
 
 ## Data Flow
 
@@ -115,26 +126,18 @@ N/A - CSS only.
 
 ## Testing Strategy
 
-1. Visual inspection on development server (`yarn dev`)
+1. Visual inspection on development server (`hugo server -D`)
 2. Check all pages: homepage, individual posts
-3. Verify code block readability with syntax highlighting
+3. Verify readability and contrast
 4. Test on mobile viewport
-5. Ensure images (avatar, post images) still look good on dark background
-
-## Open Questions
-
-1. **Avatar image** - Current avatar may need adjustment for dark background (add subtle border or glow?)
-2. **Social icons** - May need to invert or replace if they're dark icons on transparent background
-3. **Highlight.js theme** - Switch to dark theme (requires changing CDN URL in header partial)
 
 ## Summary of Changes
 
 Files to modify:
-1. `assets/stylesheets/_globals/_variables.css` - New color palette
-2. `assets/stylesheets/_globals/_base.css` - Dark background, noise texture, transitions
-3. `assets/stylesheets/_components/_author.css` - Update colors
-4. `assets/stylesheets/_components/_articles.css` - Update colors, hover states
-5. `assets/stylesheets/_components/_article.css` - Update colors, code blocks
-6. `assets/stylesheets/_components/_social.css` - Possibly invert icons
-7. `assets/stylesheets/_components/_footer.css` - Update colors
-8. `layouts/partials/header.html` - Change highlight.js to dark theme
+1. `assets/stylesheets/_globals/_variables.css` - Updated color palette
+2. `assets/stylesheets/_globals/_base.css` - Noise texture, transitions, font
+3. `assets/stylesheets/_components/_author.css` - Solid borders
+4. `assets/stylesheets/_components/_articles.css` - Hover states, solid borders
+5. `assets/stylesheets/_components/_article.css` - Solid borders
+6. `assets/stylesheets/_components/_footer.css` - Solid borders
+7. `layouts/partials/header.html` - Add IBM Plex Mono font import
