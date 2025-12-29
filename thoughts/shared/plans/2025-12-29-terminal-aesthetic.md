@@ -1,21 +1,61 @@
-# Terminal Aesthetic Redesign Implementation Plan
+# Modern Monospace Aesthetic Implementation Plan
 
-**Goal:** Transform the blog from a light brutalist theme to a dark terminal aesthetic with green text, cyan accents, subtle glow effects, and noise texture overlay.
+**Goal:** Polish the blog with a refined 2026 aesthetic - professional, clean, monospace with subtle texture and muted colors while keeping the light background.
 
-**Architecture:** Pure CSS changes to `assets/stylesheets/main.css` plus one highlight.js theme swap in `layouts/partials/header.html`. No JavaScript, no build changes, no new dependencies.
+**Architecture:** Pure CSS changes to `assets/stylesheets/main.css` plus one font import in `layouts/partials/header.html`. No JavaScript, no build changes.
 
 **Design:** [thoughts/shared/designs/2025-12-29-terminal-aesthetic-design.md](../designs/2025-12-29-terminal-aesthetic-design.md)
 
 ---
 
-## Task 1: Update CSS Variables for Terminal Color Palette
+## Task 1: Add IBM Plex Mono Font Import
+
+**Files:**
+- Modify: `layouts/partials/header.html` (add after line 2)
+
+**Step 1: Add Google Fonts import for IBM Plex Mono**
+
+In `layouts/partials/header.html`, find:
+
+```html
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width,minimum-scale=1">
+```
+
+Add after line 2:
+
+```html
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width,minimum-scale=1">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+```
+
+**Step 2: Verify the change**
+
+Run: `hugo server -D`
+Open browser dev tools, check Network tab
+Expected: IBM Plex Mono font files load from fonts.gstatic.com
+
+**Step 3: Commit**
+
+```bash
+git add layouts/partials/header.html
+git commit -m "feat(theme): add IBM Plex Mono font import"
+```
+
+---
+
+## Task 2: Update CSS Variables for Muted Color Palette
 
 **Files:**
 - Modify: `assets/stylesheets/main.css` (lines 5-21)
 
-**Step 1: Replace the Variables section with terminal colors**
+**Step 1: Replace the Variables section with muted palette**
 
-In `assets/stylesheets/main.css`, replace lines 5-21:
+In `assets/stylesheets/main.css`, find lines 5-21:
 
 ```css
 :root {
@@ -37,29 +77,17 @@ In `assets/stylesheets/main.css`, replace lines 5-21:
 }
 ```
 
-With this new terminal palette:
+Replace with:
 
 ```css
 :root {
-  /* Terminal color palette */
-  --background: #0a0a0a;
-  --foreground: #00ff00;
-  --foreground-dim: #00aa00;
-  --surface: #1a1a1a;
-  --border: #333333;
-  --accent: #00ffff;
-  --glow-green: rgba(0, 255, 0, 0.4);
-  --glow-cyan: rgba(0, 255, 255, 0.5);
-
-  /* Legacy aliases for compatibility */
   --white: #ffffff;
-  --black: var(--foreground);
-  --grey: var(--foreground-dim);
-  --grey-lighter: var(--surface);
-  --blue: var(--accent);
-  --pink: var(--accent);
+  --black: #1e293b;
+  --grey: #64748b;
+  --grey-lighter: #f1f5f9;
+  --blue: #3b82f6;
 
-  --font-family-mono: "Roboto Mono", "Courier New", monospace;
+  --font-family-mono: "IBM Plex Mono", "Courier New", monospace;
 
   --font-size-base: 0.9em;
   --font-size-small: 0.85em;
@@ -73,23 +101,23 @@ With this new terminal palette:
 **Step 2: Verify the change**
 
 Run: `hugo server -D`
-Expected: Site loads with green text on dark background
+Expected: Text appears in IBM Plex Mono, colors are slightly softer/muted
 
 **Step 3: Commit**
 
 ```bash
 git add assets/stylesheets/main.css
-git commit -m "feat(theme): add terminal color palette variables"
+git commit -m "feat(theme): update color palette to muted slate tones and IBM Plex Mono"
 ```
 
 ---
 
-## Task 2: Update Body Base Styles with Dark Background and Noise Texture
+## Task 3: Add Noise Texture Overlay and Letter Spacing
 
 **Files:**
 - Modify: `assets/stylesheets/main.css` (lines 71-78)
 
-**Step 1: Replace the body styles in the Base section**
+**Step 1: Update body styles and add noise texture pseudo-element**
 
 Find this block (around line 71-78):
 
@@ -108,16 +136,15 @@ Replace with:
 
 ```css
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--white);
+  color: var(--black);
   font-family: var(--font-family-mono);
   font-size: var(--font-size-base);
-  font-weight: 550;
+  font-weight: 500;
   line-height: 1.3;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
 }
 
-/* Noise texture overlay for terminal grain effect */
 body::before {
   content: "";
   position: fixed;
@@ -125,33 +152,33 @@ body::before {
   left: 0;
   width: 100%;
   height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.03;
   pointer-events: none;
   z-index: 9999;
-  opacity: 0.03;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
 }
 ```
 
 **Step 2: Verify the change**
 
 Run: `hugo server -D`
-Expected: Dark background with subtle grain texture visible
+Expected: Very subtle grain texture visible over the white background (look closely)
 
 **Step 3: Commit**
 
 ```bash
 git add assets/stylesheets/main.css
-git commit -m "feat(theme): add dark background with noise texture overlay"
+git commit -m "feat(theme): add subtle noise texture overlay and letter spacing"
 ```
 
 ---
 
-## Task 3: Update Link Styles with Glow Effects
+## Task 4: Update Link Styles with Smooth Transitions
 
 **Files:**
 - Modify: `assets/stylesheets/main.css` (lines 80-90)
 
-**Step 1: Replace the link styles**
+**Step 1: Replace link styles with transition-based hover**
 
 Find this block (around line 80-90):
 
@@ -173,170 +200,75 @@ Replace with:
 
 ```css
 a {
-  color: var(--foreground);
+  color: var(--black);
   text-decoration: none;
-  border-bottom: 1px solid var(--accent);
-  transition: all 0.2s ease;
+  border-bottom: 1px solid var(--blue);
+  transition: color 0.15s ease;
 }
 
 a:hover {
-  color: var(--accent);
-  background: transparent;
-  border-bottom-color: var(--accent);
-  text-shadow: 0 0 8px var(--glow-cyan);
+  color: var(--blue);
 }
 ```
 
 **Step 2: Verify the change**
 
 Run: `hugo server -D`
-Expected: Links have cyan underline, glow cyan on hover (no pink background)
+Hover over any link
+Expected: Text smoothly transitions to blue on hover (no pink background)
 
 **Step 3: Commit**
 
 ```bash
 git add assets/stylesheets/main.css
-git commit -m "feat(theme): update links with cyan glow hover effect"
+git commit -m "feat(theme): update links with smooth color transition on hover"
 ```
 
 ---
 
-## Task 4: Update Code Block Styles
+## Task 5: Update Author Section with Solid Border
 
 **Files:**
-- Modify: `assets/stylesheets/main.css` (lines 100-105)
+- Modify: `assets/stylesheets/main.css` (lines 111-118)
 
-**Step 1: Replace the code styles**
+**Step 1: Replace dotted border with solid border**
 
-Find this block (around line 100-105):
-
-```css
-code {
-  font-family: var(--font-family-mono);
-  font-size: var(--font-size-small);
-  background: var(--grey-lighter);
-  padding: 2px 4px;
-}
-```
-
-Replace with:
+Find this block (around line 111-118):
 
 ```css
-code {
-  font-family: var(--font-family-mono);
-  font-size: var(--font-size-small);
-  background: var(--surface);
-  padding: 2px 6px;
-  border: 1px solid var(--border);
-  border-radius: 3px;
-  color: var(--foreground);
-}
-
-pre {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 16px;
-  overflow-x: auto;
-}
-
-pre code {
-  background: transparent;
-  border: none;
-  padding: 0;
-}
-```
-
-**Step 2: Verify the change**
-
-Run: `hugo server -D`
-Expected: Code blocks have dark background with subtle border
-
-**Step 3: Commit**
-
-```bash
-git add assets/stylesheets/main.css
-git commit -m "feat(theme): style code blocks for dark terminal theme"
-```
-
----
-
-## Task 5: Update Author Section with Solid Borders
-
-**Files:**
-- Modify: `assets/stylesheets/main.css` (lines 111-165)
-
-**Step 1: Update the author section border and add avatar glow**
-
-Find this line (around line 117):
-
-```css
+.author {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  flex-direction: column;
   border-bottom: 3px dotted var(--black);
-```
-
-Replace with:
-
-```css
-  border-bottom: 1px solid var(--border);
-```
-
-**Step 2: Add glow effect to author name**
-
-Find this block (around line 125-129):
-
-```css
-.author h1 {
-  font-weight: 700;
-  margin: 15px 0 10px;
-  font-size: var(--font-size-large);
 }
 ```
 
 Replace with:
 
 ```css
-.author h1 {
-  font-weight: 700;
-  margin: 15px 0 10px;
-  font-size: var(--font-size-large);
-  text-shadow: 0 0 10px var(--glow-green);
+.author {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  flex-direction: column;
+  border-bottom: 1px solid var(--grey-lighter);
 }
 ```
 
-**Step 3: Add subtle glow to avatar**
-
-Find this block (around line 131-135):
-
-```css
-.author img {
-  width: 100px;
-  height: 100px;
-  border-radius: 100px;
-}
-```
-
-Replace with:
-
-```css
-.author img {
-  width: 100px;
-  height: 100px;
-  border-radius: 100px;
-  border: 2px solid var(--border);
-  box-shadow: 0 0 15px var(--glow-green);
-}
-```
-
-**Step 4: Verify the change**
+**Step 2: Verify the change**
 
 Run: `hugo server -D`
-Expected: Author name glows green, avatar has subtle green glow border, solid border instead of dotted
+Expected: Author section has thin solid grey border instead of thick dotted black
 
-**Step 5: Commit**
+**Step 3: Commit**
 
 ```bash
 git add assets/stylesheets/main.css
-git commit -m "feat(theme): update author section with glow effects and solid border"
+git commit -m "feat(theme): replace author section dotted border with solid"
 ```
 
 ---
@@ -344,25 +276,37 @@ git commit -m "feat(theme): update author section with glow effects and solid bo
 ## Task 6: Update Articles List with Solid Borders and Hover Effects
 
 **Files:**
-- Modify: `assets/stylesheets/main.css` (lines 167-214)
+- Modify: `assets/stylesheets/main.css` (lines 175-213)
 
 **Step 1: Update article list border**
 
-Find this line (around line 180):
+Find this block (around line 175-181):
 
 ```css
+.articles article {
+  display: flex;
+  margin-bottom: 0;
+  padding-bottom: 8px;
+  justify-items: center;
   border-bottom: 3px dotted var(--grey-lighter);
+}
 ```
 
 Replace with:
 
 ```css
-  border-bottom: 1px solid var(--border);
+.articles article {
+  display: flex;
+  margin-bottom: 0;
+  padding-bottom: 8px;
+  justify-items: center;
+  border-bottom: 1px solid var(--grey-lighter);
+}
 ```
 
 **Step 2: Update article link hover states**
 
-Find this block (around line 193-205):
+Find this block (around line 193-209):
 
 ```css
 .articles article a {
@@ -391,234 +335,43 @@ Replace with:
   flex: 1;
   display: flex;
   align-items: center;
-  color: var(--foreground);
+  color: var(--black);
   justify-content: space-between;
   border-bottom: none;
-  padding: 8px 0;
-  transition: all 0.2s ease;
+  padding: 4px 0;
+  transition: background-color 0.15s ease;
 }
 
 .articles article a:hover {
-  color: var(--accent);
-  background: transparent;
-  text-shadow: 0 0 8px var(--glow-cyan);
+  background-color: var(--grey-lighter);
 }
 
 .articles article a:hover time {
-  color: var(--accent);
+  color: var(--grey);
 }
 ```
 
 **Step 3: Verify the change**
 
 Run: `hugo server -D`
-Expected: Article links glow cyan on hover, no pink background, solid borders
+Hover over article links
+Expected: Subtle grey background on hover, smooth transition, solid borders
 
 **Step 4: Commit**
 
 ```bash
 git add assets/stylesheets/main.css
-git commit -m "feat(theme): update article list with glow hover and solid borders"
+git commit -m "feat(theme): update article list with solid borders and subtle hover"
 ```
 
 ---
 
-## Task 7: Update Single Article Styles
+## Task 7: Update Footer with Solid Border
 
 **Files:**
-- Modify: `assets/stylesheets/main.css` (lines 216-303)
+- Modify: `assets/stylesheets/main.css` (lines 334-339)
 
-**Step 1: Add glow to article headings**
-
-Find this block (around line 239-243):
-
-```css
-.article h1 {
-  font-weight: 700;
-  margin-bottom: 0px;
-  font-size: var(--font-size-large);
-}
-```
-
-Replace with:
-
-```css
-.article h1 {
-  font-weight: 700;
-  margin-bottom: 0px;
-  font-size: var(--font-size-large);
-  text-shadow: 0 0 10px var(--glow-green);
-}
-```
-
-**Step 2: Add subtle glow to h2 headings**
-
-Find this block (around line 245-250):
-
-```css
-.article h2 {
-  font-weight: 700;
-  font-size: var(--font-size-medium);
-  margin-bottom: 15px;
-  margin-top: 30px;
-}
-```
-
-Replace with:
-
-```css
-.article h2 {
-  font-weight: 700;
-  font-size: var(--font-size-medium);
-  margin-bottom: 15px;
-  margin-top: 30px;
-  text-shadow: 0 0 6px var(--glow-green);
-}
-```
-
-**Step 3: Update hr and blockquote colors**
-
-Find this block (around line 277-281):
-
-```css
-.article hr {
-  height: 1px;
-  border: none;
-  background: var(--grey-lighter);
-}
-```
-
-Replace with:
-
-```css
-.article hr {
-  height: 1px;
-  border: none;
-  background: var(--border);
-}
-```
-
-Find this block (around line 292-298):
-
-```css
-.article blockquote {
-  margin-left: -25px;
-  padding-left: 25px;
-  font-style: italic;
-  font-size: var(--font-size-medium);
-  border-left: 5px solid var(--black);
-}
-```
-
-Replace with:
-
-```css
-.article blockquote {
-  margin-left: -25px;
-  padding-left: 25px;
-  font-style: italic;
-  font-size: var(--font-size-medium);
-  border-left: 3px solid var(--accent);
-  color: var(--foreground-dim);
-}
-```
-
-**Step 4: Verify the change**
-
-Run: `hugo server -D`
-Expected: Article headings glow, blockquotes have cyan border
-
-**Step 5: Commit**
-
-```bash
-git add assets/stylesheets/main.css
-git commit -m "feat(theme): update article headings with glow and blockquote styling"
-```
-
----
-
-## Task 8: Update Social Icons with Invert Filter
-
-**Files:**
-- Modify: `assets/stylesheets/main.css` (lines 305-328)
-
-**Step 1: Add invert filter to social icons**
-
-Find this block (around line 325-328):
-
-```css
-.social img {
-  width: 20px;
-  height: 20px;
-}
-```
-
-Replace with:
-
-```css
-.social img {
-  width: 20px;
-  height: 20px;
-  filter: invert(1) sepia(1) saturate(5) hue-rotate(85deg);
-  transition: filter 0.2s ease;
-}
-
-.social a:hover img {
-  filter: invert(1) sepia(1) saturate(5) hue-rotate(130deg);
-}
-```
-
-**Step 2: Update resume link styling**
-
-Find this block (around line 318-323):
-
-```css
-.social a.resume {
-  margin-left: 10px;
-  margin-top: 2px;
-  font-weight: 600;
-  font-size: 1.2rem;
-}
-```
-
-Replace with:
-
-```css
-.social a.resume {
-  margin-left: 10px;
-  margin-top: 2px;
-  font-weight: 600;
-  font-size: 1.2rem;
-  color: var(--foreground);
-  border-bottom: 1px solid var(--accent);
-}
-
-.social a.resume:hover {
-  color: var(--accent);
-  text-shadow: 0 0 8px var(--glow-cyan);
-}
-```
-
-**Step 3: Verify the change**
-
-Run: `hugo server -D`
-Expected: Social icons appear green, turn cyan on hover
-
-**Step 4: Commit**
-
-```bash
-git add assets/stylesheets/main.css
-git commit -m "feat(theme): invert social icons for dark theme"
-```
-
----
-
-## Task 9: Update Footer with Solid Border
-
-**Files:**
-- Modify: `assets/stylesheets/main.css` (lines 330-339)
-
-**Step 1: Update footer border**
+**Step 1: Replace dotted border with solid border**
 
 Find this block (around line 334-339):
 
@@ -637,137 +390,39 @@ Replace with:
 .footer {
   padding-top: 40px;
   margin-top: 40px;
-  border-top: 1px solid var(--border);
-  color: var(--foreground-dim);
+  border-top: 1px solid var(--grey-lighter);
+  color: var(--grey);
   font-size: var(--font-size-small);
 }
-
-.footer a {
-  color: var(--foreground-dim);
-  border-bottom-color: var(--border);
-}
-
-.footer a:hover {
-  color: var(--accent);
-}
 ```
 
 **Step 2: Verify the change**
 
 Run: `hugo server -D`
-Expected: Footer has solid border, dimmer text, links work correctly
+Expected: Footer has thin solid grey border instead of thick dotted black
 
 **Step 3: Commit**
 
 ```bash
 git add assets/stylesheets/main.css
-git commit -m "feat(theme): update footer with solid border and dim styling"
+git commit -m "feat(theme): replace footer dotted border with solid"
 ```
 
 ---
 
-## Task 10: Update Table Styles
-
-**Files:**
-- Modify: `assets/stylesheets/main.css` (lines 341-362)
-
-**Step 1: Update table colors for dark theme**
-
-Find this block (around line 351-361):
-
-```css
-th,
-td {
-  border: 1px solid var(--grey-lighter);
-  padding: 0.6rem;
-  text-align: left;
-}
-
-th {
-  font-weight: 700;
-  background: var(--grey-lighter);
-}
-```
-
-Replace with:
-
-```css
-th,
-td {
-  border: 1px solid var(--border);
-  padding: 0.6rem;
-  text-align: left;
-}
-
-th {
-  font-weight: 700;
-  background: var(--surface);
-  color: var(--accent);
-}
-```
-
-**Step 2: Verify the change**
-
-Run: `hugo server -D`
-Expected: Tables have dark background, cyan headers
-
-**Step 3: Commit**
-
-```bash
-git add assets/stylesheets/main.css
-git commit -m "feat(theme): update table styles for dark theme"
-```
-
----
-
-## Task 11: Switch Highlight.js to Dark Theme
-
-**Files:**
-- Modify: `layouts/partials/header.html` (line 5)
-
-**Step 1: Change highlight.js theme from atom-one-light to atom-one-dark**
-
-Find this line (line 5):
-
-```html
-<link rel="stylesheet"
-      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.1/styles/atom-one-light.min.css">
-```
-
-Replace with:
-
-```html
-<link rel="stylesheet"
-      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.1/styles/atom-one-dark.min.css">
-```
-
-**Step 2: Verify the change**
-
-Run: `hugo server -D`
-Navigate to a blog post with code blocks
-Expected: Code syntax highlighting uses dark theme colors
-
-**Step 3: Commit**
-
-```bash
-git add layouts/partials/header.html
-git commit -m "feat(theme): switch to dark syntax highlighting theme"
-```
-
----
-
-## Task 12: Final Verification and Cleanup
+## Task 8: Final Verification
 
 **Step 1: Full visual inspection**
 
 Run: `hugo server -D`
 
 Check all pages:
-- [ ] Homepage: Dark background, green text, avatar glows, social icons visible
-- [ ] Article list: Hover effects work, solid borders
-- [ ] Single post: Headings glow, code blocks readable, images visible
-- [ ] Tables: Dark background, cyan headers
-- [ ] Footer: Solid border, links work
+- [ ] Homepage: Light background, IBM Plex Mono font, subtle noise texture
+- [ ] Author section: Solid grey border, muted colors
+- [ ] Article list: Solid borders, subtle grey hover effect (no pink)
+- [ ] Links: Blue underline, blue text on hover with smooth transition
+- [ ] Footer: Solid grey border
+- [ ] Overall: Professional, refined, muted aesthetic
 
 **Step 2: Check mobile viewport**
 
@@ -775,18 +430,12 @@ Open browser dev tools, test at 375px width:
 - [ ] Layout still works
 - [ ] Text readable
 - [ ] No horizontal scroll
+- [ ] Hover states work on touch
 
 **Step 3: Build for production**
 
 Run: `hugo --gc --minify`
 Expected: Build completes without errors
-
-**Step 4: Final commit (if any fixes needed)**
-
-```bash
-git add -A
-git commit -m "feat(theme): complete terminal aesthetic redesign"
-```
 
 ---
 
@@ -794,28 +443,36 @@ git commit -m "feat(theme): complete terminal aesthetic redesign"
 
 | File | Changes |
 |------|---------|
-| `assets/stylesheets/main.css` | New color palette, dark background, noise texture, glow effects, solid borders, inverted icons |
-| `layouts/partials/header.html` | Switch highlight.js to atom-one-dark theme |
+| `layouts/partials/header.html` | Add IBM Plex Mono Google Font import |
+| `assets/stylesheets/main.css` | Muted color palette, IBM Plex Mono, noise texture, solid borders, smooth transitions |
 
 ## Color Reference
 
-| Element | Color | Hex |
-|---------|-------|-----|
-| Background | Black | `#0a0a0a` |
-| Primary text | Green | `#00ff00` |
-| Secondary text | Dim green | `#00aa00` |
-| Accent/links | Cyan | `#00ffff` |
-| Surfaces | Dark grey | `#1a1a1a` |
-| Borders | Grey | `#333333` |
-| Green glow | Transparent green | `rgba(0, 255, 0, 0.4)` |
-| Cyan glow | Transparent cyan | `rgba(0, 255, 255, 0.5)` |
+| Variable | Old Value | New Value | Purpose |
+|----------|-----------|-----------|---------|
+| `--black` | `#232333` | `#1e293b` | Softer slate-800 for text |
+| `--grey` | `#a5a5a5` | `#64748b` | Muted slate grey |
+| `--grey-lighter` | `#f2f2f2` | `#f1f5f9` | Subtle warm grey for backgrounds |
+| `--blue` | `#5694f1` | `#3b82f6` | Slightly more saturated blue |
+| `--pink` | `#eb298c` | (removed) | No longer used |
+
+## Visual Changes Summary
+
+| Element | Before | After |
+|---------|--------|-------|
+| Font | Roboto Mono | IBM Plex Mono |
+| Background | Plain white | White with 3% noise texture |
+| Link hover | Pink background | Blue text color |
+| Article hover | Pink background | Subtle grey background |
+| Borders | 3px dotted | 1px solid |
+| Transitions | None | 0.15s ease on hover states |
 
 ## Rollback
 
 If issues are discovered:
 
 ```bash
-git revert HEAD~11..HEAD
+git revert HEAD~7..HEAD
 ```
 
-This reverts all 11 commits from this implementation.
+This reverts all 7 commits from this implementation.
