@@ -1,2 +1,0 @@
-(()=>{var r=globalThis,e={},n={},i=r.parcelRequire3713;null==i&&((i=function(r){if(r in e)return e[r].exports;if(r in n){var i=n[r];delete n[r];var t={id:r,exports:{}};return e[r]=t,i.call(t.exports,t,t.exports),t.exports}var a=Error("Cannot find module '"+r+"'");throw a.code="MODULE_NOT_FOUND",a}).register=function(r,e){n[r]=e},r.parcelRequire3713=i),i.register,Object.assign(i.i??={},{cjEW4:"avatar.png",gjSlJ:"github.png",cqsc8:"linkedin.png",k1p8g:"x.png","5CeXi":"rss.png"})})();
-//# sourceMappingURL=index.js.map
