@@ -11,12 +11,12 @@ a {
   color: var(--black);
   text-decoration: none;
   border-bottom: 1px solid var(--blue);
+}
 
-  &:hover {
-    color: var(--white);
-    background: var(--pink);
-    border-bottom-color: var(--pink);
-  }
+a:hover {
+  color: var(--white);
+  background: var(--pink);
+  border-bottom-color: var(--pink);
 }
 
 .container {
