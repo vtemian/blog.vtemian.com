@@ -1,42 +1,18 @@
 {
-  "name": "hugo-pipes-parcel",
-  "version": "2.0.0",
-  "description": "Starter files for a Hugo project",
-  "repository": "https://github.com/theNewDynamic/hugo-starter.git",
-  "author": "budparr <budparr@gmail.com>",
+  "name": "blog-vtemian",
+  "version": "3.0.0",
+  "description": "Personal blog built with Hugo",
+  "author": "Vlad Temian",
   "license": "MIT",
   "scripts": {
-    "clean": "rimraf public/ assets/output static/output resources",
-    "build": "run-s build:parcel build:hugo",
-    "dev": "run-p dev:parcel dev:hugo",
-    "test": "cross-env NODE_ENV=development parcel ./assets/stylesheets/main.css --dist-dir assets/output",
-    "dev:hugo": "cross-env NODE_ENV=development hugo server --gc --disableFastRender --navigateToChanged",
-    "dev:parcel": "cross-env NODE_ENV=development parcel watch",
-    "build:parcel": "cross-env NODE_ENV=development parcel build --no-cache --no-content-hash",
-    "build:hugo": "cross-env NODE_ENV=production hugo --gc --minify"
+    "dev": "hugo server -D",
+    "build": "hugo --minify",
+    "clean": "rimraf public resources"
   },
   "devDependencies": {
-    "@fullhuman/postcss-purgecss": "^7.0.2",
-    "cross-env": "^10.1.0",
-    "npm-run-all": "^4.1.5",
-    "parcel": "^2.16.1",
-    "parcel-namer-hashless": "^1.0.7",
     "postcss": "^8.5.6",
     "postcss-cli": "^11.0.1",
-    "postcss-import": "^16.1.1",
-    "postcss-modules": "^6.0.1",
     "postcss-nested": "^7.0.2",
-    "rimraf": "^6.1.2",
-    "tailwindcss": "^4.1.17",
-    "typeface-roboto": "^1.1.13"
-  },
-  "targets": {
-    "default": {
-      "source": "./assets/index.js",
-      "distDir": "./assets/output/"
-    }
-  },
-  "parcel-namer-hashless": {
-    "exclude": []
+    "rimraf": "^6.1.2"
   }
 }

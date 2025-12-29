@@ -1,31 +1,31 @@
 {{ define "content" }}
 
-{{ $avatar := resources.Get "output/avatar.png" }}
-{{ $github := resources.Get "output/github.png" }}
-{{ $linkedin := resources.Get "output/linkedin.png" }}
-{{ $twitter := resources.Get "output/x.png" }}
-{{ $rss := resources.Get "output/rss.png" }}
+{{ $avatar := resources.Get "images/avatar.png" }}
+{{ $github := resources.Get "images/github.png" }}
+{{ $linkedin := resources.Get "images/linkedin.png" }}
+{{ $twitter := resources.Get "images/x.png" }}
+{{ $rss := resources.Get "images/rss.png" }}
 
 <div class="container">
     <aside class="author">
-        <img src="{{ $avatar.Permalink | relURL }}" alt="Avatar" />
+        <img src="{{ $avatar.RelPermalink }}" alt="Avatar" />
 
         <h1>{{ .Site.Params.author }} </h1>
         <p class="social">
             <a href="https://github.com/vtemian">
-                <img src="{{ $github.Permalink | relURL }}" alt="github" />
+                <img src="{{ $github.RelPermalink }}" alt="github" />
             </a>
 
             <a href="https://www.linkedin.com/in/vtemian">
-                <img src="{{ $linkedin.Permalink | relURL }}" alt="linkedin" />
+                <img src="{{ $linkedin.RelPermalink }}" alt="linkedin" />
             </a>
 
             <a href="https://www.twitter.com/vtemian">
-                <img src="{{ $twitter.Permalink | relURL }}" alt="twitter" />
+                <img src="{{ $twitter.RelPermalink }}" alt="twitter" />
             </a>
 
             <a href="index.xml">
-                <img src="{{ $rss.Permalink | relURL }}" alt="rss" />
+                <img src="{{ $rss.RelPermalink }}" alt="rss" />
             </a>
 
             <a href="/resume.pdf" class="resume">
