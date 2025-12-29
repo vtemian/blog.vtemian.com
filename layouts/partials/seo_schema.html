@@ -33,6 +33,7 @@
 {{- end }}
 
 {{/* Open Graph Image - use post image or fallback to avatar */}}
+{{ $avatar := resources.Get "images/avatar.png" }}
 {{- $ogImage := $avatar }}
 {{- with .Params.images }}
   {{- $firstImage := index . 0 }}
