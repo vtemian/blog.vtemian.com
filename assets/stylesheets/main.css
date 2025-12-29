@@ -4,13 +4,12 @@
 
 :root {
   --white: #ffffff;
-  --black: #232333;
-  --grey: #a5a5a5;
-  --grey-lighter: #f2f2f2;
-  --blue: #5694f1;
-  --pink: #eb298c;
+  --black: #1e293b;
+  --grey: #64748b;
+  --grey-lighter: #f1f5f9;
+  --blue: #3b82f6;
 
-  --font-family-mono: "Roboto Mono", "Courier New", monospace;
+  --font-family-mono: "IBM Plex Mono", "Courier New", monospace;
 
   --font-size-base: 0.9em;
   --font-size-small: 0.85em;
@@ -73,20 +72,33 @@ body {
   color: var(--black);
   font-family: var(--font-family-mono);
   font-size: var(--font-size-base);
-  font-weight: 550;
+  font-weight: 500;
   line-height: 1.3;
+  letter-spacing: 0.01em;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 9999;
 }
 
 a {
   color: var(--black);
   text-decoration: none;
   border-bottom: 1px solid var(--blue);
+  transition: color 0.15s ease;
 }
 
 a:hover {
-  color: var(--white);
-  background: var(--pink);
-  border-bottom-color: var(--pink);
+  color: var(--blue);
 }
 
 .container {
@@ -114,7 +126,7 @@ code {
   margin-bottom: 15px;
   padding-bottom: 15px;
   flex-direction: column;
-  border-bottom: 3px dotted var(--black);
+  border-bottom: 1px solid var(--grey-lighter);
 }
 
 .author p {
@@ -177,7 +189,7 @@ code {
   margin-bottom: 0;
   padding-bottom: 8px;
   justify-items: center;
-  border-bottom: 3px dotted var(--grey-lighter);
+  border-bottom: 1px solid var(--grey-lighter);
 }
 
 .articles article:last-child {
@@ -197,15 +209,16 @@ code {
   color: var(--black);
   justify-content: space-between;
   border-bottom: none;
+  padding: 4px 0;
+  transition: background-color 0.15s ease;
 }
 
 .articles article a:hover {
-  color: var(--white);
-  background: var(--pink);
+  background-color: var(--grey-lighter);
 }
 
 .articles article a:hover time {
-  color: var(--white);
+  color: var(--grey);
 }
 
 .articles article time {
@@ -333,7 +346,8 @@ code {
 
 .footer {
   padding-top: 40px;
-  border-top: 3px dotted var(--black);
+  margin-top: 40px;
+  border-top: 1px solid var(--grey-lighter);
   color: var(--grey);
   font-size: var(--font-size-small);
 }
