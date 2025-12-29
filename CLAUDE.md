@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a personal blog built with Hugo (static site generator) and uses Parcel for asset bundling. Content is written in Markdown and styled with custom CSS.
+This is a personal blog built with Hugo (static site generator). Content is written in Markdown and styled with custom CSS processed through Hugo Pipes.
 
 ## Development Commands
 
@@ -12,40 +12,35 @@ This is a personal blog built with Hugo (static site generator) and uses Parcel 
 ```bash
 yarn dev
 ```
-This runs both Hugo's development server (`dev:hugo`) and Parcel's watch mode (`dev:parcel`) concurrently. Hugo serves on http://localhost:1313 with live reload.
+Hugo serves on http://localhost:1313 with live reload and draft posts enabled.
 
 **Build for production:**
 ```bash
 yarn build
 ```
-This runs Parcel bundling followed by Hugo's production build with minification.
+Hugo's production build with minification.
 
 **Clean build artifacts:**
 ```bash
 yarn clean
 ```
-Removes `public/`, `assets/output/`, `static/output/`, and `resources/` directories.
-
-**Test Parcel bundling:**
-```bash
-yarn test
-```
-Builds main.css to test Parcel configuration without running Hugo.
+Removes `public/` and `resources/` directories.
 
 ## Architecture
 
-### Asset Pipeline (Hugo + Parcel)
+### Asset Pipeline (Hugo Pipes)
 
-The project uses a two-stage build process:
+The project uses Hugo's native asset pipeline:
 
-1. **Parcel** bundles assets from `assets/` → `assets/output/`
-2. **Hugo** consumes bundled assets and generates the final site in `public/`
+1. **Hugo Pipes** processes CSS through PostCSS (handles nested syntax)
+2. **Hugo** fingerprints assets for cache busting in production
+3. Final static site generated in `public/`
 
-Assets entry point: `assets/index.js` imports:
-- `stylesheets/main.css` (CSS entry point)
-- Images (avatar, social icons)
+Assets are stored in `assets/`:
+- `stylesheets/main.css` - CSS entry point (uses postcss-nested)
+- `images/` - Avatar and social icons
 
-Parcel is configured (`parcel-namer-hashless`) to output files without content hashes for stable Hugo references.
+No external bundler required - Hugo handles everything.
 
 ### CSS Architecture
 
@@ -75,9 +70,7 @@ Uses PostCSS with `postcss-nested` for nested CSS syntax.
   - Author: Vlad Temian
   - Enables robots.txt and sitemap generation
 
-### Static Assets
 
-After Parcel bundling, assets are referenced by Hugo templates via the bundled files in `assets/output/`.
 
 ## Adding New Blog Posts
 
