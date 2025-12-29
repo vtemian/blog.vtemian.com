@@ -1,18 +1,13 @@
-<meta charset="utf-8">
-
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width,minimum-scale=1">
-<meta content="{{ delimit .Keywords ", " }}" name="keywords">
 
 <link rel="stylesheet"
       href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.1/styles/atom-one-light.min.css">
 <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.1/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
 
 {{ partial "seo_schema" . }}
 
 <title>{{.Title}}</title>
 
-<link href="https://fonts.googleapis.com/css?family=Karla:700,Rubik:400,400i,Inconsolata:400" rel="stylesheet" />
-
 {{ partial "stylesheets.html" . }}
-{{ partial "scripts.html" . }}
