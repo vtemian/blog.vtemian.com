@@ -1,4 +1,0 @@
-{{ $js := resources.Get "output/index.js" }}
-{{ with $js }}
-  <script type="text/javascript" src="{{ $js.Permalink }}" crossorigin="anonymous" defer></script>
-{{ end }}
