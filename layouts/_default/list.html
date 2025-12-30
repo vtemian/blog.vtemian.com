@@ -1,6 +1,5 @@
 {{ define "content" }}
 
-{{ $avatar := resources.Get "images/avatar.png" }}
 {{ $github := resources.Get "images/github.png" }}
 {{ $linkedin := resources.Get "images/linkedin.png" }}
 {{ $twitter := resources.Get "images/x.png" }}
@@ -8,8 +7,6 @@
 
 <div class="container">
     <aside class="author">
-        <img src="{{ $avatar.RelPermalink }}" alt="Avatar" />
-
         <h1>{{ .Site.Params.author }} </h1>
         <p class="social">
             <a href="https://github.com/vtemian">

@@ -1,5 +1,4 @@
 {{- $imgs := slice }}
-{{- $avatar := resources.Get "images/avatar.png" }}
 
 {{/* Use images from frontmatter if specified */}}
 {{- with .Params.images }}
@@ -8,11 +7,6 @@
       {{- $imgs = $imgs | append . }}
     {{- end }}
   {{- end }}
-{{- end }}
-
-{{/* Fallback to avatar if no images found */}}
-{{- if not $imgs }}
-  {{- $imgs = $imgs | append $avatar }}
 {{- end }}
 
 {{- return $imgs }}

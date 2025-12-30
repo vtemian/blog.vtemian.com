@@ -1,7 +1,5 @@
 {{ define "content" }}
 
-{{ $avatar := resources.Get "images/avatar.png" }}
-
 <div class="container">
     <main class="article">
         <article>
@@ -10,7 +8,6 @@
                 <h1>{{ .Title }}</h1>
 
                 <aside class="author author--is-small">
-                    <img src="{{ $avatar.RelPermalink }}" alt="Avatar" />
                     <div>
                         <h4>{{ .Site.Params.author }} </h4>
                         <p>{{ .Date.Format "02 Jan 2006" }}</p>

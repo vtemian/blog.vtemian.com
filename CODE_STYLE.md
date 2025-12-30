@@ -11,7 +11,7 @@
 | Hugo templates | `kebab-case.html` | `baseof.html`, `single.html` |
 | Hugo partials | `snake_case.html` or `kebab-case.html` | `seo_schema.html`, `header.html` |
 | Blog posts | `kebab-case.md` or `kebab-case/index.md` | `healthy-python-codebase.md` |
-| Images | `kebab-case.png` | `avatar.png`, `github.png` |
+| Images | `kebab-case.png` | `github.png`, `linkedin.png` |
 
 ### CSS Classes
 
@@ -112,8 +112,8 @@ Always load bundled assets via `resources.Get`:
 {{ $styles := resources.Get "output/index.css" }}
 <link rel="stylesheet" href="{{ $styles.Permalink }}" media="screen">
 
-{{ $avatar := resources.Get "output/avatar.png" }}
-<img src="{{ $avatar.Permalink | relURL }}" alt="Avatar" />
+{{ $github := resources.Get "images/github.png" }}
+<img src="{{ $github.Permalink | relURL }}" alt="GitHub" />
 ```
 
 ### Hugo Partials

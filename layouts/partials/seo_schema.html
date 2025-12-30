@@ -32,22 +32,25 @@
 <meta property="og:type" content="website">
 {{- end }}
 
-{{/* Open Graph Image - use post image or fallback to avatar */}}
-{{ $avatar := resources.Get "images/avatar.png" }}
-{{- $ogImage := $avatar }}
+{{/* Open Graph Image - use post image if available */}}
+{{- $ogImage := "" }}
 {{- with .Params.images }}
   {{- $firstImage := index . 0 }}
   {{- with $.Resources.GetMatch $firstImage }}
-    {{- $ogImage = . }}
+    {{- $ogImage = .Permalink }}
   {{- end }}
 {{- end }}
-<meta property="og:image" content="{{ $ogImage.Permalink }}">
+{{- with $ogImage }}
+<meta property="og:image" content="{{ . }}">
+{{- end }}
 
 {{/* Twitter Card */}}
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{{ .Title }}">
 <meta name="twitter:description" content="{{ trim $description "\n\r\t " }}">
-<meta name="twitter:image" content="{{ $ogImage.Permalink }}">
+{{- with $ogImage }}
+<meta name="twitter:image" content="{{ . }}">
+{{- end }}
 
 {{/* JSON-LD Structured Data */}}
 <script type="application/ld+json">

@@ -20,7 +20,7 @@ Personal blog for Vlad Temian built with Hugo (static site generator). The site 
 ```
 blog.vtemian.com/
 ├── assets/                    # Source assets (processed by Hugo)
-│   ├── images/               # Source images (avatar, social icons)
+│   ├── images/               # Source images (social icons)
 │   └── stylesheets/          # CSS source
 │       └── main.css          # All styles in one file
 ├── content/                   # Blog content (Markdown)
