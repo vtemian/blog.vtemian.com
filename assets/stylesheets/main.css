@@ -126,7 +126,6 @@ code {
   padding-top: 20px;
   padding-bottom: 15px;
   flex-direction: column;
-  border-bottom: 1px solid var(--grey-lighter);
 }
 
 .author p {
