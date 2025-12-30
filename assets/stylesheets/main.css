@@ -175,7 +175,7 @@ code {
 .articles article {
   display: flex;
   margin-bottom: 0;
-  padding-bottom: 8px;
+  padding: 4px 0;
   justify-items: center;
   border-bottom: 1px solid var(--grey-lighter);
 }
