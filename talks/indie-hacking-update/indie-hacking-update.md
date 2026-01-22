@@ -214,12 +214,6 @@ Higher tiers = higher revenue per customer
 
 ---
 
-<!-- _class: quote -->
-
-> sisif.ai
-
----
-
 ## Thanks
 
 @vtemian
