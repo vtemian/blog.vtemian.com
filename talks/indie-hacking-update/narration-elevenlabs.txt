@@ -1,0 +1,49 @@
+Hey everyone! I'm Vlad Temian, and welcome to Indie TM number two. Thanks for being here tonight.
+
+...
+
+So, a bit about me. I've been writing code for about 15 years now. I was CTO at QED builders — you might have heard of us, we got acquired by The Sandbox. But honestly? What really drives me is this: I love building stuff. And even more than that, I love finding other people who love building stuff.
+
+...
+
+Speaking of which — I've been pretty obsessed with communities. Started with Python, did the whole Web3 thing, and now I'm running Agentic TM. It's basically a bunch of nerds getting together to talk about AI agents. Good times.
+
+...
+
+One thing that really shaped how I think was working with Gorgias. Great company, learned a ton. The big lesson? Product drives value. Not your fancy architecture. Not your clever code. The product. Took me a while to really internalize that one.
+
+...
+
+Anyway, I co-founded QED. We grew to about 20 people, built some cool stuff, and then sold the company late last year. Wild ride.
+
+...
+
+So what am I doing now? Well, I'm building sisif.ai. It's an AI video generation API. Yeah, another AI thing — but hear me out.
+
+...
+
+It's dead simple. You send a text prompt, you get a video back. Like, that's it. Two to five minutes and boom — you've got your video.
+
+...
+
+Now, why an API? Because most AI video tools out there want you to click around in some browser interface. That's fine if you're making one video. But developers? We want to automate this stuff. Batch generation, workflow integration, programmatic control — you know, the good stuff.
+
+...
+
+The flow is super straightforward. Step one: send your prompt. Step two: we hit you with a webhook when it's done. Step three: download your video. We support multiple resolutions too.
+
+...
+
+Who's this for? Content creators who are tired of making videos manually. Developers building apps that need video. Businesses that want to automate their marketing. Basically, anyone who thinks "I wish I could just script this."
+
+...
+
+Pricing is simple. Pay per use, no subscriptions. And you get 35 free credits to start — no credit card required. Just sign up and play around.
+
+...
+
+So yeah. sisif.ai. Check it out.
+
+...
+
+Thanks for listening, everyone! Hit me up on Twitter at vtemian, or check out my blog. Now let's grab some drinks. Cheers!

@@ -1,0 +1,68 @@
+# Narration Script for Indie TM #2
+# Each section = one slide (~2.5 seconds)
+# Read at a natural pace, slight pauses between sections
+
+---
+
+[SLIDE 1 - Title]
+Hey everyone, I'm Vlad Temian. Welcome to Indie TM number two.
+
+---
+
+[SLIDE 2 - About Me]
+Quick intro: 15 years building production code. Former CTO at QED builders, acquired by The Sandbox. I love building, and I love people who love building.
+
+---
+
+[SLIDE 3 - Background: Communities]
+I've been building communities for a while. Started with Python, moved to Web3, and now Agentic TM — focused on agentic programming.
+
+---
+
+[SLIDE 4 - Background: Gorgias]
+Working with Gorgias taught me something important: product drives value, not technical implementation.
+
+---
+
+[SLIDE 5 - Background: QED]
+I co-founded QED with about 20 people. We sold the company in late 2024.
+
+---
+
+[SLIDE 6 - The Side Project]
+Now I'm working on a side project: sisif.ai — an AI video generation API.
+
+---
+
+[SLIDE 7 - What is Sisif]
+It's simple: text prompt in, video out. Send a request to the API, get your video in 2 to 5 minutes.
+
+---
+
+[SLIDE 8 - Why an API]
+Most AI video tools are built for clicking around in browsers. But developers want to automate — batch generation, workflow integration, programmatic control.
+
+---
+
+[SLIDE 9 - How It Works]
+Three steps: submit a text prompt, receive a webhook when it's done, download your video. Multiple resolutions available.
+
+---
+
+[SLIDE 10 - Target Users]
+Who's it for? Content creators scaling production. Developers building video features. Businesses automating marketing.
+
+---
+
+[SLIDE 11 - Pricing]
+Pay per use, no subscription. 35 free credits to start. No credit card required.
+
+---
+
+[SLIDE 12 - CTA]
+Check it out at sisif.ai.
+
+---
+
+[SLIDE 13 - Thanks]
+Thanks for listening. Find me at vtemian on Twitter, or visit my blog. See you around.

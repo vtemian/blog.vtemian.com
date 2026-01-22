@@ -1,0 +1,5 @@
+# Built HTML files
+*/*.html
+
+# Node modules (if installed locally)
+node_modules/
