@@ -327,6 +327,60 @@ code {
 }
 
 /* ==========================================================================
+   Talks
+   ========================================================================== */
+
+.talks-year h2 {
+  font-weight: 700;
+  font-size: var(--font-size-base);
+  margin-top: 25px;
+  margin-bottom: 10px;
+  color: var(--black);
+}
+
+.talks-list {
+  margin: 0;
+}
+
+.talk-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--grey-lighter);
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.talk-item:last-child {
+  border-bottom: none;
+}
+
+.talk-info {
+  flex: 1;
+}
+
+.talk-info > a {
+  font-weight: 700;
+}
+
+.talk-event,
+.talk-date {
+  color: var(--grey);
+  font-size: var(--font-size-small);
+}
+
+.talk-links {
+  display: flex;
+  gap: 10px;
+}
+
+.talk-link {
+  font-size: var(--font-size-small);
+  color: var(--grey);
+}
+
+/* ==========================================================================
    Footer
    ========================================================================== */
 
