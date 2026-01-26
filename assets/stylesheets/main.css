@@ -312,17 +312,50 @@ code {
 
 .feed {
   margin: 0;
+  position: relative;
+  padding-left: 24px;
+}
+
+.feed::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--grey-lighter);
 }
 
 .feed-item {
   display: flex;
   margin-bottom: 0;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--grey-lighter);
+  padding: 12px 0;
+  position: relative;
+}
+
+.feed-item::before {
+  content: "";
+  position: absolute;
+  left: -24px;
+  top: 18px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--grey);
+  border: 2px solid var(--white);
+  box-sizing: border-box;
+}
+
+.feed-item--post::before {
+  background: var(--blue);
+}
+
+.feed-item--talk::before {
+  background: #10b981;
 }
 
 .feed-item:last-child {
-  border-bottom: none;
+  padding-bottom: 0;
 }
 
 .feed-item__link {
@@ -332,7 +365,8 @@ code {
   gap: 12px;
   color: var(--black);
   border-bottom: none;
-  padding: 4px 0;
+  padding: 4px 8px;
+  margin: -4px -8px;
   transition: background-color 0.15s ease;
 }
 
