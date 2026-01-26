@@ -382,7 +382,7 @@ code {
 
 .feed-item__date {
   font-size: var(--font-size-small);
-  color: var(--grey);
+  color: var(--blue);
 }
 
 /* ==========================================================================
