@@ -336,7 +336,7 @@ code {
 .feed-item::before {
   content: "";
   position: absolute;
-  left: -24px;
+  left: -22px;
   top: 18px;
   width: 10px;
   height: 10px;
