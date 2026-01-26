@@ -4,7 +4,6 @@
 
 ## Posts
 
-- [Technical Debt is Cheap](https://blog.vtemian.com/post/technical-debt-is-cheap/): How I refactored years of technical debt in 3 hours using Claude Code - a practitioner's reality check on AI hype vs actual results
 - [Parallel Transaction Execution in Blockchains](https://blog.vtemian.com/post/parallel-transaction-execution-in-blockchains/): This article explores parallel transaction execution in blockchain systems, explaining how blockchains like Solana, SUI, and Aptos handle transactions simultaneously to increase performance. It covers the differences between deterministic and optimistic methods, the challenges of conflict resolution, and how these approaches improve scalability and efficiency in blockchain technology.
 - [Healthy Python Codebase](https://blog.vtemian.com/post/healthy-python-codebase/): Guidelines for maintaining a healthy Python codebase: consistency, explicit code, fail-fast patterns, testing strategies, and practical refactoring examples
 - [Building a serverless hosting platform](https://blog.vtemian.com/post/serverless-hosting-platform/): Building a serverless hosting platform using Knative, Tekton, and Kubernetes on bare metal - from cluster setup to automated CI/CD deployments
