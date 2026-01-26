@@ -41,15 +41,28 @@
 
     </aside>
 
-    <main class="articles">
-	    {{ range where (.Site.RegularPages.ByDate.Reverse) "Section" "post" }}
-	    <article>
-		<a href="{{ .RelPermalink }}">
-		    <h2>{{ .Title }}</h2>
-		    <time>{{ .Date.Format "02 Jan 2006" }}</time>
-		</a>
-	    </article>
-	    {{ end }}
+    {{/* Collect all content types */}}
+    {{ $posts := where .Site.RegularPages "Section" "post" }}
+    {{ $talks := where .Site.RegularPages "Section" "talk" }}
+
+    {{/* Merge and sort by date */}}
+    {{ $all := $posts | union $talks }}
+
+    <main class="feed">
+        {{ range $all.ByDate.Reverse }}
+        <article class="feed-item feed-item--{{ .Section }}">
+            <a href="{{ .RelPermalink }}" class="feed-item__link">
+                <span class="feed-item__badge">{{ .Section }}</span>
+                <div class="feed-item__content">
+                    <h2 class="feed-item__title">{{ .Title }}</h2>
+                    {{ with .Params.description }}
+                    <p class="feed-item__description">{{ . }}</p>
+                    {{ end }}
+                    <time class="feed-item__date">{{ .Date.Format "02 Jan 2006" }}</time>
+                </div>
+            </a>
+        </article>
+        {{ end }}
     </main>
 
     {{ partial "footer" .}}
