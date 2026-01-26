@@ -7,12 +7,7 @@
                 <a href="/">&larr; Go back</a>
                 <h1>{{ .Title }}</h1>
 
-                <aside class="author author--is-small">
-                    <div>
-                        <h4>{{ .Site.Params.author }} </h4>
-                        <p>{{ .Date.Format "02 Jan 2006" }}</p>
-                    </div>
-                </aside>
+                <p class="article-date">{{ .Date.Format "02 Jan 2006" }}</p>
             </header>
             <p>
                 {{ .Content }}
