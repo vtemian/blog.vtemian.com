@@ -2,6 +2,8 @@
 title: "Technical Debt is Cheap"
 date: 2025-10-27T10:00:00+02:00
 description: "How I refactored years of technical debt in 3 hours using Claude Code - a practitioner's reality check on AI hype vs actual results"
+images:
+    - vue.png
 event: ""
 event_url: ""
 slides: ""

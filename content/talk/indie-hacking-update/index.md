@@ -2,6 +2,8 @@
 title: "Riding Existing Waves: My Indie Hacking Journey with Sisif.ai"
 date: 2026-01-22T15:00:00+02:00
 description: "How I went from 0 paying customers to growing MRR by abandoning traditional marketing and riding existing distribution waves"
+images:
+    - revenue-chart.png
 event: "Indie TM #2"
 event_url: ""
 slides: ""
@@ -54,6 +56,22 @@ The result?
 - ProductHunt: crickets
 - SEO: too early to tell
 
+### Two Months of Twitter: A Reality Check
+
+I committed to **two months of consistent Twitter posting**. Daily updates. Progress screenshots. Building in public threads. Engagement with other indie hackers. The kind of content that supposedly builds audiences.
+
+After 60 days: **8 followers**. Not 8,000. Eight. Most of them were bots or other indie hackers doing the same thing. Zero customers came from Twitter. Zero meaningful conversations. Zero inbound interest.
+
+The accounts that "blow up" on Twitter? They either got lucky with timing, had an existing audience from somewhere else, or have been grinding for years. There's no shortcut. And for a solo founder with a product to ship, spending 2+ hours daily on tweets that reach nobody is a terrible ROI.
+
+### The ProductHunt Launch That Wasn't
+
+I prepared a proper ProductHunt launch. Lined up supporters. Created assets. Picked a launch day. Did everything the guides recommend.
+
+Launch day came. And... nothing. No traction. No upvotes from strangers. The supporters I gathered weren't enough to break through. ProductHunt's algorithm buried the launch before it had a chance.
+
+Here's what I learned: **ProductHunt is a lottery**. The winners are either products with existing audiences (who bring their own traffic) or products that get lucky with the algorithm. For a new product from an unknown founder? The odds are stacked against you.
+
 The harsh reality of indie hacking. Traditional marketing is slow. Twitter takes years to build. ProductHunt is a lottery. SEO needs months to compound.
 
 ## The Pivot: Ride Existing Waves
@@ -62,15 +80,30 @@ I stopped building from scratch. Instead, I asked: **where are the users already
 
 The answer was **n8n** — the workflow automation tool. Thousands of users building automations, looking for integrations. They don't need to find me. I need to be where they already are.
 
-So I built workflows:
+### The n8n Strategy
 
-- **TikTok video creation pipeline** — GPT-4o-mini for scripts + Sisif.ai for video
-- **Instagram Reels automation** — same stack, different output
-- Published everything on the n8n creator profile
+I published **2 workflow templates** on the n8n creator hub:
+
+1. **TikTok video creation pipeline** — GPT-4o-mini generates the script, Sisif.ai creates the video, posts automatically
+2. **Instagram Reels automation** — same stack, different output format
 
 ![n8n TikTok workflow](n8n-tiktok-workflow.png)
 
-This is **riding existing waves**. SEO? Write for big sites that already rank. Distribution? Let users find you through tools they already use.
+The results? **15,000 views** on the TikTok template. **4,000 views** on the Instagram one. That's **19,000 eyeballs** on my product — more than I'd get from years of tweeting.
+
+These aren't vanity metrics. n8n users are exactly my target audience: developers and technical founders who want to automate video creation. They're already in a buying mindset — they're looking for tools to plug into their workflows.
+
+The conversion funnel is simple: user discovers template → tries it → needs API access → signs up for Sisif.ai. No cold outreach. No content calendar. No algorithm to game.
+
+### Why This Works
+
+This is **riding existing waves**. Instead of building an audience from zero, you tap into platforms where your users already hang out:
+
+- **n8n** has thousands of users searching for workflow integrations
+- **Zapier** and **Make** have similar marketplaces
+- **GitHub** templates get discovered organically
+
+SEO? Write for big sites that already rank. Distribution? Let users find you through tools they already use. The math is simple: it's easier to capture 0.1% of 100,000 users than to build 100 users from scratch.
 
 ## Pricing Evolution
 

@@ -79,3 +79,29 @@
     "keywords": [{{ range $i, $tag := .Params.tags }}{{ if $i }}, {{ end }}"{{ $tag }}"{{ end }}]
 }
 </script>
+
+{{/* Event Schema for talks with event data */}}
+{{- if and .Params.event (ne .Params.event "") }}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Event",
+    "name": "{{ .Params.event }}",
+    "description": "{{ trim $description "\n\r\t " }}",
+    "startDate": "{{ .PublishDate.Format "2006-01-02" }}",
+    {{- if and .Params.event_url (ne .Params.event_url "") }}
+    "url": "{{ .Params.event_url }}",
+    {{- end }}
+    "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+    "performer": {
+        "@type": "Person",
+        "name": "{{ .Site.Params.author }}"
+    },
+    "workPerformed": {
+        "@type": "CreativeWork",
+        "name": "{{ .Title }}",
+        "url": "{{ .Permalink }}"
+    }
+}
+</script>
+{{- end }}
