@@ -1,4 +1,6 @@
 {{ define "content" }}
+{{- $readingTime := math.Round (div .WordCount 200.0) }}
+{{- if lt $readingTime 1 }}{{ $readingTime = 1 }}{{ end }}
 
 <div class="container">
     <main class="article">
@@ -7,7 +9,7 @@
                 <a href="/">&larr; Go back</a>
                 <h1>{{ .Title }}</h1>
 
-                <p class="article-date">{{ .Date.Format "02 Jan 2006" }}</p>
+                <p class="article-date">{{ .Date.Format "02 Jan 2006" }} · {{ $readingTime }} min read</p>
             </header>
             <p>
                 {{ .Content }}

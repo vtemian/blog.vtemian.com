@@ -1,3 +1,8 @@
 User-agent: *
 
 Sitemap: {{ "sitemap.xml" | absURL }}
+
+# LLM-friendly content
+# See https://llmstxt.org for the specification
+LLMsTxt: {{ "llms.txt" | absURL }}
+LLMsFullTxt: {{ "llms-full.txt" | absURL }}

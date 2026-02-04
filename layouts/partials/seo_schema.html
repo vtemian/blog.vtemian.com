@@ -53,6 +53,8 @@
 {{- end }}
 
 {{/* JSON-LD Structured Data */}}
+{{- $readingTime := math.Round (div .WordCount 200.0) }}
+{{- if lt $readingTime 1 }}{{ $readingTime = 1 }}{{ end }}
 <script type="application/ld+json">
 {
     "@context": "https://schema.org",
@@ -66,7 +68,13 @@
     "inLanguage": "en-US",
     "author": {
         "@type": "Person",
-        "name": "{{ .Site.Params.author }}"
+        "name": "{{ .Site.Params.author }}",
+        "url": "{{ .Site.BaseURL }}",
+        "sameAs": [
+            "https://github.com/{{ .Site.Params.github }}",
+            "https://linkedin.com/in/vtemian",
+            "https://x.com/vlogthedevelop"
+        ]
     },
     "publisher": {
         "@type": "Person",
@@ -76,7 +84,38 @@
     "dateModified": "{{ .Lastmod.Format "2006-01-02T15:04:05-07:00" }}",
     "url": "{{ .Permalink }}",
     "wordCount": {{ .WordCount }},
+    "timeRequired": "PT{{ $readingTime }}M",
     "keywords": [{{ range $i, $tag := .Params.tags }}{{ if $i }}, {{ end }}"{{ $tag }}"{{ end }}]
+}
+</script>
+
+{{/* Breadcrumb Schema */}}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "{{ .Site.BaseURL }}"
+        }
+        {{- if .IsPage }},
+        {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "{{ .Section | title }}",
+            "item": "{{ .Site.BaseURL }}{{ .Section }}/"
+        },
+        {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "{{ .Title }}",
+            "item": "{{ .Permalink }}"
+        }
+        {{- end }}
+    ]
 }
 </script>
 
