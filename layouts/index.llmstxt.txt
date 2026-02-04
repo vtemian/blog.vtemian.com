@@ -2,7 +2,30 @@
 
 > {{ .Site.Params.description }}
 
-## Posts
+This file provides an overview of the blog content for LLMs and AI assistants.
+
+## About
+
+- Author: {{ .Site.Params.author }}
+- Website: {{ .Site.BaseURL }}
+- GitHub: https://github.com/{{ .Site.Params.github }}
+
+## Blog Posts
+
+Each post is available as markdown at `{url}index.md` for LLM consumption.
 {{ range where (.Site.RegularPages.ByDate.Reverse) "Section" "post" }}
-- [{{ .Title }}]({{ .Permalink }}){{ with .Description }}: {{ . }}{{ end }}
+- [{{ .Title }}]({{ .Permalink }}) ([md]({{ .Permalink }}index.md)){{ with .Description }}: {{ . }}{{ end }}
 {{- end }}
+
+## Talks & Presentations
+
+Each talk is available as markdown at `{url}index.md` for LLM consumption.
+{{ range where (.Site.RegularPages.ByDate.Reverse) "Section" "talk" }}
+- [{{ .Title }}]({{ .Permalink }}) ([md]({{ .Permalink }}index.md)){{ with .Params.event }} ({{ . }}){{ end }}{{ with .Description }}: {{ . }}{{ end }}
+{{- end }}
+
+## Resources
+
+- [Full Content for LLMs]({{ .Site.BaseURL }}llms-full.txt): Complete article content for deeper context
+- [RSS Feed]({{ .Site.BaseURL }}index.xml): Subscribe to updates
+- [Sitemap]({{ .Site.BaseURL }}sitemap.xml): All pages on this site

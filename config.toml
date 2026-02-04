@@ -24,6 +24,23 @@ metaDataFormat = "yaml"
     baseName = "llms"
     isPlainText = true
     notAlternative = true
+  [outputFormats.llmsfulltxt]
+    name = "llmsfulltxt"
+    mediaType = "text/plain"
+    baseName = "llms-full"
+    isPlainText = true
+    notAlternative = true
+  [outputFormats.markdown]
+    name = "markdown"
+    mediaType = "text/markdown"
+    baseName = "index"
+    isPlainText = true
+    notAlternative = true
+
+[mediaTypes]
+  [mediaTypes."text/markdown"]
+    suffixes = ["md"]
 
 [outputs]
-  home = ["HTML", "RSS", "llmstxt"]
+  home = ["HTML", "RSS", "llmstxt", "llmsfulltxt"]
+  page = ["HTML", "markdown"]

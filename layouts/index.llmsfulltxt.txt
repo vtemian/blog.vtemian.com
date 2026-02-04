@@ -1,0 +1,64 @@
+# {{ .Site.Params.author }}'s Blog - Full Content
+
+> {{ .Site.Params.description }}
+
+This file contains the complete content of all blog posts for LLMs and AI assistants.
+
+---
+
+## About the Author
+
+**{{ .Site.Params.author }}**
+
+{{ .Site.Params.description }}
+
+- Website: {{ .Site.BaseURL }}
+- GitHub: https://github.com/{{ .Site.Params.github }}
+
+---
+
+## Blog Posts
+{{ range where (.Site.RegularPages.ByDate.Reverse) "Section" "post" }}
+### {{ .Title }}
+
+- **URL**: {{ .Permalink }}
+- **Published**: {{ .PublishDate.Format "January 2, 2006" }}
+- **Word Count**: {{ .WordCount }} words
+{{- with .Params.tags }}
+- **Tags**: {{ delimit . ", " }}
+{{- end }}
+{{- with .Description }}
+- **Summary**: {{ . }}
+{{- end }}
+
+{{ .RawContent }}
+
+---
+{{ end }}
+
+## Talks & Presentations
+{{ range where (.Site.RegularPages.ByDate.Reverse) "Section" "talk" }}
+### {{ .Title }}
+
+- **URL**: {{ .Permalink }}
+- **Date**: {{ .PublishDate.Format "January 2, 2006" }}
+{{- with .Params.event }}
+- **Event**: {{ . }}
+{{- end }}
+{{- with .Params.event_url }}
+- **Event URL**: {{ . }}
+{{- end }}
+{{- with .Params.slides }}
+- **Slides**: {{ . }}
+{{- end }}
+{{- with .Params.video }}
+- **Video**: {{ . }}
+{{- end }}
+{{- with .Description }}
+- **Summary**: {{ . }}
+{{- end }}
+
+{{ .RawContent }}
+
+---
+{{ end }}
