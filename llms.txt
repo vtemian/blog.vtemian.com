@@ -2,11 +2,34 @@
 
 > I build systems. Over 15 years helping startups scale production infrastructure. Former CTO of qed.builders (acquired by The Sandbox). Long-time open-source contributor with a systems caretaker mindset.
 
-## Posts
+This file provides an overview of the blog content for LLMs and AI assistants.
 
-- [Parallel Transaction Execution in Blockchains](https://blog.vtemian.com/post/parallel-transaction-execution-in-blockchains/): This article explores parallel transaction execution in blockchain systems, explaining how blockchains like Solana, SUI, and Aptos handle transactions simultaneously to increase performance. It covers the differences between deterministic and optimistic methods, the challenges of conflict resolution, and how these approaches improve scalability and efficiency in blockchain technology.
-- [Healthy Python Codebase](https://blog.vtemian.com/post/healthy-python-codebase/): Guidelines for maintaining a healthy Python codebase: consistency, explicit code, fail-fast patterns, testing strategies, and practical refactoring examples
-- [Building a serverless hosting platform](https://blog.vtemian.com/post/serverless-hosting-platform/): Building a serverless hosting platform using Knative, Tekton, and Kubernetes on bare metal - from cluster setup to automated CI/CD deployments
-- [Python Multiple Inheritance](https://blog.vtemian.com/post/multiple-inheritance/): How multiple inheritance works in Python?
-- [Interviews](https://blog.vtemian.com/post/interviews/): A short interviewing statement for 2019
-- [2019](https://blog.vtemian.com/post/2019/): 2019 - the beginning
+## About
+
+- Author: Vlad Temian
+- Website: https://blog.vtemian.com/
+- GitHub: https://github.com/vtemian
+
+## Blog Posts
+
+Each post is available as markdown at `{url}index.md` for LLM consumption.
+
+- [Parallel Transaction Execution in Blockchains](https://blog.vtemian.com/post/parallel-transaction-execution-in-blockchains/) ([md](https://blog.vtemian.com/post/parallel-transaction-execution-in-blockchains/index.md)): This article explores parallel transaction execution in blockchain systems, explaining how blockchains like Solana, SUI, and Aptos handle transactions simultaneously to increase performance. It covers the differences between deterministic and optimistic methods, the challenges of conflict resolution, and how these approaches improve scalability and efficiency in blockchain technology.
+- [Healthy Python Codebase](https://blog.vtemian.com/post/healthy-python-codebase/) ([md](https://blog.vtemian.com/post/healthy-python-codebase/index.md)): Guidelines for maintaining a healthy Python codebase: consistency, explicit code, fail-fast patterns, testing strategies, and practical refactoring examples
+- [Building a serverless hosting platform](https://blog.vtemian.com/post/serverless-hosting-platform/) ([md](https://blog.vtemian.com/post/serverless-hosting-platform/index.md)): Building a serverless hosting platform using Knative, Tekton, and Kubernetes on bare metal - from cluster setup to automated CI/CD deployments
+- [Python Multiple Inheritance](https://blog.vtemian.com/post/multiple-inheritance/) ([md](https://blog.vtemian.com/post/multiple-inheritance/index.md)): How multiple inheritance works in Python?
+- [Interviews](https://blog.vtemian.com/post/interviews/) ([md](https://blog.vtemian.com/post/interviews/index.md)): A short interviewing statement for 2019
+- [2019](https://blog.vtemian.com/post/2019/) ([md](https://blog.vtemian.com/post/2019/index.md)): 2019 - the beginning
+
+## Talks & Presentations
+
+Each talk is available as markdown at `{url}index.md` for LLM consumption.
+
+- [Riding Existing Waves: My Indie Hacking Journey with Sisif.ai](https://blog.vtemian.com/talk/indie-hacking-update/) ([md](https://blog.vtemian.com/talk/indie-hacking-update/index.md)) (Indie TM #2): How I went from 0 paying customers to growing MRR by abandoning traditional marketing and riding existing distribution waves
+- [Technical Debt is Cheap](https://blog.vtemian.com/talk/technical-debt-is-cheap/) ([md](https://blog.vtemian.com/talk/technical-debt-is-cheap/index.md)): How I refactored years of technical debt in 3 hours using Claude Code - a practitioner's reality check on AI hype vs actual results
+
+## Resources
+
+- [Full Content for LLMs](https://blog.vtemian.com/llms-full.txt): Complete article content for deeper context
+- [RSS Feed](https://blog.vtemian.com/index.xml): Subscribe to updates
+- [Sitemap](https://blog.vtemian.com/sitemap.xml): All pages on this site

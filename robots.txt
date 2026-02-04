@@ -1,3 +1,8 @@
 User-agent: *
 
 Sitemap: https://blog.vtemian.com/sitemap.xml
+
+# LLM-friendly content
+# See https://llmstxt.org for the specification
+LLMsTxt: https://blog.vtemian.com/llms.txt
+LLMsFullTxt: https://blog.vtemian.com/llms-full.txt

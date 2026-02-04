@@ -1,0 +1,2515 @@
+# Vlad Temian's Blog - Full Content
+
+> I build systems. Over 15 years helping startups scale production infrastructure. Former CTO of qed.builders (acquired by The Sandbox). Long-time open-source contributor with a systems caretaker mindset.
+
+This file contains the complete content of all blog posts for LLMs and AI assistants.
+
+---
+
+## About the Author
+
+**Vlad Temian**
+
+I build systems. Over 15 years helping startups scale production infrastructure. Former CTO of qed.builders (acquired by The Sandbox). Long-time open-source contributor with a systems caretaker mindset.
+
+- Website: https://blog.vtemian.com/
+- GitHub: https://github.com/vtemian
+
+---
+
+## Blog Posts
+
+### Parallel Transaction Execution in Blockchains
+
+- **URL**: https://blog.vtemian.com/post/parallel-transaction-execution-in-blockchains/
+- **Published**: October 18, 2024
+- **Word Count**: 1746 words
+- **Tags**: blockchain, parallel blockchains, solana, sui, monad, sei, aptos, block-stm, state of parallel blockchains
+- **Summary**: This article explores parallel transaction execution in blockchain systems, explaining how blockchains like Solana, SUI, and Aptos handle transactions simultaneously to increase performance. It covers the differences between deterministic and optimistic methods, the challenges of conflict resolution, and how these approaches improve scalability and efficiency in blockchain technology.
+
+
+In the last couple of years, we have seen the rise of [infrastructure](https://www.shoal.gg/p/parallel-execution-the-next-generation) projects in the blockchain space. One exciting development is [parallel blockchains](https://www.recvc.com/part-i-design-space-for-parallel-blockchains/), specifically those that execute a batch of transactions in parallel.
+
+## Concurrency at Scale
+
+When studying those chains, you can see some parallels to classical [concurrency patterns](https://en.wikipedia.org/wiki/Concurrency_control), but those are hard to implement at scale.
+Why is that? In addition to executing transactions in parallel (happening at the VM layer), we also need to consider replicating their output across the network.
+
+Let's explain the problem in a little more detail. We have this distributed state across multiple nodes. We don't sync this state as it is but use state transitions. We need to [replicate state transitions](https://en.wikipedia.org/wiki/State_machine_replication) over the network.
+
+![replicated-state-machine](replicated-state-machine.png)
+
+Those state transitions take the form of transactions bundled together in a [block](https://en.wikipedia.org/wiki/Blockchain#Blocks). A node bundles that block, then distributed and validated by other nodes. Once validated, each node mutates its local state by running [transactions](https://en.wikipedia.org/wiki/Transaction_processing).
+
+We'll have a blockchain if we chain those bundles of state transitions. Those state transitions can be quite complex since we can run arbitrary code using arbitrary input data and generating arbitrary output data.
+
+![blockchains](blockchains.png)
+
+We must be careful which transactions can be executed in parallel because we want to execute multiple transactions in parallel and replicate them across the network. Multiple transactions can be executed in parallel if they don’t mutate the same state in the same execution cycle.
+
+![tx-parallel](tx-parallel.png)
+
+Given this, state access will be the key to running transactions in parallel safely. 
+
+## Deterministic vs Optimistic
+
+There are two principal schools of thought when discussing state access and parallel blockchain execution: [deterministic](https://en.wikipedia.org/wiki/Deterministic_algorithm) vs [optimistic](https://en.wikipedia.org/wiki/Optimistic_concurrency_control) execution.
+
+### Deterministic Execution
+
+In deterministic execution, we expect the same result if we run multiple parallel transactions multiple times in different orders. We call this process deterministic because we expect the same result each time.
+How can this be achieved? We need to know before execution what data each transaction will use.
+It adds multiple data overhead since we might need to write our smart contracts so that the used data is described in the transaction’s header. Also, we might de-normalize the data, handling complex data structures that might be harder to scale.
+
+![parallel-queues](parallel-queues.png)
+
+### Solana
+
+Each Solana transaction contains the [“accounts”](https://solana.com/docs/core/accounts) field, in which an array of accounts used while processing transactions is specified. Accounts are data slots separate from the [program](https://www.quicknode.com/guides/solana-development/getting-started/an-introduction-to-the-solana-account-model) (smart contract) and owned by an address. The entire state comprises ownable accounts, and programs are isolated and don’t contain any account data.
+That’s different from EVM, where your smart contract has the business logic and the storage used. It contains the state and state transitions, all in one piece.
+
+![solana-accounts](solana-accounts.png)
+
+Once we know what data will be used, we can group transactions that do not use duplicate accounts and run them in [parallel](https://medium.com/solana-labs/sealevel-parallel-processing-thousands-of-smart-contracts-d814b378192). 
+
+Another strong point for Solana when executing transactions is the use of [pipelining](https://medium.com/solana-labs/pipelining-in-solana-the-transaction-processing-unit-2bb01dbd2d8f). The Sealevel VM can Fetch, Verify Signatures, Bank, and Write in parallel. Other blockchains have also implemented this architecture.
+
+![sealevel-vm](sealevel-vm.png)
+
+Of course, it is all about trade-offs. There’s no silver bullet. This accounting approach adds overhead for transaction building, validating, and executions. Also, the overall complexity of data management is increasing exponentially.
+
+|                 |    *Solana*   |
+| --------------- | ------------- |
+| Parallelization | Deterministic |
+| State Access | AccountsDB |
+| Virtual Machine | SVM Multi-threaded |
+| Max Recorded TPS| 7229 tx/s |
+| Max Theoretical TSP| 65000 tx/s |
+------------------------------------
+
+### SUI
+
+Instead of using this replicated state machine, SUI thinks slightly differently about state management. For SUI, everything related to data is an ownable [object](https://docs.sui.io/concepts/object-model). If you want to mutate data, you can simply change its ownership. Even smart contracts are objects that can manipulate other objects.
+
+![sui-accounts](sui-accounts.png)
+
+[Transactions](https://docs.sui.io/concepts/transactions) on SUI take some objects as input and produce other mutated or fresh objects. Each object knows the last transaction that made them, forming a [DAG](https://docs.sui.io/concepts/object-model#the-transaction-object-dag-relating-objects-and-transactions) (direct acyclic graph) where each transaction is a node and directed edges are between transactions if the output object of the source transaction is the input object of the destination transaction.
+
+![sui-transactions](sui-transactions.png)
+
+We can run multiple transactions in [parallel](https://blog.sui.io/parallelization-explained/) without conflicts because there is already a clear separation between states that need to be updated, and each object is independent of the others.
+
+|                 |    *Sui*   |
+| --------------- | ------------- |
+| Parallelization | Deterministic |
+| State Access | RocksDB |
+| Virtual Machine | Move Multi-threaded |
+| Max Recorded TPS| 800 tx/s |
+| Max Theoretical TSP| 297000 tx/s |
+------------------------------------
+
+## Optimistic Execution
+
+Optimistic parallelization is a straightforward and naive approach to the problem: try to execute multiple transactions simultaneously. Pick a winner and re-try the rest if some touch the same memory zone. Repeat until all transactions are processed.
+
+![occ](occ.png)
+
+One approach for this optimistic parallelization is an [Optimistic Concurrency Control](https://en.wikipedia.org/wiki/Optimistic_concurrency_control) mechanism, similar to how databases handle transactions. You can implement a transaction statement for each blockchain transaction, execute all state transitions, and validate that another transaction did not alter the data used inside this transaction before committing to the new state.
+
+### SeiV2
+
+SeiV2 is [implementing](https://blog.sei.io/sei-v2-the-first-parallelized-evm/) this OCC mechanism for its EVM transactions. This mechanism draws inspiration from databases, where transactions are processed optimistically, assuming that most will not conflict. In this context, transactions are executed simultaneously, and conflicts are resolved after execution, ensuring that no two transactions modify the same state simultaneously.
+
+![sei_v2](sei_v2.png)
+
+How OCC Works in SeiV2:
+* **Parallel Execution**: Multiple transactions are executed in parallel without initially checking whether they conflict. This "optimistic" approach assumes that most transactions will not overlap in the state they modify.
+* **Conflict Detection**: After the transactions are executed, SeiV2 checks for conflicts. If two transactions have modified the same state (i.e., touched the same memory zone), one is chosen to be committed, and the others are retried.
+* **Transaction Rollback**: If a conflict is detected, conflicting transactions are rolled back and re-executed until all transactions are successfully processed without conflict. This can lead to retries but allows for increased parallel throughput.
+* **State Validation Before Commit**: SeiV2 validates that no other transaction has altered the data involved in a given transaction before committing the state changes to the blockchain. If the data has changed, the transaction is retried.
+
+|                 | *SeiV2*             |
+| --------------- |---------------------|
+| Parallelization | Optimistic          |
+| State Access | SeiDB               |
+| Virtual Machine | EVM Single-threaded |
+| Max Recorded TPS| 256 tx/s            |
+| Max Theoretical TSP| 12500 tx/s          |
+------------------------------------
+
+### Monad
+
+Monad is another example of L1 that implements optimistic techniques. Their approach is very similar to SeiV2's but not the exact implementation. Besides the optimistic concurrency control and their re-trying mechanism, Monad also has a larger view of how concurrency should behave. 
+Before block execution, transactions are [statically analyzed](https://docs.monad.xyz/technical-discussion/execution/parallel-execution#scheduling), and feature dependencies can be detected.
+
+![monad_vm](monad_vm.png)
+
+Besides those mechanisms, Monad adds more optimizations to the [execution](https://docs.monad.xyz/technical-discussion/execution/parallel-execution), consensus, and [storage](https://docs.monad.xyz/technical-discussion/execution/monaddb) layers. 
+
+Once you examine how the Ethereum block time is split, you see that much time is spent on [consensus](https://docs.monad.xyz/technical-discussion/consensus/deferred-execution). From a total of 12s block time, we have 120ms on execution. The entire consensus and execution process runs synchronously, which can be optimized. 
+
+![eth_block_time](eth_block_time.png)
+
+After the consensus phase is finished, you can immediately start with the next consensus phase while, in parallel, running the execution phase. In this way, you can save those wasted 120ms. Now, the trick doesn’t consist of those saved 120ms, but it consists of extending the execution block to match the consensus block, thus allowing more transactions to get executed in the same block time.
+
+![monad_execution](monad_execution.png)
+
+Monad adds excellent [pipelining](https://docs.monad.xyz/technical-discussion/concepts/pipelining) features like Solana, allowing for a more streamlined execution. You can use different hardware to prepare the execution part. Instead of waiting for all parts of the execution (FETCH, DECODE, EXECUTE, WRITE) to finish, you can use different cores and hardware to execute them in parallel.
+
+![monad_pipeline](monad_pipeline.png)
+
+|                 | *Monad*             |
+| --------------- |---------------------|
+| Parallelization | Optimistic          |
+| State Access | MonadDB             |
+| Virtual Machine | EVM Single-threaded |
+| Max Recorded TPS| 0 tx/s              |
+| Max Theoretical TSP| 10000 tx/s          |
+------------------------------------
+
+## Block-STM
+
+One of the most significant breakthroughs in optimistic parallelization was the introduction of [block-stm](https://arxiv.org/abs/2203.06871). Block-STM takes its roots in [Software Transactional Memory](https://groups.csail.mit.edu/tds/papers/Shavit/ShavitTouitou-podc95.pdf) (STM), a concurrency technique that makes parallel execution look like sequential execution for developers. You write code that executes in parallel without orchestrating anything. No locks, no semaphores. It adds execution overhead since you need to track all memory access, usually using a multi-version data structure in which you keep all memory’s different states across execution. This allows for fast validation and easier conflict detection.
+
+![stm](stm.png)
+
+### Aptos
+
+Aptos is one of the [pioneers](https://x.com/Aptos/status/1839379657122345248) who implemented those STM mechanisms at the execution VM layer.
+Aptos can build a more efficient re-execution queue using the [multi-version](https://x.com/Aptos/status/1846310188120424899) data structure and OCC since, if you know that one transaction is written in the exact memory location as before, you can stop it and dynamically mark it for retry. They also introduced optimization for scheduling validation and execution tasks on multiple threads using a collaborative scheduler.
+
+![aptos-execution](aptos-execution.png)
+
+Aptos’ multi-version data structure stores multiple versions of values written by different transactions. When a transaction reads data, it retrieves the highest version written by any preceding transaction in the block. This ensures that reads and writes do not interfere with each other across concurrent transactions. Suppose a transaction needs to be re-executed due to validation failure. In that case, the previous version can be used as an estimate, optimizing dependency tracking and minimizing unnecessary aborts and re-execution.
+
+![multi-version](multi-version.png)
+
+|                 | *Aptos*             |
+| --------------- |---------------------|
+| Parallelization | Optimistic          |
+| State Access | RocksDB             |
+| Virtual Machine | Move Multi-threaded |
+| Max Recorded TPS| 10734 tx/s          |
+| Max Theoretical TSP| 160000 tx/s         |
+------------------------------------
+
+## Trade-offs
+
+After exploring the concepts of parallel blockchains and the different approaches to parallelization, it's clear that there are trade-offs and considerations to be made in implementing efficient and safe parallel execution of transactions.
+
+First, deterministic execution, as seen in Solana, requires careful management of data overhead and complex data structures, but it enables running multiple transactions in parallel by grouping those that do not use the same accounts.
+
+On the other hand, SUI's approach to deterministic parallelization emphasizes the clear separation between states that need to be updated, allowing multiple transactions to run in parallel without conflicts.
+
+Optimistic parallelization presents a more straightforward approach, but it requires mechanisms like Optimistic Concurrency Control to handle potential conflicts and ensure data consistency. SeiV2 is implementing such a mechanism for its EVM transactions, drawing inspiration from how databases handle transactions.
+
+Each approach has its trade-offs and implications for data management, transaction validation, and overall complexity. As parallel blockchains continue to evolve, striking a balance between scalability, data integrity, and execution efficiency will remain a crucial consideration.
+
+|                 |    *Solana*   | *Sui*         | *SeiV2*             | *Monad*             | *Aptos*             |
+| --------------- | ------------- |---------------|---------------------|---------------------|---------------------|
+| Parallelization | Deterministic | Deterministic | Optimistic          | Optimistic          | Optimistic          |
+| State Access | AccountsDB | RocksDB | SeiDB               | MonadDB             | RocksDB             |
+| Virtual Machine | SVM Multi-threaded | Move Multi-threaded | EVM Single-threaded | EVM Single-threaded | Move Multi-threaded |
+| Max Recorded TPS| 7229 tx/s | 800 tx/s | 256 tx/s            | 0 tx/s              | 10734 tx/s          |
+| Max Theoretical TSP| 65000 tx/s | 297000 tx/s | 12500 tx/s          | 10000 tx/s          | 160000 tx/s         |
+
+
+---
+
+### Healthy Python Codebase
+
+- **URL**: https://blog.vtemian.com/post/healthy-python-codebase/
+- **Published**: September 21, 2020
+- **Word Count**: 1521 words
+- **Tags**: python, guide, refactoring
+- **Summary**: Guidelines for maintaining a healthy Python codebase: consistency, explicit code, fail-fast patterns, testing strategies, and practical refactoring examples
+
+
+The code is a living entity. For the majority of the time, it stays in silence and it's doing its job, without complaining.
+But, there are these creatures, humanoid, that from time to time, will change it. Will try to fix it, adapt, or
+completely remove parts of it. Those creatures tend to conserve energy and they are using pattern recognition to do so.
+They observe patterns and take fast and easy decisions based on those patterns.
+Because of that, this code entity needs to be structured and behave in certain patterns.
+
+## Consistency
+
+Those patterns are grouped together in a collection called code style. Any change that doesn't follow the code style, 
+introduces inconsistency, and should be treated as a systemic disease. Maybe is a little harsh, but any code change should 
+avoid inconsistency. Even if the current code base has a "special" code style, even if some bad decisions were made, introducing
+inconsistency is even worst. You'll have to maintain two or more styles, multiply the decisions and patterns, thus adding extra effort.
+
+So, when reviewing any code, one should take into account the current code style. Following the current patterns and maintain
+consistency is more valuable in the long run. If the current code base is not consistent, I suggest solving this issue first.
+It should be an easy refactoring exercise and shouldn't impact the business logic.
+
+Use formatting and linting tools and setup a CI pipeline that will run on every code change.
+You can even run them as a pre-commit hook. Black for formatting and pylint / mypy for linting are the most popular tools.
+
+From a behavioral point of view, make sure that the entities are doing what their name implies: fetch_users should return a list
+of users or an empty list. It shouldn't compute anything or return false, true, int, or string. Be consistent with names
+and obey components to respect their contract. If a component violets its contract, fail fast and visible. 
+Don't be afraid to throw exceptions or stop the business logic. Failing fast and visible will help you catch bugs 
+and solve inconsistency issues.
+
+## Explicit is better than implicit
+
+Python is magic and allows you to abuse it. Besides that, when designing certain components, make sure that those are well 
+defined and their behavior is properly exposed and expected by their clients.
+
+Avoid using generic components like Manager, Service, Data since they have a tendency of hiding complexity. 
+Use specific and meaningful terminology for components that are responsible for doing just one thing. 
+Favor small and well-defined logical units over complex ones (simple is better than complex).
+
+Avoid implicit defaults and don't be afraid of exposing some implementation details:
+
+```python
+def compute_interval(start):
+    return time.now() - start
+
+def compute_interval(start, end=None):
+    if end is None:
+        end = time.now()
+
+    return end - start
+```
+
+Leverage Python's functional tooling over in-place processing:
+
+```python
+def filter(items):
+    new_items = []
+
+    for item in items:
+        if item.get("property"):
+            new_items.append(item)
+
+    new_items.sort()  # faster, in-place
+
+    return new_items
+
+
+def filter(items, filters=None):
+     if not filters:
+         filters = [lambda item: item.get("property")]
+
+     items = [item for item in items
+              if all([filter(item) for filter in filters])]
+
+     return sorted(items)  # slower, creates a new list
+ ```
+
+Keep the levels of indirection small, avoid abusing metaclasses and complex OOP design:
+
+```python
+# abstractisation just for the sake of it adds more complexity than solves real issues
+class RequestValidator:
+    def __init__(self, request, validators=None):
+         self.request = request
+         self.validators = valiadtors or [
+             lambda request: "foo" in request.POST.get("arg")
+         ]
+
+    def validate(self):
+        return all([validator(self.request) for validator in self.validators])
+
+
+if RequestValidator(request).validate():
+    process()
+
+
+# simple and concise, solves the issue is easy to read and to maintain
+if "foo" in request.POST.get("arg", ""):
+    process()
+```
+
+Avoid using classes as logical namespaces:
+
+```python
+class Refresh:
+    @classmethod
+    def create_token(cls):
+        ...
+
+    @classmethod
+    def invalidate_token(cls, token):
+        ...
+
+    @classmethod
+    def refresh_token(cls, token):
+        ...
+```
+
+## Fail fast and visible
+
+Breaking the production can be terrifying and sometimes, we tend to "hide" or "swallow" user-facing errors just to 
+avoid showing weakness and to give our user a sense of shaky/unfinished product.
+
+Having bugs and errors in your codebase is a natural thing. That's how software grows and evolves.
+The catch is to see those bugs and errors as soon as possible and to fix them.
+The scariest bugs always starts with This thing just doesn't work. It says nothing.
+
+Avoid catching all exceptions. Instead, try to handle as many exception paths as possible.
+
+```python
+try:
+    content = requests.get()
+except Exception:
+    pass
+
+
+try:
+    content = requests.get()
+except ConnectTimeout:
+    ...
+except RequestException:
+    ...
+except RetryError:
+    ...
+```
+
+Failing fast and visible allows you to identify the problem and fix it. But you'll need visibility over those exceptions. Just
+failing fast may not be enough. An exception without a traceback may not be so useful to find the root cause.
+
+[Sentry](https://sentry.io/) is the way to go. Other logging and monitoring tools will help as much:
+[Datadog](https://www.datadoghq.com/), [Google Operations](https://cloud.google.com/products/operations), or
+[NewRelic](https://newrelic.com/) are just a bunch of observability tools that will make your life easier.
+
+## End-to-End > Integration > Unit tests
+
+Testing is your safety net. It allows you a free state of mind in which changes can happen easily, without regression. In theory,
+at least. Most of the time, we trust too much this safety net. A close to 100% code coverage doesn't really mean that your changes
+are not breaking the current behavior. Some code paths can be purely understood and tested.
+
+Multiple testing methodologies will create different safety nets. A really simple and fast to obtain is one using unit tests.
+Testing small and well-contained pieces of logic is easy and fast. The downside comes when those pieces are interacting with other
+parts and the interaction may be broke. Some assertions about those interactions can be tested using mocks, but those are our
+interpretations and assertion about the behavior and not actual behavior. Avoid trusting only unit tests and mock only if
+necessary. Mock data over behavior.
+
+Instead of mocking behavior, use a production-ready setup and try to test multiple components together. This kind of testing can
+be named integration tests. Use dependency injection over global services. The setup may cost you more than the setup for unit
+tests, but in the end, it's closer to production behavior. Usually, a small integration test is more powerful than multiple unit
+tests.
+
+Even in integration, tested behavior is limited to the components tested. A wider testing methodology would be to test the entire
+stack, a request lifecycle from client to server and back. This will cost you the most, but having just one simple e2e
+(end-to-end) test can pay the bill big time. This type of test usually involves spawning a production-like environment, close to
+production data.
+
+Favor End-to-End tests over Integration tests. Favor Integration tests over Unit tests. Mock data over behavior.
+
+## Deployable
+
+Writing code is easy. But those written symbols are usually meant to run on different machines. They interact with other symbols,
+alone, without your help. Even if may not be a big concern, deploying software is a big part of it. When writing code, starting
+with the mindset that it should get deploy will help you with design decisions. Always start with deploying in mind. How should
+data migration be handled? Does it involve downtime? Should I announce my users? How to deprecate API versions?
+
+Beside actually releasing software, thinking about packaging and portability is also important. Dependencies should be locked and
+build reproducible. A clear and consistent pipeline helps users use your software and allows developers to contribute, with
+minimum pain. Don't be afraid to use helper scripts, Dockerfiles, Makefiles, or other tools to automate your job. Software is
+always changing, so allow for this pipeline/procedure to be changing as well.
+
+## Refactoring Example
+
+Those were some small guidelines from my experience. In the end, a healthy codebase is a codebase that is easy to change.
+
+Making a codebase healthy is not a one-time thing. Is a long and tedious process, with small incremental progress. Small
+deployable changes are more sustainable, less invasive, and easier to understand.
+
+```python
+import requests
+
+import os
+
+from django.conf import settings
+import time
+
+
+def a(b):
+    s = time.now()
+
+    try:
+        c = requests.get(b)
+    except:
+        return
+
+    if time.now() - s > settings.TIME:
+        return "it took too much"
+    else:
+        return c.content, c.status_code
+```
+
+```python
+# Follow PEP-8 guidelines and sort imports.
+
+import os
+import time
+
+import requests
+from django.conf import settings
+from requests.exceptions import RequestException
+
+
+def validate_url(url: str) -> bool:
+     if not url or not isinstance(url, str):
+         return False
+
+     rules = [
+         lambda url: url.startswith("https://"),
+         lambda url: settings.VALID_HOST in url,
+         ...
+     ]
+
+     return not all([rule(url) for rule in rules])
+
+
+# Naming should be meaningful and consistent.
+def try_fetch(url: str) -> str: # Type-hinting allows tools like mypy to detect bugs.
+    # Fail fast and visible.
+    if not validate_url(url):
+        raise ValueError(f"Invalid or missing url: {url}")
+
+    start = time.now()
+
+    # Avoid swallowing exceptions. If not possible, log them.
+    response = response.get(url, raise_for_status=True)
+
+    # Group conditions and their context 
+    request_duration = time.now() - start
+    if request_duration > settings.MAX_REQUEST_DURATION:
+        # Add more context to errors.
+        raise RuntimeError(f"Request duration excided maximum duration: {request_duration}.")
+
+    # Check invalid usecases.
+    if response.status_code != 200:
+        raise RuntimeError(f"Service responded with {response.status_code} instead of 200.")
+
+    return str(response.content) # Be consistent with returning type
+```
+
+Cheers 🍺!
+
+
+---
+
+### Building a serverless hosting platform
+
+- **URL**: https://blog.vtemian.com/post/serverless-hosting-platform/
+- **Published**: May 18, 2020
+- **Word Count**: 5705 words
+- **Tags**: knative, kubernetes, serverless
+- **Summary**: Building a serverless hosting platform using Knative, Tekton, and Kubernetes on bare metal - from cluster setup to automated CI/CD deployments
+
+
+
+Deploying a 3-tier application (with the presentation layer, business logic, and storage) can get a little tricky these days. Let's say that we have a simple Django application, [poll's app](https://github.com/vtemian/simple-django-app) from the tutorial. It runs perfect on our local machine, we added a requirements.txt to hold our dependencies. As for the database, we can use SQLite, since we're developing only locally. The purpose of this project is to build a system that will allow us to push on a branch and deploy our changes in a separate environment, giving us a unique URL, to check them. Similarly to how [now.sh](http://now.sh) and [heroku.com](http://heorku.com) are doing. We'll need a mechanism that will package our code and dependencies and will deploy it, but also it needs to consider multiple versions, upgrades, load-balacing, scaling and our stateful part (database).
+
+[Introduction]({{< ref "#introduction" >}})
+
+[Serving component]({{< ref "#serving-component" >}})
+
+  * [Packet]({{< ref "#packet" >}})
+  * [Kubernetes on bare-metal]({{< ref "#kubernetes-on-bare-metal" >}})
+  * [MetalLB]({{< ref "#metallb" >}})
+  * [Istio]({{< ref "#istio" >}})
+  * [First Knative service]({{< ref "#first-knative-service" >}})
+  * [ElasticSearch and Kibana]({{< ref "#elasticsearch-and-kibana" >}})
+  * [Autoscaling]({{< ref "#autoscaling" >}})
+  * [Mysql]({{< ref "#mysql" >}})
+
+[CI/CD]({{< ref "#ci-cd" >}})
+
+  * [Tekton]({{< ref "#tekton" >}})
+  * [How does Tekton work?]({{< ref "#how-does-tekton-work" >}})
+  * [Pipeline Setup]({{< ref "#pipeline-setup" >}})
+  * [Github webhook trigger]({{< ref "#github-webhook-trigger" >}})
+
+[Conclusions]({{< ref "#conclusions" >}})
+
+## Introduction
+
+In order to achieve that, we'll need two main components: one component that will take our code and prepare it to be published, namely the CI/CD component, and another one that will expose the changes to the Internet, namely the serving component. We can add a third component to hold some state for our application, like database and storage, but we'll add it to the serving component.
+
+![/](/Untitled.png)
+
+## Serving component
+
+For the serving component, we can use [Knative](https://knative.dev/). It leverages Kubernetes and integrates components that are already built on top of Kubernetes. At it's very basic, it runs and exposes a Docker image to the Internet, without any fuss. You'll just have to define a `service` that describe your image and its environment and Knative will take care of everything else (from routing, logging, monitoring to managing different versions of your application and autoscaling, including 0 scaling for no use).
+
+As you can imagine, [Knative](https://knative.dev/) is way more complex than it can be described in a paragraph and currently, we'll not dissect it.
+
+### Packet
+
+In order to move forward with Knative, we'll need a Kubernetes cluster. For the sake of over-engineering it and trying something new, let's try to install Kubernetes on bare-metal. It sounds a little overwhelming, but in the end, it is way simpler than anticipated. I've always wanted to try [packet.com](https://www.packet.com/), since they have automated their deployment (it can be controlled via an API, thus allowing tools like Terraform to shine), they have a marketplace on which you can bid for machine's usage per hour (called [Spot Market](https://www.packet.com/developers/docs/getting-started/deployment-options/spot-market/), accessible via their API) and neat networking features (like [BGP](https://www.packet.com/developers/docs/network/advanced/local-and-global-bgp/) - Border Gateway Protocol, which will need further).
+
+We can choose from 3 deployment types: on-demand, reserved and spot. Let's try the spot instances since those can be really cheap.
+
+![/Screenshot_2020-05-09_at_12.19.28.png](/Screenshot_2020-05-09_at_12.19.28.png)
+
+Once a spot market request was created, it will check for available machines that comply with your bid, and start provisioning them. For a max bid of $0.10 / h, we get a [c1.small.x86](https://www.packet.com/cloud/servers/c1-small/) instance, with 4 physical cores running at 3.4Ghz ([Intel E3-1240 v3](https://ark.intel.com/content/www/us/en/ark/products/75055/intel-xeon-processor-e3-1240-v3-8m-cache-3-40-ghz.html)), 32GB RAM, 2 x 120GB SSD and 2 Gigabit NICs. 
+
+![/Screenshot_2020-05-09_at_12.33.00.png](/Screenshot_2020-05-09_at_12.33.00.png)
+
+I've updated the hostname for each of one and now we're ready to install Kubernetes.
+
+![/Screenshot_2020-05-09_at_13.05.54.png](/Screenshot_2020-05-09_at_13.05.54.png)
+
+### Kubernetes on bare-metal
+
+There are tons of guides out there on how to install Kubernetes on bare metal, from installing all the components manually to using scripts or other tools. The most popular choices are [kops](https://github.com/kubernetes/kops), [kubeadm](https://github.com/kubernetes/kubeadm) and [kubespray](https://github.com/kubernetes-sigs/kubespray). I went with kubespray since, for me, it was easier to understand and it was the path with the least resistance to follow since I have some ansible experience. [Here](https://github.com/kubernetes-sigs/kubespray/blob/master/docs/comparisons.md) you can find a small comparison between kops, kubeadm, and kubespray.
+
+Kubespray is easy to install and to use. We just need to clone the [repository](https://github.com/kubernetes-sigs/kubespray) and install it using
+
+```bash
+sudo pip3 install -r requirements.txt
+```
+
+We can also install it in a separate virtual environment if we have different versions of ansible running on your machine.
+
+Next, we need to define an inventory of servers. It comes with pre-defined inventory examples. We can use Packet's API to list all your servers, but I decided to use a static one. Just copy the `sample` inventory into a separate one (I've called it `rabbit`).
+
+```bash
+cd kubespray
+cp -R inventory/sample/ intentory/rabbit
+```
+
+Now add our servers in `inventory.ini`
+
+```
+[all]
+rabbit-1.vtemian.com ansible_host=147.75.84.27 ansible_user=root ip=10.80.204.129 etcd_member_name=etcd1
+rabbit-2.vtemian.com ansible_host=147.75.100.161 ansible_user=root ip=10.80.204.131 etcd_member_name=etcd2
+rabbit-3.vtemian.com ansible_host=147.75.100.215 ansible_user=root ip=10.80.204.133 etcd_member_name=etcd3
+
+[kube-master]
+rabbit-1.vtemian.com
+
+[etcd]
+rabbit-1.vtemian.com
+
+[kube-node]
+rabbit-2.vtemian.com
+rabbit-3.vtemian.com
+
+[calico-rr]
+
+[k8s-cluster:children]
+kube-master
+kube-node
+calico-rr
+```
+
+Because when I was setting up my cluster, kubespray didn't fully supported Ubuntu 20.04, I had to update the tasks a little bit. I've replaced `python-minimal` with `python2-minimal` and install Docker from Ubuntu 19.10 (Eoan) repositories.
+
+Next, we just need to run ansible and let it do the magic.
+
+```bash
+ansible-playbook --become -i inventory/rabbit/inventory.ini cluster.yml
+```
+
+If everything worked as intended, we'll have a new cluster, up and running. In order to access it, we can grab the admin credentials, from the kube-master node.
+
+```bash
+scp root@rabbit-1.vtemian.com:/etc/kubernetes/admin.conf .
+```
+
+Next, add those into our local kubectl config (usually located at `~/.kube/config`) and we'll be able to access the cluster, using `kubectl`.
+
+```bash
+╰─>$ kubectl get pod --all-namespaces -o wide
+NAMESPACE     NAME                                           READY   STATUS    RESTARTS   AGE     IP              NODE                   NOMINATED NODE   READINESS GATES
+kube-system   calico-kube-controllers-5679c8548f-rffvp       1/1     Running   0          2m46s   10.80.204.133   rabbit-3.vtemian.com   <none>           <none>
+kube-system   calico-node-6wt2p                              1/1     Running   1          3m12s   10.80.204.129   rabbit-1.vtemian.com   <none>           <none>
+kube-system   calico-node-98cnq                              1/1     Running   1          3m12s   10.80.204.131   rabbit-2.vtemian.com   <none>           <none>
+kube-system   calico-node-kh9k8                              1/1     Running   1          3m12s   10.80.204.133   rabbit-3.vtemian.com   <none>           <none>
+kube-system   coredns-76798d84dd-75tz6                       1/1     Running   0          2m21s   10.233.82.1     rabbit-1.vtemian.com   <none>           <none>
+kube-system   coredns-76798d84dd-bqt66                       1/1     Running   0          2m17s   10.233.80.1     rabbit-3.vtemian.com   <none>           <none>
+kube-system   dns-autoscaler-85f898cd5c-nskgf                1/1     Running   0          2m18s   10.233.82.2     rabbit-1.vtemian.com   <none>           <none>
+kube-system   kube-apiserver-rabbit-1.vtemian.com            1/1     Running   0          4m58s   10.80.204.129   rabbit-1.vtemian.com   <none>           <none>
+kube-system   kube-controller-manager-rabbit-1.vtemian.com   1/1     Running   0          4m58s   10.80.204.129   rabbit-1.vtemian.com   <none>           <none>
+kube-system   kube-proxy-4ktbs                               1/1     Running   0          3m34s   10.80.204.131   rabbit-2.vtemian.com   <none>           <none>
+kube-system   kube-proxy-kd6n2                               1/1     Running   0          3m34s   10.80.204.133   rabbit-3.vtemian.com   <none>           <none>
+kube-system   kube-proxy-ts8nw                               1/1     Running   0          3m34s   10.80.204.129   rabbit-1.vtemian.com   <none>           <none>
+kube-system   kube-scheduler-rabbit-1.vtemian.com            1/1     Running   0          4m58s   10.80.204.129   rabbit-1.vtemian.com   <none>           <none>
+kube-system   kubernetes-dashboard-77475cf576-7sdr6          1/1     Running   0          2m15s   10.233.83.2     rabbit-2.vtemian.com   <none>           <none>
+kube-system   kubernetes-metrics-scraper-747b4fd5cd-k96pn    1/1     Running   0          2m15s   10.233.83.1     rabbit-2.vtemian.com   <none>           <none>
+kube-system   nginx-proxy-rabbit-2.vtemian.com               1/1     Running   0          3m35s   10.80.204.131   rabbit-2.vtemian.com   <none>           <none>
+kube-system   nginx-proxy-rabbit-3.vtemian.com               1/1     Running   0          3m36s   10.80.204.133   rabbit-3.vtemian.com   <none>           <none>
+kube-system   nodelocaldns-9l6vf                             1/1     Running   0          2m17s   10.80.204.133   rabbit-3.vtemian.com   <none>           <none>
+kube-system   nodelocaldns-blbcb                             1/1     Running   0          2m17s   10.80.204.131   rabbit-2.vtemian.com   <none>           <none>
+kube-system   nodelocaldns-vrspt                             1/1     Running   0          2m17s   10.80.204.129   rabbit-1.vtemian.com   <none>           <none> 
+```
+
+### MetalLB
+
+Going further, we should be able to install Knative. A big step in Knative's installation is the routing component. It supports multiple networking layers (Ambassador, Contour, Gloo, Istio, and Kourier). The only problem is that those layers need a load balancer that will be exposed to the Internet (an external [LoadBalancer](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/)). Kubernetes doesn't have native support for that. Basically, the current implementations are vendor-specific (AWS, GCP, Azure etc.) and because we're on bare-metal, we can't afford the luxury of using one of those.
+
+Luckily, there's an implementation for bare-metal, called [MetalLB](https://metallb.universe.tf/). It can do that in two ways: at [layer 2](https://metallb.universe.tf/concepts/layer2/) using ARP/NDP or by leveraging [BGP](https://metallb.universe.tf/concepts/bgp/). Because Packet has support for [BGP](https://www.packet.com/developers/docs/network/advanced/local-and-global-bgp/) and they also provide a useful example on how to configure [MetalLB](https://github.com/packet-labs/kubernetes-bgp), we'll give them a try.
+
+The instructions from Packet's BGP - Kubernetes [integration](https://github.com/packet-labs/kubernetes-bgp#calico) are well documented and easy to follow. We just need to be careful with the IPPools. Before defining them, I've configured 2 sets of elastic IPs:
+
+A global IP `147.75.40.130/32` and a Public IPv4 `147.75.80.160/30`.
+
+![/Screenshot_2020-05-09_at_16.27.30.png](/Screenshot_2020-05-09_at_16.27.30.png)
+
+[For security reason](https://www.packet.com/developers/docs/network/basic/elastic-ips/)s, you'll need to manually configure the IPs, for each server. Its fairly easy to do it and well documented. For each server, attach them an IP from the `Network` section:
+
+![/Screenshot_2020-05-09_at_16.36.03.png](/Screenshot_2020-05-09_at_16.36.03.png)
+
+And that, on each server manually (or via ansible), an example for Ubuntu/Debian, if you just want to play around with, run:
+
+```
+sudo ip addr add <elastic-ip> dev lo
+```
+
+To make it permanent, we'll need to edit `/etc/network/interfaces`
+
+```bash
+auto lo:0
+iface lo:0 inet static
+    address <elastic-ip>
+    netmask 255.255.255.255
+```
+
+Continuing with the IPPools configuration, for `metallb-ewr1-public` will have `147.75.80.160/30`, for `metallb-global-ips` will have `147.75.40.130/32` and for `metallb-private` will have our private nodes subnet, which in the current case should be `10.80.204.128/29`. You can play around with the node's private ips and a CIDR-IP conversion [tool](https://www.ipaddressguide.com/cidr).
+
+For each calico peer config (worker), we'll put node's private IP.
+
+Next, we'll install the latest metalLB manifest:
+
+```
+kubectl apply -f https://raw.githubusercontent.com/google/metallb/v0.8.1/manifests/metallb.yaml
+```
+
+Followed by the metalLB's config map, in `metallb-system` namespace:
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: metallb-system
+  name: config
+data:
+  config: |
+    peers:
+    - peer-address: 127.0.0.1
+      peer-asn: 65000
+      my-asn: 65480
+    address-pools:
+    - name: ewr1-public
+      protocol: bgp
+      addresses:
+      - 147.75.80.160/30
+    - name: ewr1-private
+      protocol: bgp
+      addresses:
+      - 10.80.204.128/29
+    - name: global-ip
+      protocol: bgp
+      addresses:
+      - 147.75.40.130/32
+```
+
+We can check if everything is configured correctly, by running `calicoctl node status` in our master node:
+
+```bash
+root@rabbit-1:~# calicoctl node status
+Calico process is running.
+
+IPv4 BGP status
++----------------+-------------------+-------+----------+-------------+
+|  PEER ADDRESS  |     PEER TYPE     | STATE |  SINCE   |    INFO     |
++----------------+-------------------+-------+----------+-------------+
+| 147.75.100.215 | node-to-node mesh | up    | 13:46:38 | Established |
+| 127.0.0.1      | global            | up    | 13:51:44 | Established |
+| 147.75.100.161 | node-to-node mesh | up    | 13:47:27 | Established |
++----------------+-------------------+-------+----------+-------------+
+```
+
+And other kubectl commands:
+
+```bash
+╰─>$ kubectl get pod -n kube-system -o wide | grep calico-node
+
+calico-node-479fz                              1/1     Running   0          8m25s   10.80.204.133   rabbit-3.vtemian.com   <none>           <none>
+calico-node-846gr                              1/1     Running   0          7m18s   10.80.204.131   rabbit-2.vtemian.com   <none>           <none>
+calico-node-tpnjc                              1/1     Running   0          8m8s    10.80.204.129   rabbit-1.vtemian.com   <none>           <none>
+```
+
+```bash
+╰─>$ kubectl get pod -n metallb-system -o wide
+
+NAME                          READY   STATUS    RESTARTS   AGE    IP              NODE                   NOMINATED NODE   READINESS GATES
+controller-6bcfdfd677-nxnw8   1/1     Running   0          5m4s   10.233.65.193   rabbit-3.vtemian.com   <none>           <none>
+speaker-d6kks                 1/1     Running   0          5m4s   10.80.204.131   rabbit-2.vtemian.com   <none>           <none>
+speaker-kk85w                 1/1     Running   0          5m4s   10.80.204.133   rabbit-3.vtemian.com   <none>           <none>
+speaker-p4lc7                 1/1     Running   0          5m4s   10.80.204.129   rabbit-1.vtemian.com   <none>           <none>
+```
+
+### Istio
+
+Now that we have the MetalLB up and running we can continue with the last routing component. Between all those networking components that Knative supports, I've chosen [Istio](https://istio.io/), because it is the only one compatible with the Knative operator (which will be mention further).
+
+We just need to follow the instructions from the main install [page](https://knative.dev/development/install/installing-istio/#downloading-istio-and-installing-crds) and if everything worked, we'll have a load balancer, with an external IP.
+
+```bash
+╰─>$ kubectl get service --all-namespaces
+NAMESPACE      NAME                        TYPE           CLUSTER-IP      EXTERNAL-IP     PORT(S)                                                                                                                                      AGE
+default        kubernetes                  ClusterIP      10.233.0.1      <none>          443/TCP                                                                                                                                      101m
+istio-system   istio-ingressgateway        LoadBalancer   10.233.24.125   147.75.80.160   15020:30935/TCP,80:31380/TCP,443:31390/TCP,31400:31400/TCP,15029:31350/TCP,15030:31699/TCP,15031:32315/TCP,15032:31519/TCP,15443:32542/TCP   55s
+istio-system   istio-pilot                 ClusterIP      10.233.48.55    <none>          15010/TCP,15011/TCP,8080/TCP,15014/TCP                                                                                                       55s
+kube-system    coredns                     ClusterIP      10.233.0.3      <none>          53/UDP,53/TCP,9153/TCP                                                                                                                       98m
+kube-system    dashboard-metrics-scraper   ClusterIP      10.233.61.223   <none>          8000/TCP                                                                                                                                     97m
+kube-system    kubernetes-dashboard        ClusterIP      10.233.16.174   <none>          443/TCP                                                                                                                                      97m
+```
+
+### Knative
+
+We're ready to install Knative. I found that the easier path is to install the common operator that will further install all the components. I've tried installing each component manually, but it can get really tricky.
+
+For now, we need to install the operator in the `default` namespace, since it will look for a ConfigMap called `config-loggin` in the `default` namespace.
+
+```bash
+╰─>$ kubens default
+╰─>$ kubectl apply -f https://github.com/knative-sandbox/operator/releases/download/v0.14.1/operator.yaml
+```
+
+Once the CRDs are installed and the operator's pods are running 
+
+```bash
+╰─>$ kubectl get pods
+NAME                                         READY   STATUS    RESTARTS   AGE
+knative-eventing-operator-5847fcc5d5-d4cb4   1/1     Running   0          53s
+knative-serving-operator-587dcd9f85-zlx7v    1/1     Running   0          53s
+```
+
+We can create the `KnativeServing` and `KnativeEventing` resources:
+
+```bash
+╰─>$ cat <<-EOF | kubectl apply -f -
+apiVersion: operator.knative.dev/v1alpha1
+kind: KnativeServing
+metadata:
+  name: ks
+EOF
+
+╰─>$ cat <<-EOF | kubectl apply -f -
+apiVersion: v1
+kind: Namespace
+metadata:
+ name: knative-eventing
+---
+apiVersion: operator.knative.dev/v1alpha1
+kind: KnativeEventing
+metadata:
+  name: ke
+  namespace: knative-eventing
+EOF
+```
+
+New pods and resources are being installed in the `default` and `knative-eventing` namespaces
+
+```bash
+╰─>$ kubectl get pods --all-namespaces -o wide
+NAMESPACE          NAME                                           READY   STATUS      RESTARTS   AGE     IP              NODE                   NOMINATED NODE   READINESS GATES
+default            activator-65fc4d666-7bwst                      1/1     Running     0          39s     10.233.125.68   rabbit-2.vtemian.com   <none>           <none>
+default            autoscaler-74b4bb97bd-ghj59                    1/1     Running     0          38s     10.233.65.195   rabbit-3.vtemian.com   <none>           <none>
+default            autoscaler-hpa-594f68d5c4-8qtg4                1/1     Running     0          30s     10.233.65.198   rabbit-3.vtemian.com   <none>           <none>
+default            controller-6b6978c965-rqb2z                    1/1     Running     0          37s     10.233.65.196   rabbit-3.vtemian.com   <none>           <none>
+default            istio-webhook-856d84fbf9-wvpph                 1/1     Running     0          26s     10.233.125.71   rabbit-2.vtemian.com   <none>           <none>
+default            knative-eventing-operator-5847fcc5d5-d4cb4     1/1     Running     0          3m18s   10.233.125.67   rabbit-2.vtemian.com   <none>           <none>
+default            knative-serving-operator-587dcd9f85-zlx7v      1/1     Running     0          3m18s   10.233.125.66   rabbit-2.vtemian.com   <none>           <none>
+default            networking-istio-6845f7cf59-bsqc2              1/1     Running     0          26s     10.233.125.69   rabbit-2.vtemian.com   <none>           <none>
+default            webhook-577576647-wrw56                        1/1     Running     0          36s     10.233.65.197   rabbit-3.vtemian.com   <none>           <none>
+istio-system       istio-ingressgateway-75694cd848-l6zfh          1/1     Running     0          64m     10.233.125.65   rabbit-2.vtemian.com   <none>           <none>
+istio-system       istio-pilot-576d858689-zxv76                   1/1     Running     0          64m     10.233.65.194   rabbit-3.vtemian.com   <none>           <none>
+knative-eventing   broker-controller-854447b8d7-vdmdz             1/1     Running     0          18s     10.233.65.200   rabbit-3.vtemian.com   <none>           <none>
+knative-eventing   broker-filter-b54b58854-w9jvw                  1/1     Running     0          17s     10.233.125.72   rabbit-2.vtemian.com   <none>           <none>
+knative-eventing   broker-ingress-75b6b8df8d-mlppj                1/1     Running     0          16s     10.233.65.201   rabbit-3.vtemian.com   <none>           <none>
+knative-eventing   eventing-controller-694594fdd7-gj2br           1/1     Running     0          26s     10.233.125.70   rabbit-2.vtemian.com   <none>           <none>
+knative-eventing   eventing-webhook-6c6b675b6f-t4ntx              1/1     Running     0          26s     10.233.65.199   rabbit-3.vtemian.com   <none>           <none>
+knative-eventing   imc-controller-7bb9bd7c6d-q2tsz                1/1     Running     0          10s     10.233.125.73   rabbit-2.vtemian.com   <none>           <none>
+knative-eventing   imc-dispatcher-6cc5c74c7f-kdj7v                1/1     Running     0          10s     10.233.125.74   rabbit-2.vtemian.com   <none>           <none>
+knative-eventing   mt-broker-controller-75ddc75d57-rg6jd          1/1     Running     0          15s     10.233.65.202   rabbit-3.vtemian.com   <none>           <none>
+knative-eventing   v0.14.0-upgrade-4sv89                          0/1     Completed   0          9s      10.233.65.203   rabbit-3.vtemian.com   <none>           <none>
+```
+
+Before we actually test it, let's configure the DNS component. We'll want to have a unique URL generated each time a new deployment is created. Knative can do that using [xip.io](http://xip.io) and we just need to create a job (we'll need to install it in the `default` namespace):
+
+```bash
+╰─>$ kubectl apply --filename https://storage.googleapis.com/knative-nightly/serving/latest/serving-default-domain.yaml
+```
+
+### First Knative service
+
+Within our initial application, I've created a simple [Dockerfile](https://github.com/vtemian/simple-django-app/tree/docker):
+
+```bash
+FROM python:3.7-slim
+
+WORKDIR /app
+
+COPY requirements.txt ./
+RUN pip install -r requirements.txt
+
+COPY app ./
+
+CMD exec gunicorn app.wsgi --bind :$PORT --workers 1 --threads 8 --timeout 0
+```
+
+And published the image, publicly, under `vtemian/simple-django-app`.
+
+```bash
+╰─>$ docker push vtemian/simple-django-app
+The push refers to repository [docker.io/vtemian/simple-django-app]
+7aa16540cfca: Pushed
+2e02cc50aabc: Pushed
+768f0318f857: Pushed
+663045c38f65: Pushed
+715414420313: Mounted from vtemian/helloworld-python
+dba4fa00b93a: Mounted from vtemian/helloworld-python
+9f690547ed37: Mounted from vtemian/helloworld-python
+6376837eded8: Mounted from vtemian/helloworld-python
+c2adabaecedb: Mounted from vtemian/helloworld-python
+latest: digest: sha256:78799d85949e31728c70ef3dbf3a492d932fc94c140cf1047d948c89141f55ab size: 2205
+```
+
+To publish it on our Knative installation, we just need to define a service:
+
+```yaml
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: simple-django-app
+  namespace: default
+spec:
+  template:
+    spec:
+      containers:
+      - image: docker.io/vtemian/simple-django-app
+```
+
+Aaaaaand `kubectl get ksvc`:
+
+```bash
+╰─>$ kubectl get ksvc
+NAME                URL                                                     LATESTCREATED             LATESTREADY   READY     REASON
+simple-django-app   http://simple-django-app.default.147.75.80.160.xip.io   simple-django-app-hc2qv                 Unknown   RevisionMissing
+```
+
+Going to the generated URL
+
+![/Screenshot_2020-05-09_at_18.28.18.png](/Screenshot_2020-05-09_at_18.28.18.png)
+
+Now this...this is pretty damn cool! There's no database and we still need to build our containers, but it looks pretty damn cool!
+
+### ElasticSearch and Kibana
+
+Before we move further to test it more, let's configure some observability tools, like ElasticSearch + Kibana for logs and Prometheus + Grafana for metrics.
+
+Let's start with the metrics component. We'll follow the [guide](https://knative.dev/development/serving/installing-logging-metrics-traces/) and we'll just need to edit the `config-observability` config map. It already provides us with an config example, we'll be using it. Just unindent the exemple, for now. Next, we'll need to create the `knative-monitoring` namespace, and apply the manifests:
+
+```bash
+╰─>$ kubectl apply --filename https://storage.googleapis.com/knative-nightly/serving/latest/monitoring-metrics-prometheus.yaml
+```
+
+The pods should be up and running in the `knative-monitoring` namespace:
+
+```bash
+╰─>$ kubectl get pod -n knative-monitoring -o wide
+NAME                                 READY   STATUS    RESTARTS   AGE    IP              NODE                   NOMINATED NODE   READINESS GATES
+grafana-c9c94bdff-5f77v              1/1     Running   0          2m3s   10.233.65.210   rabbit-3.vtemian.com   <none>           <none>
+kube-state-metrics-b6bcff8f4-tvp46   1/1     Running   0          2m7s   10.233.65.209   rabbit-3.vtemian.com   <none>           <none>
+node-exporter-9wkpn                  2/2     Running   0          2m4s   10.80.204.131   rabbit-2.vtemian.com   <none>           <none>
+node-exporter-lfjss                  2/2     Running   0          2m4s   10.80.204.129   rabbit-1.vtemian.com   <none>           <none>
+node-exporter-zjl7b                  2/2     Running   0          2m4s   10.80.204.133   rabbit-3.vtemian.com   <none>           <none>
+prometheus-system-0                  1/1     Running   0          2m1s   10.233.65.211   rabbit-3.vtemian.com   <none>           <none>
+prometheus-system-1                  1/1     Running   0          2m1s   10.233.125.75   rabbit-2.vtemian.com   <none>           <none>
+```
+
+By default, Grafana comes with some really nice dashboards and with Prometheus configured as a data source. The only problem is that the Prometheus configured, is not the currently running service. We'll need to get all currently running services and check Prometheus service name, which in this case is `prometheus-system-discovery`.
+
+```bash
+╰─>$ kubectl -n knative-monitoring get service
+NAME                          TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)             AGE
+kube-controller-manager       ClusterIP   None            <none>        10252/TCP           5m36s
+kube-state-metrics            ClusterIP   10.233.56.244   <none>        8080/TCP,8081/TCP   5m41s
+node-exporter                 ClusterIP   None            <none>        9100/TCP            5m38s
+prometheus-system-discovery   ClusterIP   None            <none>        9090/TCP            5m36s
+```
+
+We'll have to edit Grafana's config map and replace Prometheus' URL with `[http://prometheus-system-discovery.knative-monitoring.svc:9090](http://prometheus-system-discovery.knative-monitoring.svc:9090/)`.
+
+```bash
+╰─>$ kubectl -n knative-monitoring edit cm grafana-datasources
+apiVersion: v1
+data:
+  prometheus.yaml: |
+    datasources:
+     - name: prometheus
+       type: prometheus
+       access: proxy
+       org_id: 1
+       url: http://prometheus-system-discovery.knative-monitoring.svc:9090
+       version: 1
+       editable: false
+```
+
+Delete the current running Grafana pod
+
+```bash
+╰─>$ kubectl delete po -n knative-monitoring --selector=app=grafana
+pod "grafana-c9c94bdff-rkvrg" deleted
+```
+
+Wait until a new pod is started and you can port-forward it
+
+```bash
+╰─>$ kubectl port-forward --namespace knative-monitoring \
+     (kubectl get pods --namespace knative-monitoring \
+     --selector=app=grafana --output=jsonpath="{.items..metadata.name}") \
+     3000
+Forwarding from 127.0.0.1:3000 -> 3000
+```
+
+![/Screenshot_2020-05-10_at_13.29.25.png](/Screenshot_2020-05-10_at_13.29.25.png)
+
+All of those default dashboards are interesting, but I found the most useful the `Knative Serving - Revision HTTP Requests`, that describes current running applications.
+
+![/Screenshot_2020-05-10_at_15.47.39.png](/Screenshot_2020-05-10_at_15.47.39.png)
+
+And the `Kubernetes Capacity Planning` that gives an overview over the entire cluster.
+
+![/Screenshot_2020-05-10_at_15.48.07.png](/Screenshot_2020-05-10_at_15.48.07.png)
+
+Moving to logs, we'll need to configure ElasticSearch and Kibana. We'll need to edit the `config-observability` ConfigMap and set the `logging.request-log-template` to 
+
+```bash
+╰─>$ kubectl edit cm config-observability
+logging.request-log-template: '{"httpRequest": {"requestMethod": "{{.Request.Method}}", "requestUrl": "{{js .Request.RequestURI}}", "requestSize": "{{.Request.ContentLength}}", "status": {{.Response.Code}}, "responseSize": "{{.Response.Size}}", "userAgent": "{{js .Request.UserAgent}}", "remoteIp": "{{js .Request.RemoteAddr}}", "serverIp": "{{.Revision.PodIP}}", "referer": "{{js .Request.Referer}}", "latency": "{{.Response.Latency}}s", "protocol": "{{.Request.Proto}}"}, "traceId": "{{index .Request.Header "X-B3-Traceid"}}"}'
+```
+
+Apply the manifest
+
+```bash
+╰─>$ kubectl apply --filename https://storage.googleapis.com/knative-nightly/serving/latest/monitoring-logs-elasticsearch.yaml
+```
+
+We'll set `[beta.kubernetes.io/fluentd-ds-ready="true"](http://beta.kubernetes.io/fluentd-ds-ready=%22true%22)` label for our nodes
+
+```bash
+╰─>$ kubectl label nodes --all beta.kubernetes.io/fluentd-ds-ready="true"
+node/rabbit-1.vtemian.com labeled
+node/rabbit-2.vtemian.com labeled
+node/rabbit-3.vtemian.com labeled
+```
+
+And check if the fluentd daemon set is running on our nodes
+
+```bash
+╰─>$ kubectl get daemonset fluentd-ds --namespace knative-monitoring
+NAME         DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR                              AGE
+fluentd-ds   2         2         2       2            2           beta.kubernetes.io/fluentd-ds-ready=true   5m37s
+```
+
+In this point, on each node a Fluentd daemon is running, collecting logs and send them to ElasticSearch. Furthermore, we'll need to configure Kibana to access those logs.
+
+We'll start the local proxy
+
+```bash
+╰─>$kubectl proxy
+```
+
+And visit [Kibana UI](http://localhost:8001/api/v1/namespaces/knative-monitoring/services/kibana-logging/proxy/app/kibana). If the service doesn't start, you can create one with the following configuration
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: kibana-logging
+  namespace: knative-monitoring
+  labels:
+    app: kibana-logging
+    kubernetes.io/cluster-service: "true"
+    kubernetes.io/name: "Kibana"
+spec:
+  ports:
+  - port: 5601
+    protocol: TCP
+    targetPort: ui
+  selector:
+    app: kibana-logging
+```
+
+Create a new index and wait until is processed.
+
+![/Screenshot_2020-05-10_at_16.27.12.png](/Screenshot_2020-05-10_at_16.27.12.png)
+
+Set it as the default index
+
+![/Screenshot_2020-05-10_at_16.45.24.png](/Screenshot_2020-05-10_at_16.45.24.png)
+
+And the logs should flow
+
+![/Screenshot_2020-05-10_at_16.59.57.png](/Screenshot_2020-05-10_at_16.59.57.png)
+
+### Autoscaling
+
+Now that we can really see what is happening in the cluster, let's configure the autoscaling and 0 scaling. For that, we'll need to edit the `config-autoscaler` ConfigMap. All options are already described in the comments, and for testing purpose, this is the configuration I'm using:
+
+```yaml
+  activator-capacity: "100.0"
+  container-concurrency-target-default: "100"
+  container-concurrency-target-percentage: "70"
+  enable-graceful-scaledown: "true"
+  enable-scale-to-zero: "true"
+  max-scale-down-rate: "2.0"
+  max-scale-up-rate: "1000.0"
+  panic-threshold-percentage: "20.0"
+  panic-window-percentage: "5.0"
+  pod-autoscaler-class: kpa.autoscaling.knative.dev
+  requests-per-second-target-default: "20"
+  scale-to-zero-grace-period: 30s
+  stable-window: 60s
+  target-burst-capacity: "10"
+  tick-interval: 2s 
+```
+
+All those options are explained in the [docs](https://knative.dev/docs/serving/configuring-autoscaling/), but maybe what we're most interested are the 0 scaling
+
+```yaml
+# specifies the time an inactive revision is left running before it is scaled to zero (min: 6s).
+scale-to-zero-grace-period: 30s
+# enables scale to zero
+enable-scale-to-zero: "true"
+```
+
+And the autoscaling trasholds
+
+```yaml
+# defines how many concurrent requests are wanted at a given time (soft limit) and is the recommended configuration for autoscaling.
+container-concurrency-target-default: "100"
+```
+
+Those are the configuration applied for each revision, but you can control independently, using annotations. Let's configure the Horizontal Pod Autoscaler to follow the CPU metric and scale if the current consumed CPU is 30% of the limit.
+
+```yaml
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: simple-django-app
+  namespace: default
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/metric: cpu
+        autoscaling.knative.dev/target: "70"
+        autoscaling.knative.dev/class: hpa.autoscaling.knative.dev
+    spec:
+      containers:
+      - image: docker.io/vtemian/simple-django-app
+        resources:
+          requests:
+            cpu: 100m
+```
+
+Let's start a curl in background
+
+```bash
+╰─>$ watch -n 0.1 curl -SI http://simple-django-app.default.147.75.80.160.xip.io/polls/
+```
+
+And we have 2 running pods
+
+```bash
+╰─>$ kubectl get po -l serving.knative.dev/service=simple-django-app
+NAME                                                  READY   STATUS    RESTARTS   AGE
+simple-django-app-g9zf5-deployment-5b76fdf7fc-mtlwt   2/2     Running   0          3m25s
+simple-django-app-mg96q-deployment-7db5bb6b9c-29ffw   2/2     Running   0          4m18s
+```
+
+Let's go further and start a [Locust](https://locust.io/) test.  We'll follow the instructions from [zalando-incubator](https://github.com/zalando-incubator/docker-locust) and start for replicas that will hit our service:
+
+```bash
+_________________________________________________________________________________
+
+                         L O C A L - D E P L O Y M E N T
+_________________________________________________________________________________
+Target url: http://simple-django-app.default.147.75.80.160.xip.io/polls
+Where load test script is stored (e.g. https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py): https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py
+Number of slave(s): 4
+Run type [automatic/manual]: manual
+----------------------------------------------
+                   VARIABLES
+----------------------------------------------
+TARGET_URL: http://simple-django-app.default.147.75.80.160.xip.io/polls
+LOCUST_FILE: https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py
+SLAVES NUMBER: 4
+RUN_TYPE: manual || automatic=false
+NUMBER OF USERS:
+HATCH_RATE:
+DURATION [in seconds]:
+COMPOSE: false
+SEND_ANONYMOUS_USAGE_INFO: true
+----------------------------------------------
+```
+
+And the results are pretty cool
+
+```bash
+╰─>$ kubectl get po -l serving.knative.dev/service=simple-django-app
+NAME                                                  READY   STATUS      RESTARTS   AGE
+simple-django-app-ns6fm-deployment-85cff985d5-249rj   2/2     Running     0          41s
+simple-django-app-ns6fm-deployment-85cff985d5-2c6m9   2/2     Running     0          41s
+simple-django-app-ns6fm-deployment-85cff985d5-2m6kk   2/2     Running     0          86s
+simple-django-app-ns6fm-deployment-85cff985d5-2mm7t   2/2     Running     0          41s
+simple-django-app-ns6fm-deployment-85cff985d5-2q7f8   2/2     Running     0          41s
+simple-django-app-ns6fm-deployment-85cff985d5-5xcxf   2/2     Running     0          71s
+simple-django-app-ns6fm-deployment-85cff985d5-6jxfw   2/2     Running     0          41s
+simple-django-app-ns6fm-deployment-85cff985d5-77v6w   2/2     Running     0          41s
+simple-django-app-ns6fm-deployment-85cff985d5-8qk5s   2/2     Running     0          56s
+simple-django-app-ns6fm-deployment-85cff985d5-9n4h6   2/2     Running     0          41s
+simple-django-app-ns6fm-deployment-85cff985d5-b466k   2/2     Running     0          7m57s
+simple-django-app-ns6fm-deployment-85cff985d5-b8qbf   2/2     Running     0          25s
+simple-django-app-ns6fm-deployment-85cff985d5-bkt66   2/2     Running     0          71s
+simple-django-app-ns6fm-deployment-85cff985d5-bxbzf   2/2     Running     0          56s
+simple-django-app-ns6fm-deployment-85cff985d5-d5xt5   2/2     Running     0          41s
+simple-django-app-ns6fm-deployment-85cff985d5-jrchv   2/2     Running     0          41s
+simple-django-app-ns6fm-deployment-85cff985d5-mtrvh   2/2     Running     0          56s
+simple-django-app-ns6fm-deployment-85cff985d5-mzz7g   2/2     Running     0          41s
+simple-django-app-ns6fm-deployment-85cff985d5-p7wvx   2/2     Running     0          41s
+simple-django-app-ns6fm-deployment-85cff985d5-pbmzb   2/2     Running     0          25s
+simple-django-app-ns6fm-deployment-85cff985d5-pzb92   2/2     Running     0          56s
+simple-django-app-ns6fm-deployment-85cff985d5-pzkrr   2/2     Running     0          41s
+simple-django-app-ns6fm-deployment-85cff985d5-qhjxq   2/2     Running     0          41s
+simple-django-app-ns6fm-deployment-85cff985d5-rc2xx   2/2     Running     0          41s
+simple-django-app-ns6fm-deployment-85cff985d5-s7lzm   2/2     Running     0          25s
+simple-django-app-ns6fm-deployment-85cff985d5-sdpmf   2/2     Running     0          41s
+simple-django-app-ns6fm-deployment-85cff985d5-ss66c   2/2     Running     0          6m27s
+simple-django-app-ns6fm-deployment-85cff985d5-ssrzg   2/2     Running     0          56s
+simple-django-app-ns6fm-deployment-85cff985d5-t424m   2/2     Running     0          56s
+simple-django-app-ns6fm-deployment-85cff985d5-tjlsz   2/2     Running     0          71s
+simple-django-app-ns6fm-deployment-85cff985d5-tzcjw   2/2     Running     0          56s
+simple-django-app-ns6fm-deployment-85cff985d5-w2tsp   2/2     Running     0          71s
+simple-django-app-ns6fm-deployment-85cff985d5-x9626   2/2     Running     0          41s
+simple-django-app-ns6fm-deployment-85cff985d5-xm5pk   2/2     Running     0          86s
+simple-django-app-ns6fm-deployment-85cff985d5-xv9sw   2/2     Running     0          56s
+```
+
+Requests leaving the local machine 
+
+![/Screenshot_2020-05-11_at_19.23.16.png](/Screenshot_2020-05-11_at_19.23.16.png)
+
+Requests for this current revision
+
+![/Screenshot_2020-05-11_at_19.28.30.png](/Screenshot_2020-05-11_at_19.28.30.png)
+
+Resource consumption
+
+![/Screenshot_2020-05-11_at_19.25.23.png](/Screenshot_2020-05-11_at_19.25.23.png)
+
+For now, we have a running Kubernetes cluster, on bare-metal (on top of Packet), with 3 nodes, a running Knative installation that serves and scales Docker images.
+
+### Mysql
+
+Finally, let's add some state to this setup. At [Presslabs](https://www.presslabs.com/), the company I'm currently working for, we've built an operator for M[y](https://github.com/presslabs/mysql-operator)SQL. It takes care of replication, backups, and other tedious operations. The installation and its configuration are fairly straight forward, but first, we need to configure some persistent volumes:
+
+```yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  labels:
+    type: local
+  name: rabbit-1.vtemian.com
+spec:
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: 11Gi
+  hostPath:
+    path: /mnt/data
+    type: ""
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - rabbit-1.vtemian.com
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: standard
+  volumeMode: Filesystem
+```
+
+Let's create one for each node:
+
+```bash
+╰─>$ kubectl get pv
+NAME                   CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS      CLAIM                           STORAGECLASS   REASON   AGE
+rabbit-1.vtemian.com   11Gi       RWO            Retain           Available                                   standard                2m58s
+rabbit-2.vtemian.com   11Gi       RWO            Retain           Bound       default/data-mysql-operator-0   standard                3m9s
+rabbit-3.vtemian.com   11Gi       RWO            Retain           Available                                   standard                3m19s
+```
+
+We now can continue with mysql-operator:
+
+```bash
+╰─>$ helm repo add presslabs https://presslabs.github.io/charts
+╰─>$ helm install presslabs/mysql-operator --name mysql-operator --set orchestrator.persistence.storageClass=standard
+```
+
+Furthermore, we'll need a secret with the credentials we want for our mysql cluster
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: my-secret
+type: Opaque
+data:
+  ROOT_PASSWORD: bXlwYXNz
+  DATABASE: cmFiYml0Cg==
+  USER: cmFiYml0Cg==
+  PASSWORD: bXlwYXNz
+```
+
+And create the cluster with 2 replicas
+
+```yaml
+apiVersion: mysql.presslabs.org/v1alpha1
+kind: MysqlCluster
+metadata:
+  name: my-cluster
+spec:
+  replicas: 2
+  secretName: my-secret
+```
+
+Now we have our 2 replicas:
+
+```bash
+╰─>$ kubectl get po -l app.kubernetes.io/name=mysql
+NAME                 READY   STATUS    RESTARTS   AGE
+my-cluster-mysql-0   4/4     Running   0          3m11s
+my-cluster-mysql-1   4/4     Running   0          4m37s
+```
+
+And a service on which we can connect:
+
+```bash
+╰─>$ kubectl get service -l app.kubernetes.io/name=mysql
+NAME                      TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)             AGE
+my-cluster-mysql          ClusterIP   10.233.50.17    <none>        3306/TCP            10m
+my-cluster-mysql-master   ClusterIP   10.233.29.255   <none>        3306/TCP            10m
+```
+
+At this point, the serving component is up and running and tested with a dummy application. Let's move further with the building component.
+
+## CI/CD
+
+### Tekton
+
+Knative used to have a build [component](https://github.com/knative/build/), which now is [deprecated](https://github.com/knative/build/issues/614) in favour of [Tekton](https://tekton.dev/). There are some nice guides on how to configure Tekton and integrate it with Knative, but first, let's install it:
+
+```bash
+╰─>$ kubectl apply --filename https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml
+```
+
+Finally, we just need to edit the `config-artifact-pvc` ConfigMap, in order to allow Tekton to save artifacts in a PVC.
+
+```yaml
+data:
+  size: 5Gi
+  storageClassName: default
+```
+
+Taking a look at Tekton pod's we can see that it's running properly:
+
+```bash
+╰─>$ kubectl get po -n tekton-pipelines
+NAME                                           READY   STATUS    RESTARTS   AGE
+tekton-pipelines-controller-5c44bcfc44-gfhdx   1/1     Running   0          85m
+tekton-pipelines-webhook-7bd568f6c6-vll6v      1/1     Running   0          85m
+```
+
+### How does Tekton work?
+
+Before setting up the pipeline, let's explore Tekton a little bit. Tekton leverages CRDs and allow us to describe pipelines by defining Kubernetes resources. I'll resume the information from [this guide](https://www.alibabacloud.com/blog/first-knative-attempt-a-quick-guide-to-continuous-integration-and-continuous-delivery_595803) and their official [docs](https://tekton.dev/docs/pipelines/).
+
+[Tasks](https://tekton.dev/docs/pipelines/tasks/) are a template for defining an actual working unit. It's like defining a function, with its parameters and behavior. It defines one or more steps and at each step, a container is executed. Example from [https://github.com/knative-sample/tekton-knative](https://github.com/knative-sample/tekton-knativehttps://github.com/knative-sample/tekton-knative/blob/master/tekton-cicd/tasks/deploy-using-kubectl.yaml)
+
+```yaml
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: deploy-using-kubectl
+spec:
+  inputs:
+    resources:
+      - name: git-source
+        type: git
+    params:
+      - name: pathToYamlFile
+        description: The path to the yaml file to deploy within the git source
+      - name: imageUrl
+        description: Url of image repository
+      - name: imageTag
+        description: Tag of the images to be used.
+        default: "latest"
+  steps:
+    - name: update-yaml
+      image: alpine
+      command: ["sed"]
+      args:
+        - "-i"
+        - "-e"
+        - "s;__IMAGE__;${inputs.params.imageUrl}:${inputs.params.imageTag};g"
+        - "/workspace/git-source/${inputs.params.pathToYamlFile}"
+    - name: run-kubectl
+      image: registry.cn-hangzhou.aliyuncs.com/knative-sample/kubectl:v0.5.0
+      command: ["kubectl"]
+      args:
+        - "apply"
+        - "-f"
+        - "/workspace/git-source/${inputs.params.pathToYamlFile}"
+```
+
+A [TaskRun](https://tekton.dev/docs/pipelines/taskruns/) is a running instance of a Task. It executes all the steps of a task, in order, until all of them are completed. Example from [https://github.com/knative-sample/tekton-knative](https://github.com/knative-sample/tekton-knativehttps://github.com/knative-sample/tekton-knative/blob/master/tekton-cicd/tasks/deploy-using-kubectl.yaml)
+
+```yaml
+apiVersion: tekton.dev/v1alpha1
+kind: TaskRun
+metadata:
+  name: source-to-image
+spec:
+  taskRef:
+    name: source-to-image
+  params:
+    - name: pathToContext
+      value: "${params.pathToContext}"
+    - name: imageUrl
+      value: "${params.imageUrl}"
+    - name: imageTag
+      value: "${params.imageTag}"
+  resources:
+    inputs:
+      - name: git-source
+        resource: git-source
+```
+
+A [Pipeline](https://tekton.dev/docs/pipelines/pipelines/) allows us to define multiple tasks. Using TaskRun we could run only one task. Each Task in a Pipeline executes as a Pod. Example from [https://github.com/knative-sample/tekton-knative](https://github.com/knative-sample/tekton-knativehttps://github.com/knative-sample/tekton-knative/blob/master/tekton-cicd/tasks/deploy-using-kubectl.yaml)
+
+```yaml
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: build-and-deploy-pipeline
+spec:
+  resources:
+    - name: git-source
+      type: git
+  params:
+    - name: pathToContext
+      description: The path to the build context, used by Kaniko - within the workspace
+      default: src
+    - name: pathToYamlFile
+      description: The path to the yaml file to deploy within the git source
+    - name: imageUrl
+      description: Url of image repository
+    - name: imageTag
+      description: Tag to apply to the built image
+  tasks:
+  - name: source-to-image
+    taskRef:
+      name: source-to-image
+    params:
+      - name: pathToContext
+        value: "${params.pathToContext}"
+      - name: imageUrl
+        value: "${params.imageUrl}"
+      - name: imageTag
+        value: "${params.imageTag}"
+    resources:
+      inputs:
+        - name: git-source
+          resource: git-source
+  - name: deploy-to-cluster
+    taskRef:
+      name: deploy-using-kubectl
+    runAfter:
+      - source-to-image
+    params:
+      - name: pathToYamlFile
+        value:  "${params.pathToYamlFile}"
+      - name: imageUrl
+        value: "${params.imageUrl}"
+      - name: imageTag
+        value: "${params.imageTag}"
+    resources:
+      inputs:
+        - name: git-source
+          resource: git-source
+```
+
+Similar to TaskRun, [PipelineRun](https://tekton.dev/docs/pipelines/pipelineruns/) executes all the tasks defined in a Pipeline. Example from [https://github.com/knative-sample/tekton-knative](https://github.com/knative-sample/tekton-knativehttps://github.com/knative-sample/tekton-knative/blob/master/tekton-cicd/tasks/deploy-using-kubectl.yaml)
+
+```yaml
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineRun
+metadata:
+  generateName: tekton-kn-sample-
+spec:
+  pipelineRef:
+    name: build-and-deploy-pipeline
+  resources:
+    - name: git-source
+      resourceRef:
+        name: tekton-knative-git
+  params:
+    - name: pathToContext
+      value: "src"
+    - name: pathToYamlFile
+      value: "knative/helloworld-go.yaml"
+    - name: imageUrl
+      value: "registry.cn-hangzhou.aliyuncs.com/knative-sample/tekton-knative-helloworld"
+    - name: imageTag
+      value: "1.0"
+  trigger:
+    type: manual
+  serviceAccount: pipeline-account
+```
+
+[PipelineResources](https://tekton.dev/docs/pipelines/resources/) allows us to define objects that are used by tasks' inputs and outputs. Example from [https://github.com/knative-sample/tekton-knative](https://github.com/knative-sample/tekton-knativehttps://github.com/knative-sample/tekton-knative/blob/master/tekton-cicd/tasks/deploy-using-kubectl.yaml)
+
+```yaml
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: tekton-knative-git
+spec:
+  type: git
+  params:
+    - name: revision
+      value: master
+    - name: url
+      value: https://github.com/knative-sample/tekton-knative
+```
+
+### Pipeline setup
+
+Those are all the major components that we'll play with. 
+
+Let's create a new namespace called `ci` and install the above manifests, adapted for our needs. I've commited the changes in the example [app](https://github.com/vtemian/simple-django-app/tree/tekton).
+
+```bash
+╰─>$ kubectl get po
+NAME                                                           READY   STATUS      RESTARTS   AGE
+tekton-simple-django-app-1-deploy-to-cluster-982xv-pod-kkmpw   0/3     Completed   0          3m18s
+tekton-simple-django-app-1-source-to-image-8c47t-pod-ccc44     0/3     Completed   0          3m44s
+```
+
+```bash
+╰─>$ kubectl get pipelinerun
+NAME                         SUCCEEDED   REASON      STARTTIME   COMPLETIONTIME
+tekton-simple-django-app-1   True        Succeeded   2m14s       95s
+```
+
+### Github webhook trigger
+
+Right now, we manually have to trigger the build by deleting and re-creating the `Pipelinerun` resource. Let's try to automate it, by configuring a Github webhook that will ping the building process each time a new commit is made.
+
+The setup for that is not too complex, nor too simple. When a github hook arrives, it lands in an `[EventListener](https://tekton.dev/docs/triggers/eventlisteners/)` pod (that will need to be exposed to the Internet via Istio). From its payload, we'll need to extract relevant parameters, like commit information. For that, we'll be using [TriggerBindings](https://tekton.dev/docs/triggers/triggerbindings/). The parameters are then used by [TriggerTemplate](https://tekton.dev/docs/triggers/triggertemplates/) to generate our pipeline run. The following configurations are inspired by [@nikhilthomas1](https://medium.com/@nikhilthomas1/cloud-native-cicd-on-openshift-with-openshift-pipelines-tektoncd-pipelines-part-3-github-1db6dd8e8ca7). 
+
+![/Untitled%201.png](/Untitled%201.png)
+
+Let's create the a role, service account and the role binding for this process.
+
+```yaml
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+rules:
+- apiGroups:
+  - triggers.tekton.dev
+  resources:
+  - eventlisteners
+  - triggerbindings
+  - triggertemplates
+  - pipelineresources
+  verbs:
+  - get
+- apiGroups:
+  - triggers.tekton.dev
+  resources:
+  - pipelineruns
+  - pipelineresources
+  verbs:
+  - create
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - create
+  - update
+  - delete
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tekton-triggers-sa
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: tekton-triggers-rolebinding
+subjects:
+- kind: ServiceAccount
+  name: tekton-triggers-sa
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: tekton-triggers-role⏎
+```
+
+TriggerTemplate is very basic. It describes some parameters that can be used, from the binding and it patches them together with PipelineRun and other resources:
+
+```yaml
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: tekton-triggertemplate
+spec:
+  params:
+  - name: gitrevision
+    description: The git revision
+    default: master
+  - name: gitrepositoryurl
+    description: The git repository url
+  - name: namespace
+    description: The namespace to create the resources
+  - name: gitrepositoryname
+    description: The name of the deployment to be created / patched
+  resourcetemplates:
+  - apiVersion: tekton.dev/v1alpha1
+    kind: PipelineResource
+    metadata:
+      name: source-repo-$(params.gitrepositoryname)-$(uid)
+      namespace: $(params.namespace)
+    spec:
+      type: git
+      params:
+      - name: revision
+        value: $(params.gitrevision)
+      - name: url
+        value: $(params.gitrepositoryurl)
+  - apiVersion: tekton.dev/v1alpha1
+    kind: PipelineRun
+    metadata:
+      name: teokton-build-$(params.gitrepositoryname)-$(uid)
+      namespace: $(params.namespace)
+    spec:
+      pipelineRef:
+        name: build-and-deploy-pipeline
+      serviceAccountName: pipeline-account
+      resources:
+      - name: git-source
+        resourceRef:
+          name: source-repo-$(params.gitrepositoryname)-$(uid)
+      params:
+      - name: pathToContext
+        value: ""
+      - name: pathToDockerFile
+        value: Dockerfile
+      - name: pathToYamlFile
+        value: knative.yaml
+      - name: imageUrl
+        value: docker.io/vtemian/$(params.gitrepositoryname)
+      - name: imageTag
+        value: latest
+```
+
+Our TriggerBinding will also be pretty simple. Just a mapping from Github's payload to the parameters used in TriggerTemplate
+
+```yaml
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: tekton-pipelinebinding
+spec:
+  params:
+  - name: gitrevision
+    value: $(body.head_commit.id)
+  - name: namespace
+    value: default
+  - name: gitrepositoryurl
+    value: $(body.repository.url)
+  - name: gitrepositoryname
+    value: $(body.repository.name)
+```
+
+Finally, we'll need the EventListener, with binds a TemplateTrigger with a TemplateBinding
+
+```yaml
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: el-tekton-listener
+spec:
+  serviceAccountName: tekton-triggers-sa
+  triggers:
+  - bindings:
+      - name: tekton-pipelinebinding
+    template:
+      name: tekton-triggertemplate
+```
+
+```bash
+╰─>$ kubectl get service | grep tek
+el-tekton-listener                ClusterIP      10.233.47.3     <none>                                                 8080/TCP                             114m
+```
+
+Now that we have the service, we'll just need to expose it using Istio's primitives. Let's use Tekton's tools for that, using a separate service account:
+
+```yaml
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: tekton-triggers-createwebhook
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+  - list
+  - create
+  - update
+  - delete
+- apiGroups:
+  - tekton.dev
+  resources:
+  - eventlisteners
+  verbs:
+  - get
+  - list
+  - create
+  - update
+  - delete
+- apiGroups:
+  - extensions
+  resources:
+  - ingresses
+  verbs:
+  - create
+  - get
+  - list
+  - delete
+  - update
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tekton-triggers-createwebhook
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: tekton-triggers-createwebhook
+subjects:
+- kind: ServiceAccount
+  name: tekton-triggers-createwebhook
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: tekton-triggers-createwebhook⏎
+```
+
+Following by the task itself:
+
+```yaml
+apiVersion: tekton.dev/v1beta1
+kind: Task
+spec:
+  params:
+  - description: The external domain for the EventListener
+    name: ExternalDomain
+    type: string
+  - description: The name of the Service used in the VirtualService
+    name: Service
+    type: string
+  - description: The service port that the VirtualService is being created on
+    name: ServicePort
+    type: string
+  steps:
+  - args:
+    - -ce
+    - |
+      set -ex
+      cat << EOF | kubectl create -f -
+      apiVersion: networking.istio.io/v1alpha3
+      kind: Gateway
+      metadata:
+        name: $(inputs.params.Service)-gateway
+      spec:
+        selector:
+          istio: ingressgateway
+        servers:
+        - port:
+            number: 80
+            name: http-$(inputs.params.Service)
+            protocol: HTTP
+          hosts:
+          - $(inputs.params.ExternalDomain)
+      ---
+      apiVersion: networking.istio.io/v1alpha3
+      kind: VirtualService
+      metadata:
+        name: $(inputs.params.Service)-virtual-service
+      spec:
+        hosts:
+        - $(inputs.params.ExternalDomain)
+        gateways:
+        - $(inputs.params.Service)-gateway
+        http:
+        - route:
+          - destination:
+              host: $(inputs.params.Service)
+              port:
+                number: $(inputs.params.ServicePort)
+      EOF
+    command:
+    - sh
+    image: lachlanevenson/k8s-kubectl:latest
+    name: create-istio-gateway-virtualservice
+    resources: {}
+  volumes:
+  - emptyDir: {}
+    name: work
+```
+
+And ending with it's initialisation:
+
+```yaml
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+spec:
+  params:
+  - name: ExternalDomain
+    value: simple-django-app-event-listner.default.147.75.80.160.xip.io
+  - name: Service
+    value: el-tekton-listener
+  - name: ServicePort
+    value: "8080"
+  serviceAccountName: tekton-triggers-createwebhook
+  taskRef:
+    kind: Task
+    name: create-istio-gateway-virtualservice
+  timeout: 1h0m0s
+```
+
+And let's check the result:
+
+```bash
+╰─>$ kubectl get VirtualService
+NAME                                 GATEWAYS                                                          HOSTS                                                                                                                                                  AGE
+el-tekton-listener-virtual-service   [el-tekton-listener-gateway]                                      [simple-django-app-event-listner.default.147.75.80.160.xip.io]
+```
+
+Now that we have the tools up and running in our cluster, we can create the webhook. For that, we'll need a Github personal token, stored in a secret
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: webhook-secret
+stringData:
+  #https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line#creating-a-token
+  token: <token>
+  secret: random-string-data
+```
+
+The task that will actually create the webhook
+
+```yaml
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: create-webhook
+spec:
+  volumes:
+  - name: github-secret
+    secret:
+      secretName: $(inputs.params.GitHubSecretName)
+  inputs:
+    params:
+    - name: ExternalDomain
+      description: "The external domain for the EventListener e.g. `$(inputs.params.EventListenerName).<PROXYIP>.nip.io`"
+    - name: GitHubUser
+      description: "The GitHub user"
+    - name: GitHubRepo
+      description: "The GitHub repo where the webhook will be created"
+    - name: GitHubOrg
+      description: "The GitHub organization where the webhook will be created"
+    - name: GitHubSecretName
+      description: "The Secret name for GitHub access token. This is always mounted and must exist"
+    - name: GitHubAccessTokenKey
+      description: "The GitHub access token key name"
+    - name: GitHubSecretStringKey
+      description: "The GitHub secret string key name"
+    - name: GitHubDomain
+      description: "The GitHub domain. Override for GitHub Enterprise"
+      default: "github.com"
+    - name: WebhookEvents
+      description: "List of events the webhook will send notifications for"
+      default: '[\"push\",\"pull_request\"]'
+  steps:
+  - name: create-webhook
+    image: pstauffer/curl:latest
+    volumeMounts:
+    - name: github-secret
+      mountPath: /var/secret
+    command:
+    - sh
+    args:
+    - -ce
+    - |
+      set -e
+      echo "Create Webhook"
+      if [ $(inputs.params.GitHubDomain) = "github.com" ];then
+        curl -v -d "{\"name\": \"web\",\"active\": true,\"events\": $(inputs.params.WebhookEvents),\"config\": {\"url\": \"$(inputs.params.ExternalDomain)\",\"content_type\": \"json\",\"insecure_ssl\": \"1\" ,\"secret\": \"$(cat /var/secret/$(inputs.params.GitHubSecretStringKey))\"}}" -X POST -u $(inputs.params.GitHubUser):$(cat /var/secret/$(inputs.params.GitHubAccessTokenKey)) -L https://api.github.com/repos/$(inputs.params.GitHubOrg)/$(inputs.params.GitHubRepo)/hooks
+      else
+        curl -d "{\"name\": \"web\",\"active\": true,\"events\": $(inputs.params.WebhookEvents),\"config\": {\"url\": \"$(inputs.params.ExternalDomain)/\",\"content_type\": \"json\",\"insecure_ssl\": \"1\" ,\"secret\": \"$(cat /var/secret/$(inputs.params.GitHubSecretStringKey))\"}}" -X POST -u $(inputs.params.GitHubUser):$(cat /var/secret/$(inputs.params.GitHubAccessTokenKey)) -L https://$(inputs.params.GitHubDomain)/api/v3/repos/$(inputs.params.GitHubOrg)/$(inputs.params.GitHubRepo)/hooks
+      fi
+```
+
+And it's initialization
+
+```yaml
+apiVersion: tekton.dev/v1alpha1
+kind: TaskRun
+metadata:
+  name: create-api-repo-webhook-run
+spec:
+  taskRef:
+    name: create-webhook
+  inputs:
+    params:
+    - name: GitHubOrg
+      value: "vtemian"
+    - name: GitHubUser
+      value: "vtemian"
+    - name: GitHubRepo
+      value: "simple-django-app"
+    - name: GitHubSecretName
+      value: webhook-secret
+    - name: GitHubAccessTokenKey
+      value: token
+    - name: GitHubSecretStringKey
+      value: secret
+    - name: ExternalDomain
+      value: http://simple-django-app-event-listner.default.147.75.80.160.xip.io
+  timeout: 1000s
+  serviceAccountName: tekton-triggers-createwebhook
+```
+
+![](/Screenshot_2020-05-16_at_20.23.20.png)
+
+Now, each time we push new changes, a new build is being trigger:
+
+```bash
+╰─>$ kubectl get po | grep teo
+teokton-build-simple-django-app-2fcdr-source-to-image-v86-mwxhw   0/3     Error       0          71m
+teokton-build-simple-django-app-qlw5w-source-to-image-sz2-gpqdm   0/3     Error       0          73m
+teokton-build-simple-django-app-sl9zf-source-to-image-knl-tzxpk   1/3     Running     0          18s
+teokton-build-simple-django-app-xh54x-deploy-to-cluster-b-5p7r4   0/3     Completed   0          66m
+teokton-build-simple-django-app-xh54x-source-to-image-wv5-9bsdt   0/3     Completed   0          66m
+```
+
+And the application is being deployed
+
+```bash
+╰─>$ kubectl get po | grep simple
+simple-django-app-cjx8b-deployment-7cd5c5999d-vwjhv               2/2     Running     0          4h3m
+simple-django-app-d2n6n-deployment-77c664bf4f-pz6hg               2/2     Running     0          4h29m
+simple-django-app-hcmpl-deployment-7687b96b5f-pv2wz               2/2     Running     0          67m
+```
+
+## Conclusions
+
+In the end, we've managed to configure a bare-metal infrastructure, install Knative and have a CI/CD that builds and deploys 
+new versions of our application, on git push. It's a little bit of a hassle and we left behind some details regarding
+revisions, [routing](https://knative.dev/development/serving/using-subroutes/) and 
+[blue-green deployments](https://knative.dev/development/serving/samples/blue-green-deployment/).
+
+Platforms like [Vercel](https://vercel.com/), [Heroku](https://www.heroku.com/), [Google Cloud Run](https://cloud.google.com/run)
+and [AWS ECS](https://aws.amazon.com/ecs/) are truly remarkable, from an engineering point of view and because they lift
+the burden of deploying your application and manage your infrastructure.
+Kudos to Knative and Tekton for bringing such platforms closer to our reach.
+
+Cheers 🍺!
+
+Thanks [@catileptic](https://twitter.com/catileptic) for the awesome illustrations!
+
+
+---
+
+### Python Multiple Inheritance
+
+- **URL**: https://blog.vtemian.com/post/multiple-inheritance/
+- **Published**: May 1, 2020
+- **Word Count**: 892 words
+- **Tags**: python, mro, multiple inheritance, python multiple inheritance
+- **Summary**: How multiple inheritance works in Python?
+
+
+Inheritance, a simple and evil mechanism for re-using code, can get tricky. Traditionally, you may have encountered inheritance when you wanted to extend or override a class's behavior.
+
+```python
+class Pet:
+    def walk(self):
+        print("walk")
+
+    def eat(self):
+        print("talk")
+
+    def talk(self):
+        print("!@#$")
+
+class Dog(Pet):
+    def talk(self):
+        print("Ham!")
+
+class Cat(Pet):
+    def talk(self):
+        print("Miau!")
+```
+
+
+Fairly easy to understand and follow. Dog and Cat share most of Pet's behavior, with some "small" particularities.
+Let's say that we want to isolate particular behavior, for better testing purposes.
+
+
+```python
+class Eats:
+    def eat(self):
+        print("eat")
+
+class Walks:
+    def walk(self):
+        print("walk")
+
+class Talks:
+    def talk(self):
+        print("talk")
+
+def Dog(Eats, Walks, Talks):
+    def talk(self):
+        print("Ham!")
+
+class Cat(Eats, Walks, Talks):
+    def talk(self):
+        print("Miau!")
+```
+It may look a little bit weird, but isolating eating, walking and talking, improve re-usability, and may ease testing, but adds complexity and it increases readability efforts.
+
+What's Dog's or Cat's behavior? Well, you need to look at its parents. They inherit from Eats, Walks, and Talks. That class is commonly known as Mixins. Using multiple inheritances, you can compose specific behaviors. Think about playing with Lego. Using well defined, independent components, you can build complex constructs. In practice, you may use mixins within models, forms, serializers, views, etc.
+
+Multiple-inheritance seems to work for independent components that don't share state or behavior. What's going to happen when you try to combine a Dog and a Cat into a SuperPet?
+
+```python
+class SuperPet(Cat, Dog):
+    pass
+
+
+super_pet = SuperPet()
+assert super_pet.talk() == "Miau!"
+```
+SuperPet will inherit all the methods and properties of Dog and Cat and will respect the Method Resolution Order. More exactly, the C3 Method Resolution Order, which was initially released in a paper in 1996, designed for Dylan, called ["A Monotonic Superclass Linearization for Dylan"](https://doi.org/10.1145/236337.236343). It's implemented in other languages as well, Raku, Parrot, Solidarity, and Perl 5 (as a non-default option).
+
+Ok, it starts to look complicated, but basically, it just takes the methods of the left-most class, right?
+Almost.
+
+```python
+class GrandParent:
+    def describe(self):
+        print("Grandparent")
+
+class Mother(GrandParent):
+    def describe(self):
+        print("Mother, son of")
+        super().describe()
+
+class Father(GrandParent):
+    def describe(self):
+        print("Father, son of")
+        super().describe()
+
+class Child(Mother, Father):
+    def describe(self):
+        print("I'm child, son of")
+        super().describe()
+
+child = Child()
+child.describe()
+
+>>>>
+
+I'm child, son of
+Mother, son of
+Father, son of
+Grandparent
+```
+
+Introducing super() and we'll discover pretty cool interactions.
+Going a little deeper, Method Resolution Order (further referring to MRO) represents a set of rules that compute the linearization (a scary term that represents a serial way in which nested classes inherit from each other). Basically, it flattens the graph hierarchy. From:
+
+![](/parents.jpg)
+
+to something more like `[Child, Mother, Father, GrandParent]`.
+
+The problem above is also known as the [Diamond problem](https://en.wikipedia.org/wiki/Multiple_inheritance).
+We can easily describe the linearization process as a recursive algorithm: Child + merge(linearization(Mother), linearization(Father)) or Child + the merge of linearization of the parents and the list of the parents. It seems a little trivial, but let's try a more [complex example](https://www.python.org/download/releases/2.3/mro/):
+
+```python
+class O:
+    pass
+
+class F(O):
+    pass
+
+class E(O):
+    pass
+
+class D(O):
+    pass
+
+class C(D, F):
+    pass
+
+class B(D, E):
+    pass
+
+class A(B, C):
+    pass
+```
+
+![](/complex.jpg)
+
+```
+MRO(O) = O
+MRO(F) = F, O
+MRO(E) = E, O
+MRO(D) = D, O
+
+MRO(C) = C + merge(MRO(D), MRO(F) + MRO(DF))
+       = C + merge([D, O], [F, O], [D, F])
+       = C + D + merge([O], [F, O], [F])
+       = C + D + F + merge([O], [O])
+       = C + D + F + O
+       = C, D, F, O
+
+MRO(B) = B + merge(MRO(D), MRO(E), MRO(DE))
+       = B + merge([D, O], [E, O], [D, E])
+       = B + D + merge([O], [E, O], [E])
+       = B + D + E + merge([O], [O])
+       = B + D + E + O
+
+MRO(A) = A + merge([B, D, E, O], [C, D, F, O], [B, C])
+       = A + B + merge([D, E, O], [C, D, F, O], [C])
+       = A + B + C + merge([D, E, O], [D, F, O])
+       = A + B + C + D + merge([E, O]), [F, O])
+       = A + B + C + D + E + merge([O], [F, O])
+       = A + B + C + D + E + F + merge([O], [O])
+       = A + B + C + D + E + F + O
+```
+
+You can double check it, using the `mro` function:
+```
+(<class '__main__.A'>, <class '__main__.B'>, <class '__main__.C'>, <class '__main__.D'>, <class '__main__.E'>, <class
+'__main__.F'>, <class '__main__.O'>, <class 'object'>)
+```
+
+And, of course, you can have your own MRO, no problem. All you need to do is to define a method called `mro` inside a metaclass.
+Random MRO is not that smart, but for sure is interesting.
+
+```python
+import random
+
+
+class GrandParent:
+    def describe(self):
+        print("Grandparent")
+
+
+class Mother(GrandParent):
+    def describe(self):
+        print("Mother, son of")
+        super().describe()
+
+
+class Father(GrandParent):
+    def describe(self):
+        print("Father, son of")
+        super().describe()
+
+
+class RandomMRO(type):
+    def mro(cls):
+        parents = [Father, Mother, GrandParent]
+        random.shuffle(parents)
+        return [cls] + parents + [object]
+
+
+class Child(metaclass=RandomMRO):
+    def describe(self):
+        print("I'm child, son of")
+        super().describe()
+
+
+child = Child()
+child.describe()
+
+>>> 
+[<class '__main__.Mother'>, <class '__main__.GrandParent'>, <class '__main__.Father'>]
+I'm child, son of
+Mother, son of
+Grandparent
+>>>
+[<class '__main__.Father'>, <class '__main__.GrandParent'>, <class '__main__.Mother'>]
+I'm child, son of
+Father, son of
+Grandparent
+```
+
+Multiple inheritance can get messy and for the full story please take a look at https://www.python.org/download/releases/2.3/mro/.
+It can be really fun to play with, but in the long run it can be a real trouble maker.
+
+Cheers 🍺!
+
+Thanks [@catileptic](https://twitter.com/catileptic) for the awesome illustrations!
+
+
+---
+
+### Interviews
+
+- **URL**: https://blog.vtemian.com/post/interviews/
+- **Published**: January 3, 2019
+- **Word Count**: 739 words
+- **Tags**: interviewing, plan
+- **Summary**: A short interviewing statement for 2019
+
+
+I’m really nervous, only thinking of them. I had only one or two real interviews and conducted a few. Usually, I’m pretty lucky when it comes to job finding. The companies I like or want to work with contacted me, and it’s really flattering. No interview, just a small discussion, a beer and I’ll start next Monday.
+
+![](https://images.unsplash.com/photo-1535515384173-d74166f26820?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1350&q=80)
+
+For the past 2.5 years, I’ve started practicing. Practicing maybe it’s too much. I bought the books (like everybody does: [Cracking the Coding Interview](https://www.amazon.com/0984782850-983056789626-Cracking-Coding-Interview/dp/B07F16D3BG/ref=pd_lpo_sbs_14_t_1?_encoding=UTF8&psc=1&refRID=RD27GF1B4JP3R14XH98M), [The Algorithm Design Manual](https://www.amazon.com/Algorithm-Design-Manual-Steven-Skiena/dp/1849967202/ref=sr_1_2?ie=UTF8&qid=1546546500&sr=8-2&keywords=Algorithm+Design) and [Elements of Programming Interviews](https://www.amazon.com/Elements-Programming-Interviews-Questions-Tsung-Hsien/dp/B00C7F0V3W/ref=sr_1_6?ie=UTF8&qid=1546546537&sr=8-6&keywords=elements+of+Programming+Interviews)), paid a monthly subscription to leetcode.com, did some problems out there and that was it. I even told all my friends, and they all supported me. But each time I discovered a hard problem or did a mock interview that went bad, I would really feel ashamed and stopped trying. I would procrastinate and find other things to do (like finishing other work-related tasks or start a side-project in a new language etc.).
+I wanted to feel safe and comfortable. I felt stupid that I didn’t know how to solve that problem, but I felt smart that I’ve could complete this extra task or did something pointless in a new programming language.
+
+Now, this year, I have a terrific incentive to start learning for interviews and start passing them. I’m 25, and I’ve been procrastinating on this goal for over 2.5 years. Since college, I’ve dreamed of working for a big company. Also, last month I refused the best offer I ever had: re-locate to San Francisco and work for a startup there. In Silicon Valley. Living the dream. [Excellent team, awesome people, awesome vibe](https://gorgias.io/). And I said no. I said no mainly for personal reasons that I want to keep them personal and, in some proportion, because I was afraid that I’ll never get to work for a big company. Maybe it’s stupid, and it sounds like problems of a privileged kid that refused a really lovely, 2018 toy, for a cooler and famous 2019 toy. It was hard, the hardest decision I’ve ever taken, but it’s mine, and I stand by it. They were super kind and supportive, and we still work together.
+
+### Some inspiration
+
+Inspired by a friend of mine ([Alex Palcuie](https://interviews.palcu.ro/)), I want to start a log and to start working on the following 3 months plan (really ambitious one, but I may alter it a little bit):
+
+* build the resume. This also includes to research what a good resume looks like, writing it, asking for feedback, improve it.
+* read and practice from those 3 holy books: Cracking the Coding Interview, Algorithm Design and Programming Interviews. It’s a little overshot, but since I’ll be working part-time, it’s possible. I need to focus more on it.
+* practice on [Leetcode](https://leetcode.com/). I have in mind 500 problems (easy and medium) and 250 hard. I know that I can do those 500 in time, the hard problems will be tricky to hit in my timeline. I may extend the timeline or lower the number of problems.
+* start practicing with other people. This includes re-starting the algorithms meetup, doing mocks online with friends and hopefully, I can get an invite for [interviewing.io](https://interviewing.io/) and start doing mocks with strangers.
+* read, read, read. Start learning more about databases, about how to think at scale, more about distributed systems, fundamentals about networking, operating systems and security. Pretty much what’s on this [github repository](https://github.com/checkcheckzz/system-design-interview).
+
+**This period is not only about interviews. Is a period in which I want to become a better engineer. Right now, I pretty much feel like I’ve learned how to play an instrument, just by myself. Exploring it and discover it’s capabilities by playing and learning new songs for other people.**
+
+More like what we call in Romania “lautari” (usually gypsy musicians, but not necessary, who learned to play instruments to [survive](https://www.youtube.com/watch?v=joDtKv62V9c)). Continuing with this analogy, I like playing music, learning new styles and even composing new songs. But I never actually played in an orchestra, on a big stage. That’s nothing wrong with it, maybe is also a really authentic thing, but I crave playing with the big guys.
+
+***
+
+Besides the goal of being socially accountable for actually sticking with the plan, I also want to share my thoughts, how I try to solve the problems and maybe some tips regarding the practice and the interviews themselves. For that, I’ll post a log with everything on [interviews.vtemian.com](interviews.vtemian.com).
+
+Cheers 🍺!
+
+
+---
+
+### 2019
+
+- **URL**: https://blog.vtemian.com/post/2019/
+- **Published**: January 2, 2019
+- **Word Count**: 339 words
+- **Tags**: blog, 2019, vtemian, confort zone, interviews
+- **Summary**: 2019 - the beginning
+
+
+So here I am, me, **naked**, starting a blog.
+
+I must admit, I’m shy and I don’t have any **courage**. I’ve always been this way. I lack the courage to make decisions, to commit, to trust myself. I’ve always wondered if people will accept me and I’ve tried my best to please and impress people.
+
+This led to a stagnation stage. I was too afraid of trying new things, learning, experimenting, trusting. I was, and I still am **afraid of failing**. What my friends will think of me if I say something stupid? What will happen if I’ll say something wrong during a presentation? What if I’ll ask a foolish question, during a presentation? What will the interviewer think if I say or do something wrong? What my friends/parents will think of me if I fail this interview? Why did that driver honk me? Did I make something wrong? What...if...something...stupid?
+
+It’s easier to hide, to build a **comfortable space** and to stay there. It’s easier to feel safe and to avoid the harsh truth about yourself. I’m not *smart*. I’m not the *wonder kid I used to think I was*. I’m not *athletic*. I’m not a *leader*. I’m not *funny*. I’m not a *good friend*. I’m not the best *boyfriend*.
+
+With this realization, I want to start 2019. My motto this year will be to **“live uncomfortably”**. I’m not what I thought I was, but that’s ok. It’s normal *not always to be the best and the most*.... But that doesn’t mean that I can’t overcome my fears and to live a more **peaceful life**.
+
+That’s why this year I want to **live uncomfortably**. I want to start doing the things **I was afraid of**. I want to understand me better and to expose myself to the world. To internalized that **it is normal and ok to fail**. It’s ok to be *sad*, *disappointment*, *jealous*, *slow* or *stupid*.
+
+And this is the first step. Exposing myself to the Internet. To the people that I know or don’t know. **Hello!**
+
+
+---
+
+
+## Talks & Presentations
+
+### Riding Existing Waves: My Indie Hacking Journey with Sisif.ai
+
+- **URL**: https://blog.vtemian.com/talk/indie-hacking-update/
+- **Date**: January 22, 2026
+- **Event**: Indie TM #2
+- **Summary**: How I went from 0 paying customers to growing MRR by abandoning traditional marketing and riding existing distribution waves
+
+
+I sold my company in late 2024. After 15 years of building production code, being CTO at QED (acquired by The Sandbox), and working with companies like Gorgias, I had one clear lesson: **product drives value, not technical implementation**.
+
+So I started a side project. Something I could build and ship fast. Something that solves a real problem.
+
+## The Side Project: Sisif.ai
+
+**[sisif.ai](https://sisif.ai)** is an AI video generation API. Text prompt in, video out. Simple.
+
+![Sisif.ai demo](sisif-scroll.gif)
+
+Most AI video tools are built for clicking around in browsers. But developers want to automate — batch generation, workflow integration, programmatic control. That's the gap I saw.
+
+Three steps: submit a text prompt, receive a webhook when it's done, download your video. Multiple resolutions. Pay per use, no subscription required.
+
+I started building in December 2024 and launched in early 2025. Built it with **SaaS Pegasus**, a Django boilerplate by Cory Zue — who's been building in public since 2017 and runs at a $122/hour effective rate. No AI coding agents for this one. Just good old Django.
+
+## The Marketing Playbook (That Didn't Work)
+
+I did everything the indie hacking playbook says:
+
+- **Twitter/X content** — posted regularly, shared progress
+- **ProductHunt launch** — prepared the launch, gathered supporters
+- **SEO** — added llms.txt, optimized pages
+- **Building in public** — shared the journey
+
+The result?
+
+- **0** paying customers
+- **8** followers
+- ProductHunt: crickets
+- SEO: too early to tell
+
+### Two Months of Twitter: A Reality Check
+
+I committed to **two months of consistent Twitter posting**. Daily updates. Progress screenshots. Building in public threads. Engagement with other indie hackers. The kind of content that supposedly builds audiences.
+
+After 60 days: **8 followers**. Not 8,000. Eight. Most of them were bots or other indie hackers doing the same thing. Zero customers came from Twitter. Zero meaningful conversations. Zero inbound interest.
+
+The accounts that "blow up" on Twitter? They either got lucky with timing, had an existing audience from somewhere else, or have been grinding for years. There's no shortcut. And for a solo founder with a product to ship, spending 2+ hours daily on tweets that reach nobody is a terrible ROI.
+
+### The ProductHunt Launch That Wasn't
+
+I prepared a proper ProductHunt launch. Lined up supporters. Created assets. Picked a launch day. Did everything the guides recommend.
+
+Launch day came. And... nothing. No traction. No upvotes from strangers. The supporters I gathered weren't enough to break through. ProductHunt's algorithm buried the launch before it had a chance.
+
+Here's what I learned: **ProductHunt is a lottery**. The winners are either products with existing audiences (who bring their own traffic) or products that get lucky with the algorithm. For a new product from an unknown founder? The odds are stacked against you.
+
+The harsh reality of indie hacking. Traditional marketing is slow. Twitter takes years to build. ProductHunt is a lottery. SEO needs months to compound.
+
+## The Pivot: Ride Existing Waves
+
+I stopped building from scratch. Instead, I asked: **where are the users already?**
+
+The answer was **n8n** — the workflow automation tool. Thousands of users building automations, looking for integrations. They don't need to find me. I need to be where they already are.
+
+### The n8n Strategy
+
+I published **2 workflow templates** on the n8n creator hub:
+
+1. **TikTok video creation pipeline** — GPT-4o-mini generates the script, Sisif.ai creates the video, posts automatically
+2. **Instagram Reels automation** — same stack, different output format
+
+![n8n TikTok workflow](n8n-tiktok-workflow.png)
+
+The results? **15,000 views** on the TikTok template. **4,000 views** on the Instagram one. That's **19,000 eyeballs** on my product — more than I'd get from years of tweeting.
+
+These aren't vanity metrics. n8n users are exactly my target audience: developers and technical founders who want to automate video creation. They're already in a buying mindset — they're looking for tools to plug into their workflows.
+
+The conversion funnel is simple: user discovers template → tries it → needs API access → signs up for Sisif.ai. No cold outreach. No content calendar. No algorithm to game.
+
+### Why This Works
+
+This is **riding existing waves**. Instead of building an audience from zero, you tap into platforms where your users already hang out:
+
+- **n8n** has thousands of users searching for workflow integrations
+- **Zapier** and **Make** have similar marketplaces
+- **GitHub** templates get discovered organically
+
+SEO? Write for big sites that already rank. Distribution? Let users find you through tools they already use. The math is simple: it's easier to capture 0.1% of 100,000 users than to build 100 users from scratch.
+
+## Pricing Evolution
+
+My first pricing was wrong. **$9/month** single plan. Too cheap, wrong incentives.
+
+I switched to tiered pricing:
+
+- **Alpha Tester**: $10/month (100 tokens)
+- **Starter Pack**: $50/month (1,000 tokens)
+- **Pro Creator**: $200/month (5,000 tokens)
+
+Higher tiers = higher revenue per customer. The change increased MRR 4x.
+
+![Revenue growth](revenue-chart.png)
+
+## Lessons Learned
+
+After months of building and marketing sisif.ai, here's what stuck:
+
+**Distribution beats product.** Build where users already are. The best product nobody knows about loses to the mediocre product everyone finds.
+
+**Ride existing waves.** n8n, marketplaces, integrations. Don't fight for attention. Go where attention already exists.
+
+**Price for value.** Tiered pricing forces you to think about customer segments. Not everyone needs the same thing. Charge accordingly.
+
+**Traditional marketing is slow.** Twitter/ProductHunt/SEO didn't work yet. Maybe they will. But I needed results now. Existing platforms delivered.
+
+---
+
+Find me at [@vtemian](https://twitter.com/vtemian) or check out [sisif.ai](https://sisif.ai).
+
+
+---
+
+### Technical Debt is Cheap
+
+- **URL**: https://blog.vtemian.com/talk/technical-debt-is-cheap/
+- **Date**: October 27, 2025
+- **Summary**: How I refactored years of technical debt in 3 hours using Claude Code - a practitioner's reality check on AI hype vs actual results
+
+
+It's hard to write about AI these days without speaking about the elephant in the room. Every single business is pushing AI. We're seeing it everywhere. Google Chrome. Slack. WhatsApp. Even our toothbrushes. A lot of businesses are trying to capitalize on this new tech. And it's raising a negative sentiment.
+
+![AI-powered toothbrush](toothbrush.png)
+
+This negative sentiment is amplified by the **slop**: shitty images, shitty videos, shitty text polluting websites everywhere. It's not just bad for sentiment. It's bad for the entire internet. Worse, this slop affects current AI research: shitty content trains new models, risking a decline in performance over time. But I think we're just following a normal **hype cycle**, similar to others we've seen before. Most recently, blockchain. People get super excited. "AGI is here! Jobs are being replaced! We're doomed forever!" I'm not that pessimistic.
+
+![AI-generated slop](slop.png)
+
+Because beneath all the noise and hype, something real is happening. We see an increase in daily usage. People use AI tools to do productive things. Generating code. Enhancing learning. Navigating legal frameworks. And there's a shift in more personal usage too. Organizing life. Finding purpose. Therapy. My dad uses it to help him with his heat pump. My mom uses it for research on her medical needs. This adoption is facilitated by UX improvements. You can now use voice to talk with ChatGPT. Use video to show your surroundings.
+
+And regarding code? At The Sandbox, more than **75% of the code is generated using AI tools**. Claude Code is 3rd in the number of commits. But even other code not committed by Claude is still generated with it or Copilot. So my take: **AI is here to stay**. Even if we like it or not. Even if there are no new advancements for the models, the current tools are good enough to have a great impact on our lives.
+
+That realization, for me, happened on **March 17th, 2025**. The day I discovered that technical debt isn't the insurmountable mountain we pretend it is. The day I refactored a nightmare codebase in three hours.
+
+***
+
+You know the project. The one nobody wants to touch. It's been making money for years. Users depend on it. But every time someone opens the codebase, they quietly close their laptop and find something else to do. Fat controllers with thousands of lines. Copy-paste logic scattered across dozens of files. Comments in three different languages. jQuery callbacks nested so deep you need a map to find your way out. And the worst part? You can't just rewrite it. It works. It's critical. The business depends on it.
+
+So it sits there. Accumulating technical debt like interest on a loan you forgot about. Maybe one day, if there's time, if there's budget, if the stars align... maybe then someone will refactor it. What if I told you that "one day" could be today? And it would take **three hours**?
+
+The project was exactly what you're imagining. An old Laravel application. Controllers weren't controllers. They were novels. One function: thousands of lines. Another copy-pasted so many times there were files literally named `HomeController-2.php` and `HomeController - Copie.php`. The codebase was a polyglot nightmare. Variables in Romanian. Comments in English. Error messages in... who knows. HTML embedded directly in PHP strings. One missing closing tag and the entire page implodes. And the frontend? Pure jQuery. Callbacks nested so deep you needed archaeological excavation. No validation. No sanitization. No tests. Deployed via FTP.
+
+![Messy codebase with duplicate controllers](duplicates.png)
+
+![Thousands of lines in a single controller](monolith.png)
+
+![jQuery callback hell](callbacks.png)
+
+Here's the thing: **I don't want to shame this project**. You know why? Because it was adding value. Real value. Making money for someone. Users getting what they needed. And I'd bet that your company has at least one project exactly like this. Maybe it's critical infrastructure. Maybe it's a revenue generator. Maybe it's just too scary to touch. **Why fix something that's working, right?**
+
+My regular work was done for the day. Claude Code had been out for less than a month. I'd been using GitHub Copilot for autocomplete. Played around with ChatGPT. Wasn't sold on Cursor. A friend recommended Claude Code. "Think of it like having a really junior developer on your team." I paid $20 for API tokens. They didn't have subscriptions yet. Pointed it at the spaghetti project. Not because I had to. Not because anyone asked me to. Just to see what would happen. Three hours. That's all I had before I needed to stop and do other things. So I gave myself one evening to see if the hype was real.
+
+First problem: the thing was deployed via FTP. No containers. No version control for infrastructure. Just raw files pushed to a server somewhere. I asked Claude to modernize the deployment. Within minutes, I had a complete Docker setup. docker-compose configuration. Environment variables. The app running in containers. Something that used to take an afternoon of DevOps work was done before I finished my coffee.
+
+Next: those enormous controllers. One file had everything. Authentication. Business logic. Database queries. Email sending. PDF generation. All in one beautiful 2,000-line monument to "I'll refactor this later." Claude analyzed the structure. Identified logical boundaries. Split it into smaller, focused controllers. Extracted business logic into service classes. Separated concerns. The code went from a single massive file to a clean architecture.
+
+![Clean architecture with service classes](services.png)
+
+Then the code quality issues. Sure, I speak Romanian, but mixing languages in code is unprofessional. I asked Claude to translate everything to English and add documentation. Variable names went from `$prenume_utilizator` to `$userFirstName`. Functions got doc blocks. Type hints appeared everywhere. The code suddenly looked like humans were supposed to read it.
+
+The frontend was its own disaster. jQuery spaghetti mixed with Blade templates mixed with inline PHP. I started conservative: "Extract this jQuery and add Tailwind." It worked. But then I remembered: Laravel's best friend is Vue. Why not go all the way? "Convert these jQuery components to Vue." I'll be honest: the Vue code wasn't perfect. Neither was the Tailwind. This was March. Before I'd built my custom workflows. We were starting from jQuery spaghetti and PHP-embedded HTML. But it worked. It was functional. It was maintainable.
+
+![Modern Vue components](vue.png)
+
+After three hours, I stopped. Looked at what we'd done. A fully functional application. Latest dependencies. Modern standards. Running in Docker. Clean architecture. Readable code. And it was **way, way faster** than before. **Three hours.** One guy. No designer. No DevOps. No frontend specialist. No backend team. No IDE even. Just Claude Code.
+
+That was the moment I realized: **technical debt is cheap**. One individual can bring a disproportionate amount of value with these tools. The math changed. The equation flipped. All those projects sitting in the corner gathering dust? All those "maybe someday" ideas? All that technical debt your team avoids because it would take weeks? **It doesn't have to.**
+
+***
+
+Three hours changed everything. I couldn't unsee it. Every abandoned project, every "we'll fix it later" codebase, every side project I'd shelved because "who has the time?" suddenly felt within reach.
+
+I was hooked. The tools were getting better. And there were so many things I could do. All those tiny ideas in the back of my mind. The ones I'd think about and say "maybe one day, if I have time." It started. I began paying my **old technical debt**. Upgrading old open-source libraries. Improving them. Showing them the care and love they needed.
+
+I forked my oldest fun project: **[gitfs](https://github.com/vtemian/gitfs)**. A FUSE git-based filesystem written in Python. Python 2.7. FUSE 2. No release for 6 years. Fuck it. Fire up Claude. Vagrant. Ubuntu. All the tooling. After a week, as a **side project**, I managed to upgrade to Python 3. Implement support for FUSE 3. Release it on Launchpad. Build it for Ubuntu and Debian.
+
+![GitFS v1.0.0 release](gitfs.png)
+
+Then I started thinking of **new projects**. New ideas. New open-source tools. An **explosion**. Multiple new side projects: **[sisif.ai](https://sisif.ai)** for AI video generation, **[cleaninvoices.com](https://cleaninvoices.com)** for invoice processing, **[vatguard.com](https://vatguard.com)** for VAT validation, **[formulare.ai](https://formulare.xyz)** for Romanian form generation, and multiple internal tools. My GitHub contribution graph lit up like a Christmas tree. **Prototyping is cheap.** Technical debt is cheap. That individual contributor leverage? Massive.
+
+![sisif.ai AI video generator](sisif.png)
+
+***
+
+### What I Actually Learned
+
+After months of building with these tools, I've developed some strong opinions. The hype and the reality don't always match up.
+
+Let me address what the hype says versus what I actually experienced.
+
+**The Hype Says:** AI will replace developers.
+
+**My Reality:** Not even close. These tools are productivity multipliers. I still made every decision. I still understood the domain. I still validated every change. I still tested everything. Claude didn't replace me. It gave me superpowers.
+
+---
+
+**The Hype Says:** You need perfect prompts and prompt engineering skills.
+
+**My Reality:** I just talked to it like a junior developer. "Modernize this deployment." "Split this controller." "Convert this to Vue." No magic prompts. No prompt engineering course. Just clear communication.
+
+![Prompt engineering meme](prompts.png)
+
+---
+
+**The Hype Says:** It works out of the box.
+
+**My Reality:** I needed domain knowledge to validate. I needed to understand Laravel, Docker, Vue, PHP architecture. The tool amplified my knowledge. It didn't replace it. Someone without that knowledge? They'd get plausible-looking garbage.
+
+---
+
+**The Hype Says:** Technical debt is too complex for AI.
+
+**My Reality:** Depends on the type. Structural refactoring? Dependency upgrades? Modernizing deployment? Claude crushed it. Complex business logic requiring deep domain expertise? Still needs human judgment.
+
+---
+
+**The Hype Says:** This is just hype. It'll pass.
+
+**My Reality:** Even if models never improve from here, even if we're stuck with today's technology forever, these tools already deliver massive ROI. At The Sandbox, 75% of code is AI-generated. That's not hype. That's production reality.
+
+***
+
+So where does that leave us? Back to March 17th, 2025. The day I learned that technical debt isn't this insurmountable mountain. The day three hours changed my perspective on what's possible.
+
+Technical debt is cheap now. Side projects don't require months of evenings and weekends. Prototyping doesn't need a team. One person with the right tools can move **fast**.
+
+Is it perfect? No. Does it replace thinking? Absolutely not. Will it eliminate programming jobs? I doubt it. But it changed the equation. The math is different now. Those projects gathering dust in your backlog? That technical debt your team avoids? That idea you've been sitting on for years?
+
+**Try spending three hours with Claude Code.** You might be surprised.
+
+Cheers 🍺!
+
+
+---
+
