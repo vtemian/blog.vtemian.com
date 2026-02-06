@@ -44,3 +44,6 @@ metaDataFormat = "yaml"
 [outputs]
   home = ["HTML", "RSS", "llmstxt", "llmsfulltxt"]
   page = ["HTML", "markdown"]
+
+[markup.goldmark.renderer]
+  unsafe = true
