@@ -593,6 +593,24 @@ th {
   text-align: center;
 }
 
+.github-stats__stat-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.github-stats__stat-icon {
+  width: 18px;
+  height: 18px;
+  opacity: 0.6;
+}
+
+.github-stats__stat-icon--star {
+  color: #f1e05a;
+  opacity: 1;
+}
+
 .github-stats__value {
   display: block;
   font-size: 1.8em;
