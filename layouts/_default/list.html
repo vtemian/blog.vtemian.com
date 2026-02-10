@@ -48,8 +48,8 @@
     <main class="feed">
         {{ range $all.ByDate.Reverse }}
         <article class="feed-item feed-item--{{ .Section }}">
+            <span class="feed-item__badge">{{ .Section }}</span>
             <a href="{{ .RelPermalink }}" class="feed-item__link">
-                <span class="feed-item__badge">{{ .Section }}</span>
                 <div class="feed-item__content">
                     <h2 class="feed-item__title">{{ .Title }}</h2>
                     {{ with .Params.description }}

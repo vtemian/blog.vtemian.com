@@ -313,13 +313,13 @@ code {
 .feed {
   margin: 0;
   position: relative;
-  padding-left: 24px;
+  padding-left: 80px;
 }
 
 .feed::before {
   content: "";
   position: absolute;
-  left: 6px;
+  left: 70px;
   top: 0;
   bottom: 0;
   width: 2px;
@@ -328,6 +328,7 @@ code {
 
 .feed-item {
   display: flex;
+  align-items: flex-start;
   margin-bottom: 0;
   padding: 12px 0;
   position: relative;
@@ -336,7 +337,7 @@ code {
 .feed-item::before {
   content: "";
   position: absolute;
-  left: -22px;
+  left: -14px;
   top: 18px;
   width: 10px;
   height: 10px;
@@ -362,32 +363,19 @@ code {
   padding-bottom: 0;
 }
 
-.feed-item__link {
-  flex: 1;
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  color: var(--black);
-  border-bottom: none;
-  padding: 4px 8px;
-  margin: -4px -8px;
-  transition: background-color 0.15s ease;
-}
-
-.feed-item__link:hover {
-  background-color: var(--grey-lighter);
-}
-
 .feed-item__badge {
-  display: inline-block;
-  padding: 2px 8px;
-  font-size: 0.7em;
+  position: absolute;
+  left: -78px;
+  top: 14px;
+  padding: 2px 6px;
+  font-size: 0.6em;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.02em;
   border-radius: 3px;
-  flex-shrink: 0;
-  margin-top: 2px;
+  width: 58px;
+  text-align: center;
+  box-sizing: border-box;
 }
 
 .feed-item--post .feed-item__badge {
@@ -403,6 +391,21 @@ code {
 .feed-item--project .feed-item__badge {
   background-color: #8b5cf6;
   color: var(--white);
+}
+
+.feed-item__link {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  color: var(--black);
+  border-bottom: none;
+  padding: 4px 8px;
+  margin: -4px -8px;
+  transition: background-color 0.15s ease;
+}
+
+.feed-item__link:hover {
+  background-color: var(--grey-lighter);
 }
 
 .feed-item__content {
