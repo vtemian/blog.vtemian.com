@@ -1,6 +1,6 @@
 ---
 title: "claude-notes: claude code sessions to html"
-date: 2026-02-10T12:00:00+02:00
+date: 2025-06-25T19:46:00+03:00
 description: "A CLI tool to transform Claude Code transcripts into readable HTML. Built because I wanted to share and replay my coding sessions."
 images:
     - screenshot.png

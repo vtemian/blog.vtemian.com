@@ -40,9 +40,10 @@
     {{/* Collect all content types */}}
     {{ $posts := where .Site.RegularPages "Section" "post" }}
     {{ $talks := where .Site.RegularPages "Section" "talk" }}
+    {{ $projects := where .Site.RegularPages "Section" "project" }}
 
     {{/* Merge and sort by date */}}
-    {{ $all := $posts | union $talks }}
+    {{ $all := $posts | union $talks | union $projects }}
 
     <main class="feed">
         {{ range $all.ByDate.Reverse }}

@@ -354,6 +354,10 @@ code {
   background: #10b981;
 }
 
+.feed-item--project::before {
+  background: #8b5cf6;
+}
+
 .feed-item:last-child {
   padding-bottom: 0;
 }
@@ -393,6 +397,11 @@ code {
 
 .feed-item--talk .feed-item__badge {
   background-color: #10b981;
+  color: var(--white);
+}
+
+.feed-item--project .feed-item__badge {
+  background-color: #8b5cf6;
   color: var(--white);
 }
 
