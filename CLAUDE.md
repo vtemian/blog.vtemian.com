@@ -70,6 +70,12 @@ Uses plain CSS with CSS custom properties for theming.
   - Author: Vlad Temian
   - Enables robots.txt and sitemap generation
 
+## Writing Style
+
+When writing or editing blog content:
+- Never use em dashes (—). Use periods, commas, or restructure the sentence instead.
+- Sign-off is "Stay curious ☕" (not "Cheers 🍺")
+
 ## Adding New Blog Posts
 
 Create a new Markdown file in `content/post/` with YAML frontmatter. Hugo will automatically include it in the blog index when the dev server is running.
