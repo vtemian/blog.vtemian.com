@@ -18,6 +18,8 @@ tags:
     - open-source
 ---
 
+{{< github-stats repo="vtemian/claude-notes" >}}
+
 I wanted to share a Claude Code session with someone. Show them the conversation. The prompts, the tool calls, the code edits. And I wanted to replay my own sessions later.
 
 The problem: Claude Code stores everything as JSONL in `~/.claude/projects/`. Each line is a message, tool use, or tool result. Useful for machines. Useless for humans.
