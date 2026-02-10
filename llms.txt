@@ -26,7 +26,7 @@ Each post is available as markdown at `{url}index.md` for LLM consumption.
 Each talk is available as markdown at `{url}index.md` for LLM consumption.
 
 - [Riding Existing Waves: My Indie Hacking Journey with Sisif.ai](https://blog.vtemian.com/talk/indie-hacking-update/) ([md](https://blog.vtemian.com/talk/indie-hacking-update/index.md)) (Indie TM #2): How I went from 0 paying customers to growing MRR by abandoning traditional marketing and riding existing distribution waves
-- [Technical Debt is Cheap](https://blog.vtemian.com/talk/technical-debt-is-cheap/) ([md](https://blog.vtemian.com/talk/technical-debt-is-cheap/index.md)): How I refactored years of technical debt in 3 hours using Claude Code - a practitioner's reality check on AI hype vs actual results
+- [Technical Debt is Cheap](https://blog.vtemian.com/talk/technical-debt-is-cheap/) ([md](https://blog.vtemian.com/talk/technical-debt-is-cheap/index.md)): I gave myself 3 hours to see if AI coding tools could tackle a legacy Laravel app. Here's what actually happened.
 
 ## Resources
 
