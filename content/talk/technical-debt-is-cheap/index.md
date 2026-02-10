@@ -1,6 +1,7 @@
 ---
 title: "Technical Debt is Cheap"
 date: 2025-10-27T10:00:00+02:00
+lastmod: 2026-02-10T12:00:00+02:00
 description: "I gave myself 3 hours to see if AI coding tools could tackle a legacy Laravel app. Here's what actually happened."
 images:
     - vue.png
