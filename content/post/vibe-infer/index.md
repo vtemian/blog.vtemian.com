@@ -15,7 +15,7 @@ tags:
     - ai tools
     - webgpu
     - learning
-draft: true
+draft: false
 ---
 
 Everyone has a story about how AI helped them learn something. "I asked ChatGPT to explain monads and it finally clicked." Cool. But where's the actual session? Where's the messy back-and-forth where you got confused, the AI corrected you, and you iterated until understanding emerged?
