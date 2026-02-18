@@ -45,3 +45,25 @@ With the ground rules set, three dynamics emerged.
 **Claude handles the boilerplate.** HTML scaffolding, CSS layout, the canvas drawing interface. None of that teaches GPU programming. Offloading it meant I could spend 100% of my mental energy on the hard, interesting parts: how workgroups distribute threads, why uniform buffers need 16-byte alignment, how reduction operations work in softmax.
 
 **My pace, my depth.** Unlike a course with a fixed curriculum, I controlled when to go deeper and when to move on. If workgroup scheduling fascinated me, I could ask Claude to explain dispatch dimensions three different ways. If I already understood buffer creation, I could skip ahead. The curriculum emerged from the conversation, shaped by my curiosity and my gaps.
+
+## The Journey: 8 Lessons from Zero to Inference
+
+The session naturally organized itself into eight progressive lessons.
+
+It started with **WebGPU Bootstrap**: acquiring a GPU adapter and device. The "hello world" of GPU programming. Then a **First Compute Shader** that added two numbers on the GPU. Simple, but it proved the entire pipeline worked: buffer creation, shader compilation, command encoding, dispatch, and result readback.
+
+**Matrix Multiplication** was where things got real. This is the core operation of neural networks, and on the GPU, each thread computes a single element of the output matrix. You index into flat memory using `row * numColumns + col` because GPU buffers have no concept of rows or columns. Just raw bytes.
+
+**ReLU Activation** was a welcome breather. An "embarrassingly parallel" operation where every element is independent. No coordination between threads, no shared state. Just `max(value, 0.0)` across thousands of elements simultaneously.
+
+**Softmax** was the hardest shader. Unlike ReLU, every output element depends on every other element. You need three passes: find the maximum (for numerical stability), compute exponentials and their sum, then normalize. Getting this right meant understanding reduction operations, race conditions, and why naively exponentiating large numbers produces infinity.
+
+The **Forward Pass** chained all kernels together. The critical insight here: keep data on the GPU between operations. Reading results back to JavaScript after each step would kill performance. One command encoder, multiple compute passes, data flowing between buffers without ever touching the CPU.
+
+**Real Weights** brought the system to life. A Python script trained a 784-to-128-to-10 network on MNIST (97.5% accuracy), exported the weights as raw binary, and loaded them into GPU buffers. The final lesson was an **Interactive Canvas Demo**: draw a digit, watch the GPU classify it in real-time.
+
+Here's what the learning actually looked like. I implemented the matrix multiplication kernel, and Claude reviewed my code line by line.
+
+<iframe style="width:100%;height:500px;border:none;" src="https://claudebin.com/threads/jmdbMowNTz/embed?from=55&to=62"></iframe>
+
+Buffer sizes in bytes, not elements. Uniform buffers need 16-byte alignment. Missing builtin parameters for thread identification. These are GPU-specific gotchas that a textbook mentions in a footnote. A tutor catches them in your actual code and explains why they matter.
