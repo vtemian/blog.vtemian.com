@@ -77,3 +77,13 @@ Two things separated this from reading documentation or watching a YouTube tutor
 This is the part that surprised me most. I could verify my understanding in real-time. The loop looked like this: I write a shader, Claude reads it, finds the bugs I can't see yet, and explains not just *what's* wrong but *why* GPU programming works that way. It's not Q&A. It's closer to a code review where the reviewer happens to be infinitely patient and knows every corner of the WebGPU spec.
 
 The difference from vibe coding is worth stating plainly. In vibe coding, the AI writes the code and you ship it. Here, I wrote the code and the AI made sure I understood it. Every bug Claude caught was a concept I internalized. Every correction was a lesson I wouldn't need to learn again. The understanding compounds in a way that copy-pasting from an AI chat never does.
+
+## The Result
+
+And then it worked.
+
+<iframe style="width:100%;height:500px;border:none;" src="https://claudebin.com/threads/jmdbMowNTz/embed?from=130&to=136"></iframe>
+
+Digit 7, classified at 99.95% confidence. Eight lessons of compute shaders, buffer management, and type wrestling, running entirely in the browser. No backend, no ML framework, no CUDA. Just WebGPU, WGSL, and a neural network I built from scratch.
+
+You can [try the live demo](https://vtemian.github.io/vibe-infer/) or browse [the source code](https://github.com/vtemian/vibe-infer). Every GPU line was written by hand. The repo includes a [LESSONS.md](https://github.com/vtemian/vibe-infer/blob/main/LESSONS.md) file summarizing what each lesson covered.
