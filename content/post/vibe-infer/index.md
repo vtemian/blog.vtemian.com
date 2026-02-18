@@ -67,3 +67,13 @@ Here's what the learning actually looked like. I implemented the matrix multipli
 <iframe style="width:100%;height:500px;border:none;" src="https://claudebin.com/threads/jmdbMowNTz/embed?from=55&to=62"></iframe>
 
 Buffer sizes in bytes, not elements. Uniform buffers need 16-byte alignment. Missing builtin parameters for thread identification. These are GPU-specific gotchas that a textbook mentions in a footnote. A tutor catches them in your actual code and explains why they matter.
+
+## What Made This Different
+
+Two things separated this from reading documentation or watching a YouTube tutorial.
+
+**The learning was personalized.** I didn't follow someone else's idea of what order to learn things. When Claude introduced softmax and I didn't fully grasp why subtracting the maximum before exponentiation prevents overflow, I asked it to explain numerical stability from first principles. We went down that rabbit hole until it clicked. When I already understood ReLU from prior ML experience, we spent thirty seconds on it and moved on. No filler, no padding, no waiting for the rest of the class.
+
+This is the part that surprised me most. I could verify my understanding in real-time. The loop looked like this: I write a shader, Claude reads it, finds the bugs I can't see yet, and explains not just *what's* wrong but *why* GPU programming works that way. It's not Q&A. It's closer to a code review where the reviewer happens to be infinitely patient and knows every corner of the WebGPU spec.
+
+The difference from vibe coding is worth stating plainly. In vibe coding, the AI writes the code and you ship it. Here, I wrote the code and the AI made sure I understood it. Every bug Claude caught was a concept I internalized. Every correction was a lesson I wouldn't need to learn again. The understanding compounds in a way that copy-pasting from an AI chat never does.
