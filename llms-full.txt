@@ -92,7 +92,7 @@ The difference from vibe coding is worth stating plainly. In vibe coding, the AI
 
 And then it worked.
 
-<iframe style="width:100%;height:1000px;border:none;" src="https://claudebin.com/threads/jmdbMowNTz/embed?from=130&to=136"></iframe>
+<iframe style="width:100%;height:900px;border:none;" src="https://claudebin.com/threads/jmdbMowNTz/embed?from=130&to=136"></iframe>
 
 Digit 7, classified at 99.95% confidence. Eight lessons of compute shaders, buffer management, and type wrestling, running entirely in the browser. No backend, no ML framework, no CUDA. Just WebGPU, WGSL, and a neural network I built from scratch.
 
