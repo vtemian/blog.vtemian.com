@@ -19,7 +19,7 @@ I build systems. Over 15 years helping startups scale production infrastructure.
 
 ## Blog Posts
 
-### vibe-infer: Learning GPU Programming with an AI Tutor, Not an AI Author
+### vibe-infer: Learning GPU Programming with Claude Code
 
 - **URL**: https://blog.vtemian.com/post/vibe-infer/
 - **Published**: February 18, 2026
