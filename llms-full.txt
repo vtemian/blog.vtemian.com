@@ -46,7 +46,7 @@ I wanted to build a neural network from scratch on the GPU. Not by importing a f
 
 I used [Claude Code](https://claude.ai/code), Anthropic's agentic coding tool, as a pair programming partner. But the first thing I established was the dynamic: Claude guides, I write. It explains concepts, reviews my code, catches mistakes. It does not write GPU code for me.
 
-<iframe style="width:100%;height:500px;border:none;" src="https://claudebin.com/threads/jmdbMowNTz/embed?from=7&to=10"></iframe>
+<iframe style="width:100%;height:800px;border:none;" src="https://claudebin.com/threads/jmdbMowNTz/embed?from=7&to=10"></iframe>
 
 With the ground rules set, three dynamics emerged.
 
@@ -74,7 +74,7 @@ The **Forward Pass** chained all kernels together. The critical insight here: ke
 
 Here's what the learning actually looked like. I implemented the matrix multiplication kernel, and Claude reviewed my code line by line.
 
-<iframe style="width:100%;height:500px;border:none;" src="https://claudebin.com/threads/jmdbMowNTz/embed?from=55&to=62"></iframe>
+<iframe style="width:100%;height:800px;border:none;" src="https://claudebin.com/threads/jmdbMowNTz/embed?from=55&to=62"></iframe>
 
 Buffer sizes in bytes, not elements. Uniform buffers need 16-byte alignment. Missing builtin parameters for thread identification. These are GPU-specific gotchas that a textbook mentions in a footnote. A tutor catches them in your actual code and explains why they matter.
 
@@ -92,7 +92,7 @@ The difference from vibe coding is worth stating plainly. In vibe coding, the AI
 
 And then it worked.
 
-<iframe style="width:100%;height:500px;border:none;" src="https://claudebin.com/threads/jmdbMowNTz/embed?from=130&to=136"></iframe>
+<iframe style="width:100%;height:800px;border:none;" src="https://claudebin.com/threads/jmdbMowNTz/embed?from=130&to=136"></iframe>
 
 Digit 7, classified at 99.95% confidence. Eight lessons of compute shaders, buffer management, and type wrestling, running entirely in the browser. No backend, no ML framework, no CUDA. Just WebGPU, WGSL, and a neural network I built from scratch.
 
