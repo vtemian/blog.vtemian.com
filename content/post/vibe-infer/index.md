@@ -88,6 +88,6 @@ Digit 7, classified at 99.95% confidence. Eight lessons of compute shaders, buff
 
 You can [try the live demo](https://vtemian.github.io/vibe-infer/) or browse [the source code](https://github.com/vtemian/vibe-infer). Every GPU line was written by hand. The repo includes a [LESSONS.md](https://github.com/vtemian/vibe-infer/blob/main/LESSONS.md) file summarizing what each lesson covered.
 
-The entire 155-message session is captured and browsable at [claudebin.com](https://claudebin.com/threads/jmdbMowNTz). I built [claudebin](https://github.com/wunderlabs-dev/claudebin.com) with [Marius](https://github.com/mariusandra) as an open-source tool for sharing Claude Code sessions. If you're using Claude Code and want to share a session with your team or publicly, it's one command to publish and get a shareable link.
+The entire 155-message session is captured and browsable at [claudebin.com](https://claudebin.com/threads/jmdbMowNTz). I built [claudebin](https://github.com/wunderlabs-dev/claudebin.com) with [Marius](https://github.com/balajmarius) as an open-source tool for sharing Claude Code sessions. If you're using Claude Code and want to share a session with your team or publicly, it's one command to publish and get a shareable link.
 
 Stay curious ☕
