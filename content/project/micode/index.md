@@ -1,5 +1,5 @@
 ---
-title: "micode: structured workflows for agentic development"
+title: "micode: context harnessing, planning and parallel execution for OpenCode"
 date: 2025-12-20T00:00:00+03:00
 description: "An OpenCode plugin that turns a single coding agent into an orchestrated team of 12 specialized sub-agents, enforcing a Brainstorm-Plan-Implement workflow with parallel execution and session continuity."
 images: []

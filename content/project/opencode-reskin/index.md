@@ -1,5 +1,5 @@
 ---
-title: "opencode-reskin: AI-powered style transformation planning"
+title: "opencode-reskin: multi-agent CSS analysis for OpenCode"
 date: 2026-01-02T01:00:00+03:00
 description: "An OpenCode plugin that analyzes a web project's visual styling and generates a concrete transformation plan to match a target design system. Three agents, zero guesswork."
 images: []

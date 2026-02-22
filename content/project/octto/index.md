@@ -1,5 +1,5 @@
 ---
-title: "octto: 10 minutes of typing to 2 minutes of clicking"
+title: "octto: browser UI for brainstorming with OpenCode agents"
 date: 2026-01-02T00:00:00+03:00
 description: "An OpenCode plugin that replaces terminal-based brainstorming with a browser UI. 14 rich input types, parallel exploration branches, and a 5x speedup over typing."
 images: []
