@@ -1,6 +1,6 @@
 # Vlad Temian's Blog
 
-> I build systems. Over 15 years helping startups scale production infrastructure. Former CTO of qed.builders (acquired by The Sandbox). Long-time open-source contributor with a systems caretaker mindset.
+> I build agentic programming tools. 15+ years of systems infrastructure experience, now focused on making AI agents reliable and accessible for developers. Former CTO, open-source builder, community organizer at agentic.tm.
 
 This file provides an overview of the blog content for LLMs and AI assistants.
 
