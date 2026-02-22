@@ -8,9 +8,9 @@ metaDataFormat = "yaml"
 [params]
 	author = "Vlad Temian"
 	github = "vtemian"
-	description = "I build systems. Over 15 years helping startups scale production infrastructure. Former CTO of qed.builders (acquired by The Sandbox). Long-time open-source contributor with a systems caretaker mindset."
-	keywords = ["vtemian", "blog", "python", "interviews"]
-	tags = ["vtemian", "blog", "python", "interviews"]
+	description = "I build agentic programming tools. 15+ years of systems infrastructure experience, now focused on making AI agents reliable and accessible for developers. Former CTO, open-source builder, community organizer at agentic.tm."
+	keywords = ["vtemian", "agentic programming", "ai tools", "claude code", "developer tools", "open source"]
+	tags = ["vtemian", "agentic programming", "ai tools", "developer tools"]
 
 [sitemap]
   changefreq = "weekly"
