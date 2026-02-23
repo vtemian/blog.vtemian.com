@@ -42,7 +42,7 @@
  &lt;/div>
 &lt;/div>
 
-&lt;video autoplay loop muted playsinline width="100%" style="margin-bottom: 2rem;">
+&lt;video controls playsinline width="100%" style="margin-bottom: 2rem;">
  &lt;source src="demo.mp4" type="video/mp4">
 &lt;/video>
 &lt;p>Claude Code sessions live and die inside the terminal. You spend an hour debugging a tricky issue with an agent, arrive at a solution, and then there&amp;rsquo;s no way to share the conversation. No way to link it in a PR description. No way to show a colleague how you got there. The JSONL files in &lt;code>~/.claude/projects/&lt;/code> aren&amp;rsquo;t something you send to someone.&lt;/p></description></item><item><title>Riding Existing Waves: My Indie Hacking Journey with Sisif.ai</title><link>https://blog.vtemian.com/talk/indie-hacking-update/</link><pubDate>Thu, 22 Jan 2026 15:00:00 +0200</pubDate><guid>https://blog.vtemian.com/talk/indie-hacking-update/</guid><description>&lt;p>I sold my company in late 2024. After 15 years of building production code, being CTO at QED (acquired by The Sandbox), and working with companies like Gorgias, I had one clear lesson: &lt;strong>product drives value, not technical implementation&lt;/strong>.&lt;/p>
