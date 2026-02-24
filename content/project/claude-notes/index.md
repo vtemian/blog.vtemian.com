@@ -56,4 +56,6 @@ I use it mostly to replay my own sessions. Go back to see how something was debu
 
 **[Source on GitHub](https://github.com/vtemian/claude-notes)**
 
+claude-notes was the starting point. The need to share sessions led to [claudebin](/project/claudebin/) — a web platform where sessions become permanent, searchable, embeddable URLs with a single command.
+
 Stay curious ☕

@@ -74,4 +74,6 @@ The bet is simple: constraining the AI into a disciplined workflow produces bett
 
 **[Source on GitHub](https://github.com/vtemian/micode)**
 
+If you prefer brainstorming in a browser UI instead of the terminal, [octto](/project/octto/) adds a visual layer with 14 input types and parallel exploration branches. And if you want to share your agent sessions with colleagues, [claudebin](/project/claudebin/) turns them into permanent, embeddable URLs.
+
 Stay curious ☕

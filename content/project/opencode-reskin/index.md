@@ -61,4 +61,6 @@ The plugin ships with one skin (`nof1`, a neutral dashboard style), but the syst
 
 **[Source on GitHub](https://github.com/vtemian/opencode-reskin)**
 
+Another OpenCode plugin in the same family: [micode](/project/micode/) applies the multi-agent pattern to the full development workflow, not just styling.
+
 Stay curious ☕

@@ -58,4 +58,6 @@ Built by [Wunderlabs](https://github.com/wunderlabs-dev). Free, MIT licensed, no
 
 **[Source on GitHub](https://github.com/wunderlabs-dev/claudebin.com)** | **[claudebin.com](https://claudebin.com)**
 
+claudebin grew out of [claude-notes](/project/claude-notes/), a CLI tool I built earlier to convert Claude Code transcripts to HTML. claude-notes solved the local case; claudebin makes sessions shareable, searchable, and embeddable on the web. Pair it with [micode](/project/micode/) for structured agent workflows, and you get a full loop: plan, implement, and share the evidence.
+
 Stay curious ☕

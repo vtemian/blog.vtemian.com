@@ -57,4 +57,6 @@ Simple setup: one line in your OpenCode config. You can customize the port, agen
 
 **[Source on GitHub](https://github.com/vtemian/octto)**
 
+octto handles the brainstorming phase. For the full structured workflow — brainstorm, plan, and parallel implementation with review — see [micode](/project/micode/).
+
 Stay curious ☕
