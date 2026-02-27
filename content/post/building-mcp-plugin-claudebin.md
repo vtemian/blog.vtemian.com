@@ -22,6 +22,16 @@ Claude Code sessions live as `.jsonl` files under `~/.claude/projects/`. They're
 
 This post is about what's underneath. Building an MCP server, shipping it as a Claude Code plugin, and where the architecture shines vs where it falls apart.
 
+**TL;DR**
+
+- MCP is JSON-RPC 2.0 over stdio. Your plugin is a child process that Claude Code pipes JSON to. Simple, isolated, language-agnostic.
+- Claude Code's slash commands are non-deterministic. A markdown file instructs the LLM to call your tool. The dispatch goes through model reasoning. It works. Usually.
+- `console.log` in an MCP server corrupts the JSON-RPC stream. You will learn this the hard way.
+- Claude Code plugins can't observe, intercept, or modify agent behavior. No lifecycle hooks. You get a pipe and a schema. That's it.
+- OpenCode plugins run in-process with 11+ hooks, shared state, and deterministic dispatch. The DX is better. The portability is worse.
+- MCP is the right model for tools. OpenCode's model is the right one for agent systems. Claude Code only offers MCP. If you need more than a simple tool, you're fighting the architecture.
+- The ideal platform would offer both. Neither does that today.
+
 ## MCP: JSON-RPC 2.0 Over stdio
 
 The [Model Context Protocol](https://modelcontextprotocol.io/) sits on top of [JSON-RPC 2.0](https://www.jsonrpc.org/specification). Claude Code spawns your server as a child process, pipes stdin/stdout, and exchanges newline-delimited JSON. No HTTP, no WebSockets, no port allocation. One child process per MCP server, lifecycle tied to the parent.
@@ -67,12 +77,12 @@ One gotcha with the long-lived process model: `console.log` goes to stdout and c
 
 The genuinely hard part of claudebin is figuring out where Claude stores sessions and extracting the right one.
 
-Sessions are `.jsonl` files under `~/.claude/projects/`. The directory name is a normalized project path. `/Users/vlad/projects/my-app` becomes `Users-vlad-projects-my-app`. Every non-alphanumeric character maps to a dash:
+Sessions are `.jsonl` files under `~/.claude/projects/`. The directory name is a normalized project path. `/Users/vlad/projects/my-app` becomes `-Users-vlad-projects-my-app`. Every non-alphanumeric character (including the leading slash) maps to a dash. One regex, one pass:
 
 ```typescript
-function normalizeProjectPath(projectPath: string): string {
-  return projectPath.replace(/^\//, "").replace(/[^a-zA-Z0-9]/g, "-");
-}
+const normalizeProjectPath = (projectPath: string): string => {
+  return projectPath.replace(/[^a-zA-Z0-9]/g, "-");
+};
 ```
 
 This is undocumented. I found it by reading Claude Code's source and verifying against the filesystem. Getting it wrong means a silent "session not found" error.
@@ -103,7 +113,7 @@ sequenceDiagram
     P->>B: POST /api/auth/start
     B-->>P: { code, authUrl }
     P->>Br: exec("open", authUrl)
-    Br->>B: User logs in + POST /api/auth/verify
+    Br->>B: User logs in + POST /api/auth/validate
     B->>B: Mark code as verified
     loop Every 2s, up to 5min
         P->>B: GET /api/auth/poll?code=abc
@@ -119,26 +129,22 @@ Why not WebSockets? Connection lifecycle management, stateful load balancing, ma
 
 ## Two Plugin Models, Two Philosophies
 
-I've also built [micode](https://github.com/vtemian/micode), a plugin for [OpenCode](https://opencode.ai/) with 22 specialized agents. The experience of building for both platforms exposed a fundamental design disagreement about what a "plugin" should be.
+I've also built [micode](https://github.com/vtemian/micode), a plugin for [OpenCode](https://opencode.ai/) with 26 specialized agents. The experience of building for both platforms exposed a fundamental design disagreement about what a "plugin" should be.
 
 In Claude Code, a plugin is a separate process that the LLM talks to over a protocol. In OpenCode, a plugin is code that runs inside the agent runtime. This isn't a minor implementation detail. It shapes everything.
 
 ```mermaid
-flowchart LR
-    subgraph Claude Code
-        U1[User: /share] --> MD[Markdown file]
-        MD --> LLM[LLM interprets]
-        LLM --> RPC[JSON-RPC over stdio]
-        RPC --> ZOD[Zod validates]
-        ZOD --> FN1[Handler runs]
-    end
+flowchart TD
+    U1["User: /share"] --> MD["Markdown file"] --> LLM["LLM interprets"] --> RPC["JSON-RPC over stdio"] --> ZOD["Zod validates"] --> FN1["Handler runs"]
+    U2["User: /init"] --> CFG["Config lookup"] --> AGT["Agent receives prompt"] --> FN2["Tool executes"]
 
-    subgraph OpenCode
-        U2[User: /init] --> CFG[Config lookup]
-        CFG --> AGT[Agent receives prompt]
-        AGT --> FN2[Tool executes]
-    end
+    style U1 fill:#f9f,stroke:#333
+    style U2 fill:#bbf,stroke:#333
+    style FN1 fill:#f9f,stroke:#333
+    style FN2 fill:#bbf,stroke:#333
 ```
+
+The left chain (pink) is Claude Code: 6 hops. The right chain (blue) is OpenCode: 4 hops.
 
 ### Dispatch: Deterministic vs Probabilistic
 
@@ -184,11 +190,11 @@ This matters in practice. Micode tracks file operations across tool calls and au
 
 ### State: Shared vs Isolated
 
-OpenCode plugins share the runtime. Tools access a `ToolContext` with session ID, abort signals, and plugin state. One tool can read what another tool wrote. Agents spawn subagents that inherit context.
+OpenCode plugins share the runtime. Tools access a `ToolContext` with session ID, abort signals, and plugin state. One tool can read what another tool wrote. Agents spawn subagents via `spawn_agent`, which creates fresh sessions but receives context explicitly through the prompt.
 
 MCP servers are isolated processes. If two tools need shared state, they go through the filesystem. There's no session context, no abort propagation, no shared memory. Claudebin manages its own auth state in `~/.claudebin/config.json` because there's nowhere else to put it.
 
-For simple tools like claudebin, isolation is fine. You call one function, get one result. But for a system like micode where 22 agents coordinate, spawn subagents in parallel, share continuity ledgers, and track progress across tasks, process isolation would be a straitjacket.
+For simple tools like claudebin, isolation is fine. You call one function, get one result. But for a system like micode where 26 agents coordinate, spawn subagents in parallel, share continuity ledgers, and track progress across tasks, process isolation would be a straitjacket.
 
 ### So Which One Wins?
 
