@@ -74,61 +74,98 @@ def parse_frontmatter(content):
     return {"title": title, "description": desc, "reading_time": reading_time}
 
 
+def measure_block(draw, title, description, reading_time, fonts):
+    """Measure total height of content block for vertical centering."""
+    font_title, font_desc, font_meta = fonts
+    total = 0
+
+    # Title
+    wrapped_title = textwrap.wrap(title, width=28)
+    for line in wrapped_title:
+        bbox = draw.textbbox((0, 0), line, font=font_title)
+        total += (bbox[3] - bbox[1]) + 8
+    total += 16  # gap after title
+
+    # Reading time pill
+    rt_text = f"{reading_time} min read"
+    rt_bbox = draw.textbbox((0, 0), rt_text, font=font_meta)
+    total += (rt_bbox[3] - rt_bbox[1]) + 14 + 16  # pill height + gap
+
+    # Description
+    if description:
+        wrapped_desc = textwrap.wrap(description, width=60)
+        for line in wrapped_desc[:3]:
+            bbox = draw.textbbox((0, 0), line, font=font_desc)
+            total += (bbox[3] - bbox[1]) + 6
+        total += 20  # gap after desc
+
+    # Author row
+    total += 50
+
+    return total
+
+
 def generate_og(title, description, reading_time, output_path):
     img = Image.new("RGB", (W, H), BG_COLOR)
     draw = ImageDraw.Draw(img)
 
-    font_title = get_font(58, bold=True)
-    font_desc = get_font(26)
-    font_meta = get_font(20)
-    font_author = get_font(24)
+    font_title = get_font(56, bold=True)
+    font_desc = get_font(24)
+    font_meta = get_font(18)
+    font_author = get_font(22)
 
-    # Title - wrap and draw
-    y = 55
+    # Left accent bar
+    draw.rectangle([(0, 0), (5, H)], fill=ACCENT_COLOR)
+
+    # Measure content height for vertical centering
+    total_h = measure_block(draw, title, description, reading_time,
+                            (font_title, font_desc, font_meta))
+    y = max(40, (H - total_h) // 2)
+    left = 60
+
+    # Title
     wrapped_title = textwrap.wrap(title, width=28)
     for line in wrapped_title:
-        draw.text((60, y), line, font=font_title, fill=TITLE_COLOR)
-        bbox = draw.textbbox((60, y), line, font=font_title)
+        draw.text((left, y), line, font=font_title, fill=TITLE_COLOR)
+        bbox = draw.textbbox((left, y), line, font=font_title)
         y = bbox[3] + 8
+    y += 16
 
     # Reading time pill
-    y += 18
     rt_text = f"{reading_time} min read"
     rt_bbox = draw.textbbox((0, 0), rt_text, font=font_meta)
-    rt_w = rt_bbox[2] - rt_bbox[0] + 24
-    rt_h = rt_bbox[3] - rt_bbox[1] + 14
+    rt_w = rt_bbox[2] - rt_bbox[0] + 20
+    rt_h = rt_bbox[3] - rt_bbox[1] + 12
     draw.rounded_rectangle(
-        [(60, y), (60 + rt_w, y + rt_h)],
+        [(left, y), (left + rt_w, y + rt_h)],
         radius=4,
         fill=ACCENT_COLOR,
     )
-    draw.text((60 + 12, y + 5), rt_text, font=font_meta, fill=(255, 255, 255))
-    y += rt_h + 22
+    draw.text((left + 10, y + 4), rt_text, font=font_meta, fill=(255, 255, 255))
+    y += rt_h + 16
 
     # Description
     if description:
-        wrapped_desc = textwrap.wrap(description, width=55)
-        for line in wrapped_desc[:3]:  # max 3 lines
-            draw.text((60, y), line, font=font_desc, fill=DESC_COLOR)
-            bbox = draw.textbbox((60, y), line, font=font_desc)
+        wrapped_desc = textwrap.wrap(description, width=60)
+        for line in wrapped_desc[:3]:
+            draw.text((left, y), line, font=font_desc, fill=DESC_COLOR)
+            bbox = draw.textbbox((left, y), line, font=font_desc)
             y = bbox[3] + 6
+    y += 20
 
-    # Author avatar (circular)
+    # Author row - avatar + name + URL, all on one line
     if os.path.exists(AVATAR_PATH):
         avatar = Image.open(AVATAR_PATH).convert("RGB")
-        avatar = avatar.resize((60, 60), Image.LANCZOS)
-        mask = Image.new("L", (60, 60), 0)
-        ImageDraw.Draw(mask).ellipse((0, 0, 60, 60), fill=255)
-        avatar_x = W - 250
-        avatar_y = H - 95
-        img.paste(avatar, (avatar_x, avatar_y), mask)
-        draw.text((avatar_x + 75, avatar_y + 15), AUTHOR_NAME, font=font_author, fill=TITLE_COLOR)
+        avatar = avatar.resize((44, 44), Image.LANCZOS)
+        mask = Image.new("L", (44, 44), 0)
+        ImageDraw.Draw(mask).ellipse((0, 0, 44, 44), fill=255)
+        img.paste(avatar, (left, y), mask)
+        draw.text((left + 55, y + 10), AUTHOR_NAME, font=font_author, fill=TITLE_COLOR)
 
-    # Blog URL bottom-left
-    draw.text((60, H - 45), BLOG_URL, font=font_meta, fill=URL_COLOR)
-
-    # Subtle top accent line
-    draw.rectangle([(0, 0), (W, 4)], fill=ACCENT_COLOR)
+        # Dot separator + URL
+        name_bbox = draw.textbbox((left + 55, y + 10), AUTHOR_NAME, font=font_author)
+        dot_x = name_bbox[2] + 16
+        draw.text((dot_x, y + 10), f"·  {BLOG_URL}", font=font_author, fill=URL_COLOR)
 
     img.save(output_path, "PNG")
 
