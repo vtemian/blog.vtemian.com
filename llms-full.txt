@@ -19,7 +19,7 @@ I build agentic programming tools. 15+ years of systems infrastructure experienc
 
 ## Blog Posts
 
-### Building an MCP Plugin for Claude Code
+### MCP Is Great for Tools. Terrible for Agents.
 
 - **URL**: https://blog.vtemian.com/post/building-mcp-plugin-claudebin/
 - **Published**: February 27, 2026
