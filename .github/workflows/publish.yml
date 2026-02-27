@@ -24,6 +24,16 @@ jobs:
         npm install @marp-team/marp-cli
         make
 
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Generate OG images
+      run: |
+        pip install Pillow
+        python scripts/gen_og.py
+
     - name: Setup Hugo
       uses: peaceiris/actions-hugo@v3
       with:

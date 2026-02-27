@@ -16,6 +16,8 @@ tags:
     - agentic-programming
     - typescript
     - deep-dive
+images:
+    - og.png
 ---
 
 Claude Code sessions live as `.jsonl` files under `~/.claude/projects/`. They're ephemeral. You debug a race condition, the agent rewrites three files, and then it's gone. [Claudebin](https://claudebin.com) turns any session into a shareable URL. Run `/claudebin:share`, get back a permanent link.
