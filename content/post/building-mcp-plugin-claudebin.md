@@ -105,77 +105,85 @@ Both auth and session publishing use async polling. Rather than duplicate the re
 
 Why not WebSockets? Connection lifecycle management, stateful load balancing, maintaining a persistent socket alongside the stdio event loop. The polling implementation is 20 lines. A robust WebSocket client is 200+. For a 5-15 second wait, 2 seconds of overhead is acceptable.
 
-## The Indirection Problem
+## Two Plugin Models, Two Philosophies
 
-Let's be honest about what happens when a user types `/claudebin:share`:
+I've also built [micode](https://github.com/vtemian/micode), a plugin for [OpenCode](https://opencode.ai/) with 22 specialized agents. The experience of building for both platforms exposed a fundamental design disagreement about what a "plugin" should be.
 
-```
-"/claudebin:share"
-  → Claude reads commands/share.md (markdown with YAML frontmatter)
-  → Markdown body becomes instructions injected into Claude's context
-  → Claude interprets instructions and decides to call the MCP tool
-  → Claude constructs a tools/call JSON-RPC message
-  → Serialized over stdio to the child process
-  → MCP SDK deserializes, Zod validates, dispatches to handler
-  → Handler runs, result serialized back
-  → Claude reads response, formats for user
-```
+In Claude Code, a plugin is a separate process that the LLM talks to over a protocol. In OpenCode, a plugin is code that runs inside the agent runtime. This isn't a minor implementation detail. It shapes everything.
 
-Four layers of indirection between "user wants to share" and "code runs."
+### Dispatch: Deterministic vs Probabilistic
 
-Compare this to [OpenCode](https://opencode.ai/) (the platform [micode](https://github.com/vtemian/micode) extends):
+When you type `/claudebin:share` in Claude Code, the slash command is a markdown file. Claude reads it, interprets the natural language instructions, and *decides* to call the MCP tool. The dispatch goes through model reasoning. It's probabilistic. Claude usually gets it right. Usually.
 
-```
-"/init"
-  → Command config maps to agent "project-initializer" with a template
-  → Agent calls tools via typed function dispatch
-```
-
-In OpenCode, a tool is a TypeScript function registered in-process. No IPC, no serialization, no child process:
+When you type `/init` in OpenCode, a config object maps the command to an agent:
 
 ```typescript
-export const ast_grep_search = tool({
-  description: "Search code patterns using AST-aware matching",
-  args: {
-    pattern: tool.schema.string().describe("AST pattern"),
-    lang: tool.schema.enum(LANGUAGES).describe("Target language"),
+config.command = {
+  init: {
+    agent: "project-initializer",
+    template: `Initialize this project. $ARGUMENTS`,
   },
-  execute: async (args, context) => {
-    const result = await runSg(args);
-    return formatMatches(result.matches);
-  },
-});
+};
 ```
 
-Commands map deterministically to agents. `/init` always routes to `project-initializer`. Always. The template is filled via string substitution, not LLM inference.
+String substitution. Hash map lookup. Deterministic. `/init` always routes to `project-initializer`. There is no interpretation step.
 
-In Claude Code, the slash command is natural language that Claude *interprets*. The dispatch is non-deterministic. Claude usually gets it right, but the path goes through model reasoning. If instructions are ambiguous, Claude might ask questions instead of calling the tool.
+For claudebin, a single-tool plugin, this means Claude spends 1-2 seconds reasoning about which tool to call when there's only one option. That's model inference time burned on a decision with exactly one valid answer.
 
-### The Trade-offs
+### Hooks: Observing vs Hoping
+
+This is where the gap gets wide. OpenCode plugins have lifecycle hooks. You can intercept and modify behavior at 11+ points: before/after tool execution, on message receive, on context compaction, on permission prompts.
+
+In micode, the `tool.execute.after` hook truncates tool output to stay within context limits. The `chat.params` hook injects project context files before each LLM call. The `experimental.chat.system.transform` hook modifies the system prompt dynamically based on what the agent is doing.
+
+```typescript
+return {
+  "tool.execute.after": async (input, output) => {
+    await tokenAwareTruncation(input, output);
+    await artifactAutoIndex(input, output);
+  },
+  "chat.params": async (input, output) => {
+    await injectProjectContext(input, output);
+    await loadContinuityLedger(input, output);
+  },
+};
+```
+
+Claude Code plugins can't do any of this. Your MCP server is a black box behind a pipe. You get a request, you return a response. You can't observe what Claude is doing, intercept other tools, modify the system prompt, or react to session events. You can't even know how much context is left.
+
+This matters in practice. Micode tracks file operations across tool calls and auto-indexes artifacts. It detects when context is running low and triggers a ledger dump. It enforces code style patterns by injecting constraints into the system prompt. None of this is possible through MCP. You'd have to rely on Claude's built-in behavior and hope it does the right thing.
+
+### State: Shared vs Isolated
+
+OpenCode plugins share the runtime. Tools access a `ToolContext` with session ID, abort signals, and plugin state. One tool can read what another tool wrote. Agents spawn subagents that inherit context.
+
+MCP servers are isolated processes. If two tools need shared state, they go through the filesystem. There's no session context, no abort propagation, no shared memory. Claudebin manages its own auth state in `~/.claudebin/config.json` because there's nowhere else to put it.
+
+For simple tools like claudebin, isolation is fine. You call one function, get one result. But for a system like micode where 22 agents coordinate, spawn subagents in parallel, share continuity ledgers, and track progress across tasks, process isolation would be a straitjacket.
+
+### So Which One Wins?
+
+Neither. They solve different problems.
 
 |                       | MCP (Claude Code)          | Direct Plugin (OpenCode)        |
 |-----------------------|----------------------------|---------------------------------|
 | Tool dispatch         | LLM inference              | Hash map lookup                 |
-| State sharing         | Filesystem/external only   | In-process context              |
+| Lifecycle hooks       | None                       | 11+ hook points                 |
+| State sharing         | Filesystem only            | In-process context              |
 | Language support      | Any (JSON-RPC over stdio)  | JS/TS only (Bun runtime)       |
-| Process isolation     | Yes (child process)        | No (shared process)             |
-| Portability           | Claude Code, Cursor, Zed...| OpenCode only                   |
-| Debug experience      | Multi-layer, stderr only   | Standard debugging              |
-| Latency overhead      | ~1-2s (model thinking)     | Negligible                      |
+| Process isolation     | Yes                        | No                              |
+| Portability           | Claude Code, Cursor, Zed   | OpenCode only                   |
+| Agent orchestration   | Single agent, sequential   | Multi-agent, parallel spawning  |
 
-MCP earns its keep on language agnosticism and ecosystem portability. Claudebin is TypeScript. I've also built MCP servers in Python with Playwright for browser automation. MCP doesn't care what language you use. OpenCode plugins must be JS/TS compiled for Bun.
+MCP is the right model for tools. Standalone utilities that do one thing, work across editors, and benefit from isolation. A hotel scraper, a session sharer, a code search engine. Write it in any language, ship it everywhere.
 
-Process isolation matters too. An MCP server that crashes doesn't take down Claude Code. A segfaulting native module in an OpenCode plugin kills the entire process.
+OpenCode's model is the right one for agent systems. When you need hooks, state, parallel agents, deterministic routing, and deep integration with the runtime. When the plugin isn't a utility but a workflow engine.
 
-But the developer experience is worse. When your tool doesn't receive the right arguments, you have to figure out which of four layers failed. Did Claude misinterpret the markdown? Did it construct the wrong arguments? Did Zod reject valid input? You end up writing to a debug file and tailing it in another terminal because `console.log` corrupts stdout.
+The problem is that Claude Code only offers MCP. If you want to build anything beyond a simple tool, you're fighting the architecture. You can't observe, you can't intercept, you can't orchestrate. You get a pipe and a JSON schema.
 
-### The Honest Assessment
+OpenCode only offers direct plugins. If you want a Python tool, you're wrapping it in a subprocess yourself. If you want cross-editor portability, you're out of luck.
 
-MCP is the right choice when you value portability over performance. It's the wrong choice when you need tight integration, state sharing, and deterministic dispatch.
-
-I've shipped multiple MCP servers and an OpenCode plugin with 22 agents. If a tool needs to work across editors, MCP is the only game in town. If it only needs one platform, skip the protocol and go direct.
-
-MCP is to agent tooling what REST was to web services in 2008. Verbose, imperfect, too much ceremony for simple cases. But it's becoming the standard. Building against a standard, even an imperfect one, compounds over time.
+The ideal platform would offer both. MCP for portable tools, direct plugins for deep integration. Neither does that today.
 
 The code is at [github.com/wunderlabs-dev/claudebin](https://github.com/wunderlabs-dev/claudebin).
 
