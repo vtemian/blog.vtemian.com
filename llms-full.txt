@@ -25,7 +25,7 @@ I build agentic programming tools. 15+ years of systems infrastructure experienc
 - **Published**: February 27, 2026
 - **Word Count**: 1769 words
 - **Tags**: mcp, agentic-programming, typescript, deep-dive
-- **Summary**: A technical deep dive into building claudebin as an MCP server for Claude Code. Covers the JSON-RPC wire protocol, session extraction, device authorization, and an honest comparison with OpenCode's direct plugin model.
+- **Summary**: Building claudebin as an MCP server for Claude Code. JSON-RPC protocol, session extraction, device auth, and an honest comparison with OpenCode's plugin model.
 
 
 Claude Code sessions live as `.jsonl` files under `~/.claude/projects/`. They're ephemeral. You debug a race condition, the agent rewrites three files, and then it's gone. [Claudebin](https://claudebin.com) turns any session into a shareable URL. Run `/claudebin:share`, get back a permanent link.
