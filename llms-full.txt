@@ -23,7 +23,7 @@ I build agentic programming tools. 15+ years of systems infrastructure experienc
 
 - **URL**: https://blog.vtemian.com/post/building-mcp-plugin-claudebin/
 - **Published**: February 27, 2026
-- **Word Count**: 1701 words
+- **Word Count**: 1763 words
 - **Tags**: mcp, agentic-programming, typescript, deep-dive
 - **Summary**: A technical deep dive into building claudebin as an MCP server for Claude Code. Covers the JSON-RPC wire protocol, session extraction, device authorization, and an honest comparison with OpenCode's direct plugin model.
 
@@ -44,7 +44,7 @@ This post is about what's underneath. Building an MCP server, shipping it as a C
 
 ## MCP: JSON-RPC 2.0 Over stdio
 
-The [Model Context Protocol](https://modelcontextprotocol.io/) sits on top of [JSON-RPC 2.0](https://www.jsonrpc.org/specification). Claude Code spawns your server as a child process, pipes stdin/stdout, and exchanges newline-delimited JSON. No HTTP, no WebSockets, no port allocation. One child process per MCP server, lifecycle tied to the parent.
+The [Model Context Protocol](https://modelcontextprotocol.io/) sits on top of JSON-RPC 2.0 [1]. Claude Code spawns your server as a child process, pipes stdin/stdout, and exchanges newline-delimited JSON [2]. No HTTP, no WebSockets, no port allocation. One child process per MCP server, lifecycle tied to the parent [2].
 
 ```mermaid
 flowchart LR
@@ -70,18 +70,18 @@ When Claude Code starts your server, it sends an `initialize` request:
 → {"jsonrpc":"2.0","method":"notifications/initialized"}
 ```
 
-Capability negotiation. The client declares what it supports, the server responds with its own. Claudebin only declares `tools`. The third message is a notification (no `id`, no response expected), signaling the handshake is complete.
+Capability negotiation [3]. The client declares what it supports, the server responds with its own. Claudebin only declares `tools`. The third message is a notification (no `id`, no response expected), signaling the handshake is complete.
 
-Then Claude discovers tools via `tools/list` and invokes them via `tools/call`. The tool response uses MCP's content block format:
+Then Claude discovers tools via `tools/list` and invokes them via `tools/call` [4]. The tool response uses MCP's content block format:
 
 ```json
 ← {"jsonrpc":"2.0","id":3,"result":{
     "content":[{"type":"text","text":"https://claudebin.com/threads/abc123"}]}}
 ```
 
-MCP separates *protocol errors* (malformed JSON-RPC) from *tool errors* (your code ran but failed). Tool errors return a successful response with `isError: true`. The distinction matters because Claude can reason about tool errors and retry. Protocol errors are opaque.
+MCP separates *protocol errors* (malformed JSON-RPC) from *tool errors* (your code ran but failed). Tool errors return a successful response with `isError: true` [4]. The distinction matters because Claude can reason about tool errors and retry. Protocol errors are opaque.
 
-One gotcha with the long-lived process model: `console.log` goes to stdout and corrupts the JSON-RPC stream. This bites every new MCP developer. Use `console.error` for debugging.
+One gotcha with the long-lived process model: `console.log` goes to stdout and corrupts the JSON-RPC stream [2]. This bites every new MCP developer. Use `console.error` for debugging.
 
 ## Session Extraction
 
@@ -95,7 +95,7 @@ const normalizeProjectPath = (projectPath: string): string => {
 };
 ```
 
-This is undocumented. I found it by reading Claude Code's source and verifying against the filesystem. Getting it wrong means a silent "session not found" error.
+This is undocumented. I found it by reading Claude Code's source [5] and verifying against the filesystem. Getting it wrong means a silent "session not found" error.
 
 The directory contains multiple files:
 
@@ -108,11 +108,11 @@ The directory contains multiple files:
 
 Claudebin filters out `agent-*` files and picks the most recent by `mtime`. Each JSONL line is a self-contained message object (user message, assistant response, tool call, tool result). The file is read as a UTF-8 string and sent as-is to the backend for rendering.
 
-The memory trade-off: Node.js strings are UTF-16 internally, so a 50MB session becomes ~100MB of heap. Add JSON serialization for the HTTP body and you hit ~200MB peak. A streaming upload would fix this, but for typical sessions (100KB-5MB) it wasn't worth the complexity. The 50MB limit is a client-side safety valve.
+The memory trade-off: Node.js strings are UTF-16 internally [6], so a 50MB session becomes ~100MB of heap. Add JSON serialization for the HTTP body and you hit ~200MB peak. A streaming upload would fix this, but for typical sessions (100KB-5MB) it wasn't worth the complexity. The 50MB limit is a client-side safety valve.
 
 ## Device Authorization
 
-MCP servers run in a terminal. No browser window, no OAuth redirect URI. Claudebin uses a pattern similar to [RFC 8628 (Device Authorization Grant)](https://datatracker.ietf.org/doc/html/rfc8628):
+MCP servers run in a terminal. No browser window, no OAuth redirect URI. Claudebin uses a pattern similar to RFC 8628 (Device Authorization Grant) [7]:
 
 ```mermaid
 sequenceDiagram
@@ -131,7 +131,7 @@ sequenceDiagram
     B-->>P: { accessToken, refreshToken, expiresAt }
 ```
 
-The one-time code correlates the CLI and browser session. Tokens are cached in `~/.claudebin/config.json` with `0o600` permissions (same pattern as `~/.ssh/`). Before every share, claudebin checks the cached token. If it's within 5 minutes of expiry, it refreshes proactively rather than failing mid-upload.
+The one-time code correlates the CLI and browser session. Tokens are cached in `~/.claudebin/config.json` with `0o600` permissions [5] (same pattern as `~/.ssh/`). Before every share, claudebin checks the cached token. If it's within 5 minutes of expiry, it refreshes proactively rather than failing mid-upload.
 
 Both auth and session publishing use async polling. Rather than duplicate the retry logic, claudebin has a generic `poll<T>()` with configurable interval, timeout, and a type guard callback. Auth polls for 5 minutes (user might be slow). Session processing polls for 2 minutes. No backoff, fixed 2-second interval. For a single-user CLI tool generating 30 req/min during a poll, this is fine.
 
@@ -233,6 +233,24 @@ The ideal platform would offer both. MCP for portable tools, direct plugins for 
 The code is at [github.com/wunderlabs-dev/claudebin](https://github.com/wunderlabs-dev/claudebin).
 
 Stay curious ☕
+
+---
+
+**References**
+
+[1] JSON-RPC 2.0 Specification — [jsonrpc.org/specification](https://www.jsonrpc.org/specification)
+
+[2] MCP Specification: Transports — [spec.modelcontextprotocol.io/specification/2024-11-05/basic/transports](https://spec.modelcontextprotocol.io/specification/2024-11-05/basic/transports/)
+
+[3] MCP Specification: Lifecycle — [spec.modelcontextprotocol.io/specification/2024-11-05/basic/lifecycle](https://spec.modelcontextprotocol.io/specification/2024-11-05/basic/lifecycle/)
+
+[4] MCP Specification: Tools — [spec.modelcontextprotocol.io/specification/2024-11-05/server/tools](https://spec.modelcontextprotocol.io/specification/2024-11-05/server/tools/)
+
+[5] Claudebin source code — [github.com/wunderlabs-dev/claudebin](https://github.com/wunderlabs-dev/claudebin)
+
+[6] JavaScript's internal character encoding: UCS-2 or UTF-16? — [mathiasbynens.be/notes/javascript-encoding](https://mathiasbynens.be/notes/javascript-encoding)
+
+[7] RFC 8628: OAuth 2.0 Device Authorization Grant — [datatracker.ietf.org/doc/html/rfc8628](https://datatracker.ietf.org/doc/html/rfc8628)
 
 
 ---

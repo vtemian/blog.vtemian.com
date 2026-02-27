@@ -11,4 +11,4 @@
 &lt;li>The ideal platform would offer both. Neither does that today.&lt;/li>
 &lt;/ul>
 &lt;h2 id="mcp-json-rpc-20-over-stdio">MCP: JSON-RPC 2.0 Over stdio&lt;/h2>
-&lt;p>The &lt;a href="https://modelcontextprotocol.io/">Model Context Protocol&lt;/a> sits on top of &lt;a href="https://www.jsonrpc.org/specification">JSON-RPC 2.0&lt;/a>. Claude Code spawns your server as a child process, pipes stdin/stdout, and exchanges newline-delimited JSON. No HTTP, no WebSockets, no port allocation. One child process per MCP server, lifecycle tied to the parent.&lt;/p></description></item></channel></rss>
+&lt;p>The &lt;a href="https://modelcontextprotocol.io/">Model Context Protocol&lt;/a> sits on top of JSON-RPC 2.0 [1]. Claude Code spawns your server as a child process, pipes stdin/stdout, and exchanges newline-delimited JSON [2]. No HTTP, no WebSockets, no port allocation. One child process per MCP server, lifecycle tied to the parent [2].&lt;/p></description></item></channel></rss>
