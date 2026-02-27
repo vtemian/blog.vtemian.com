@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>vtemian - blog</title><link>https://blog.vtemian.com/</link><description>Recent content on vtemian - blog</description><generator>Hugo</generator><language>en-us</language><lastBuildDate>Wed, 18 Feb 2026 12:00:00 +0200</lastBuildDate><atom:link href="https://blog.vtemian.com/index.xml" rel="self" type="application/rss+xml"/><item><title>vibe-infer: Learning GPU Programming with Claude Code</title><link>https://blog.vtemian.com/post/vibe-infer/</link><pubDate>Wed, 18 Feb 2026 12:00:00 +0200</pubDate><guid>https://blog.vtemian.com/post/vibe-infer/</guid><description>&lt;p>Everyone has a story about how AI helped them learn something. &amp;ldquo;I asked ChatGPT to explain monads and it finally clicked.&amp;rdquo; Cool. But where&amp;rsquo;s the actual session? Where&amp;rsquo;s the messy back-and-forth where you got confused, the AI corrected you, and you iterated until understanding emerged?&lt;/p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>vtemian - blog</title><link>https://blog.vtemian.com/</link><description>Recent content on vtemian - blog</description><generator>Hugo</generator><language>en-us</language><lastBuildDate>Fri, 27 Feb 2026 10:00:00 +0200</lastBuildDate><atom:link href="https://blog.vtemian.com/index.xml" rel="self" type="application/rss+xml"/><item><title>Building an MCP Plugin for Claude Code: A Deep Dive with Claudebin</title><link>https://blog.vtemian.com/post/building-mcp-plugin-claudebin/</link><pubDate>Fri, 27 Feb 2026 10:00:00 +0200</pubDate><guid>https://blog.vtemian.com/post/building-mcp-plugin-claudebin/</guid><description>&lt;p>Claude Code sessions are ephemeral. You have a 45-minute conversation where you debug a gnarly race condition, the agent rewrites three files, and then it&amp;rsquo;s gone. Buried in a &lt;code>.jsonl&lt;/code> file somewhere under &lt;code>~/.claude/projects/&lt;/code>. No way to share it, reference it, or learn from it later.&lt;/p>
+&lt;p>That bothered me enough to build &lt;a href="https://claudebin.com">claudebin&lt;/a>, a plugin that turns any Claude Code session into a permanent, shareable URL. Run &lt;code>/claudebin:share&lt;/code>, get back &lt;code>claudebin.com/threads/abc123&lt;/code>. Done.&lt;/p></description></item><item><title>vibe-infer: Learning GPU Programming with Claude Code</title><link>https://blog.vtemian.com/post/vibe-infer/</link><pubDate>Wed, 18 Feb 2026 12:00:00 +0200</pubDate><guid>https://blog.vtemian.com/post/vibe-infer/</guid><description>&lt;p>Everyone has a story about how AI helped them learn something. &amp;ldquo;I asked ChatGPT to explain monads and it finally clicked.&amp;rdquo; Cool. But where&amp;rsquo;s the actual session? Where&amp;rsquo;s the messy back-and-forth where you got confused, the AI corrected you, and you iterated until understanding emerged?&lt;/p>
 &lt;p>Most AI-assisted learning stories are sanitized after the fact. You get the polished takeaway, not the process. The repo is called &lt;a href="https://github.com/vtemian/vibe-infer">vibe-infer&lt;/a> and that&amp;rsquo;s intentional irony, because what happened here is the opposite of vibe coding. I wrote every line of GPU code. The AI was my tutor, not my ghostwriter.&lt;/p></description></item><item><title>claudebin: share and embed Claude Code sessions</title><link>https://blog.vtemian.com/project/claudebin/</link><pubDate>Sun, 01 Feb 2026 00:00:00 +0300</pubDate><guid>https://blog.vtemian.com/project/claudebin/</guid><description>&lt;div class="github-stats">
  &lt;div class="github-stats__header">
  &lt;a href="https://github.com/wunderlabs-dev/claudebin.com" target="_blank" rel="noopener noreferrer" class="github-stats__repo">
@@ -10,7 +11,7 @@
  &lt;div class="github-stats__item">
  &lt;div class="github-stats__stat-row">
  &lt;svg class="github-stats__stat-icon github-stats__stat-icon--star" viewBox="0 0 16 16" fill="currentColor">&lt;path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25z"/>&lt;/svg>
- &lt;span class="github-stats__value">45&lt;/span>
+ &lt;span class="github-stats__value">48&lt;/span>
  &lt;/div>
  &lt;span class="github-stats__label">Stars&lt;/span>
  &lt;/div>
@@ -31,7 +32,7 @@
  &lt;div class="github-stats__item">
  &lt;div class="github-stats__stat-row">
  &lt;svg class="github-stats__stat-icon" viewBox="0 0 16 16" fill="currentColor">&lt;path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"/>&lt;path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Z"/>&lt;/svg>
- &lt;span class="github-stats__value">17&lt;/span>
+ &lt;span class="github-stats__value">19&lt;/span>
  &lt;/div>
  &lt;span class="github-stats__label">Open Issues&lt;/span>
  &lt;/div>
@@ -105,7 +106,7 @@
  &lt;div class="github-stats__item">
  &lt;div class="github-stats__stat-row">
  &lt;svg class="github-stats__stat-icon github-stats__stat-icon--star" viewBox="0 0 16 16" fill="currentColor">&lt;path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25z"/>&lt;/svg>
- &lt;span class="github-stats__value">145&lt;/span>
+ &lt;span class="github-stats__value">160&lt;/span>
  &lt;/div>
  &lt;span class="github-stats__label">Stars&lt;/span>
  &lt;/div>
@@ -151,7 +152,7 @@
  &lt;div class="github-stats__item">
  &lt;div class="github-stats__stat-row">
  &lt;svg class="github-stats__stat-icon github-stats__stat-icon--star" viewBox="0 0 16 16" fill="currentColor">&lt;path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25z"/>&lt;/svg>
- &lt;span class="github-stats__value">219&lt;/span>
+ &lt;span class="github-stats__value">230&lt;/span>
  &lt;/div>
  &lt;span class="github-stats__label">Stars&lt;/span>
  &lt;/div>
@@ -172,7 +173,7 @@
  &lt;div class="github-stats__item">
  &lt;div class="github-stats__stat-row">
  &lt;svg class="github-stats__stat-icon" viewBox="0 0 16 16" fill="currentColor">&lt;path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"/>&lt;path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Z"/>&lt;/svg>
- &lt;span class="github-stats__value">4&lt;/span>
+ &lt;span class="github-stats__value">5&lt;/span>
  &lt;/div>
  &lt;span class="github-stats__label">Open Issues&lt;/span>
  &lt;/div>
@@ -199,7 +200,7 @@
  &lt;div class="github-stats__item">
  &lt;div class="github-stats__stat-row">
  &lt;svg class="github-stats__stat-icon github-stats__stat-icon--star" viewBox="0 0 16 16" fill="currentColor">&lt;path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25z"/>&lt;/svg>
- &lt;span class="github-stats__value">64&lt;/span>
+ &lt;span class="github-stats__value">67&lt;/span>
  &lt;/div>
  &lt;span class="github-stats__label">Stars&lt;/span>
  &lt;/div>
