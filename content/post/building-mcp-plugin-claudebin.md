@@ -190,7 +190,7 @@ This matters in practice. Micode tracks file operations across tool calls and au
 
 ### State: Shared vs Isolated
 
-OpenCode plugins share the runtime. Tools access a `ToolContext` with session ID and abort signals. Shared state lives in closures over the plugin scope — one tool can read what another tool wrote. Agents spawn subagents via `spawn_agent`, which creates fresh sessions but receives context explicitly through the prompt.
+OpenCode plugins share the runtime. Tools access a `ToolContext` with session ID and abort signals. Shared state lives in closures over the plugin scope. One tool can read what another tool wrote. Agents spawn subagents via `spawn_agent`, which creates fresh sessions but receives context explicitly through the prompt.
 
 MCP servers are isolated processes. If two tools need shared state, they go through the filesystem. There's no session context, no abort propagation, no shared memory. Claudebin manages its own auth state in `~/.claudebin/config.json` because there's nowhere else to put it.
 
@@ -228,16 +228,16 @@ Stay curious ☕
 
 **References**
 
-<a id="ref-1"></a>[1] JSON-RPC 2.0 Specification — [jsonrpc.org/specification](https://www.jsonrpc.org/specification)
+<a id="ref-1"></a>[1] JSON-RPC 2.0 Specification -[jsonrpc.org/specification](https://www.jsonrpc.org/specification)
 
-<a id="ref-2"></a>[2] MCP Specification: Transports — [modelcontextprotocol.io/specification/2025-11-25/basic/transports](https://modelcontextprotocol.io/specification/2025-11-25/basic/transports)
+<a id="ref-2"></a>[2] MCP Specification: Transports -[modelcontextprotocol.io/specification/2025-11-25/basic/transports](https://modelcontextprotocol.io/specification/2025-11-25/basic/transports)
 
-<a id="ref-3"></a>[3] MCP Specification: Lifecycle — [modelcontextprotocol.io/specification/2025-11-25/basic/lifecycle](https://modelcontextprotocol.io/specification/2025-11-25/basic/lifecycle)
+<a id="ref-3"></a>[3] MCP Specification: Lifecycle -[modelcontextprotocol.io/specification/2025-11-25/basic/lifecycle](https://modelcontextprotocol.io/specification/2025-11-25/basic/lifecycle)
 
-<a id="ref-4"></a>[4] MCP Specification: Tools — [modelcontextprotocol.io/specification/2025-11-25/server/tools](https://modelcontextprotocol.io/specification/2025-11-25/server/tools)
+<a id="ref-4"></a>[4] MCP Specification: Tools -[modelcontextprotocol.io/specification/2025-11-25/server/tools](https://modelcontextprotocol.io/specification/2025-11-25/server/tools)
 
-<a id="ref-5"></a>[5] Claudebin source code — [github.com/wunderlabs-dev/claudebin](https://github.com/wunderlabs-dev/claudebin)
+<a id="ref-5"></a>[5] Claudebin source code -[github.com/wunderlabs-dev/claudebin](https://github.com/wunderlabs-dev/claudebin)
 
-<a id="ref-6"></a>[6] JavaScript's internal character encoding: UCS-2 or UTF-16? — [mathiasbynens.be/notes/javascript-encoding](https://mathiasbynens.be/notes/javascript-encoding)
+<a id="ref-6"></a>[6] JavaScript's internal character encoding: UCS-2 or UTF-16? -[mathiasbynens.be/notes/javascript-encoding](https://mathiasbynens.be/notes/javascript-encoding)
 
-<a id="ref-7"></a>[7] RFC 8628: OAuth 2.0 Device Authorization Grant — [datatracker.ietf.org/doc/html/rfc8628](https://datatracker.ietf.org/doc/html/rfc8628)
+<a id="ref-7"></a>[7] RFC 8628: OAuth 2.0 Device Authorization Grant -[datatracker.ietf.org/doc/html/rfc8628](https://datatracker.ietf.org/doc/html/rfc8628)
