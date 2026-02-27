@@ -181,4 +181,16 @@ deployable changes are more sustainable, less invasive, and easier to understand
 </span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> str(response<span style=color:#f92672>.</span>content) <span style=color:#75715e># Be consistent with returning type</span>
 </span></span></code></pre></div><p>Cheers 🍺!</p></p></article></main><script>hljs.initHighlightingOnLoad()</script><footer class=footer>&copy; 2026 <a href=https://github.com/vtemian>Vlad Temian</a>,
 powered by <a href=https://gohugo.io/ target=_blank>Hugo</a>,
-with help from <a href=https://github.com/balajmarius>&copy;balajmarius</a>.</footer></div></body></html>
+with help from <a href=https://github.com/balajmarius>&copy;balajmarius</a>.</footer></div><script type=module>
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: false, theme: 'neutral' });
+    
+    document.querySelectorAll('code.language-mermaid').forEach(el => {
+        const pre = el.parentElement;
+        const div = document.createElement('pre');
+        div.className = 'mermaid';
+        div.textContent = el.textContent;
+        pre.parentElement.replaceChild(div, pre);
+    });
+    await mermaid.run();
+</script></body></html>

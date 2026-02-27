@@ -11,4 +11,16 @@
 </span></span></code></pre></div><video autoplay loop muted playsinline width=100% style=margin-bottom:2rem>
 <source src=terminal-output.mp4 type=video/mp4></video><h2 id=example>Example</h2><p>Here&rsquo;s an actual exported session. Scroll through it or <a href=https://blog.vtemian.com/examples/claude-notes-conversation.html>open full screen</a>.</p><iframe src=https://blog.vtemian.com/examples/claude-notes-conversation.html width=100% height=600 style="border:1px solid #ccc;border-radius:8px"></iframe><h2 id=implementation>Implementation</h2><p>Nothing fancy. Python with Rich for terminal rendering and Jinja2 for HTML templates. Point it at a project directory, it finds the JSONL files and renders them.</p><p>I use it mostly to replay my own sessions. Go back to see how something was debugged. Or export to HTML and send to someone when I want to show them an interesting conversation.</p><p><strong><a href=https://github.com/vtemian/claude-notes>Source on GitHub</a></strong></p><p>claude-notes was the starting point. The need to share sessions led to <a href=https://blog.vtemian.com/project/claudebin/>claudebin</a> — a web platform where sessions become permanent, searchable, embeddable URLs with a single command.</p><p>Stay curious ☕</p></p></article></main><script>hljs.initHighlightingOnLoad()</script><footer class=footer>&copy; 2026 <a href=https://github.com/vtemian>Vlad Temian</a>,
 powered by <a href=https://gohugo.io/ target=_blank>Hugo</a>,
-with help from <a href=https://github.com/balajmarius>&copy;balajmarius</a>.</footer></div></body></html>
+with help from <a href=https://github.com/balajmarius>&copy;balajmarius</a>.</footer></div><script type=module>
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: false, theme: 'neutral' });
+    
+    document.querySelectorAll('code.language-mermaid').forEach(el => {
+        const pre = el.parentElement;
+        const div = document.createElement('pre');
+        div.className = 'mermaid';
+        div.textContent = el.textContent;
+        pre.parentElement.replaceChild(div, pre);
+    });
+    await mermaid.run();
+</script></body></html>

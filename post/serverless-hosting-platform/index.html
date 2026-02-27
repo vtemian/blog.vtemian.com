@@ -916,4 +916,16 @@ and <a href=https://aws.amazon.com/ecs/>AWS ECS</a> are truly remarkable, from a
 the burden of deploying your application and manage your infrastructure.
 Kudos to Knative and Tekton for bringing such platforms closer to our reach.</p><p>Cheers 🍺!</p><p>Thanks <a href=https://twitter.com/catileptic>@catileptic</a> for the awesome illustrations!</p></p></article></main><script>hljs.initHighlightingOnLoad()</script><footer class=footer>&copy; 2026 <a href=https://github.com/vtemian>Vlad Temian</a>,
 powered by <a href=https://gohugo.io/ target=_blank>Hugo</a>,
-with help from <a href=https://github.com/balajmarius>&copy;balajmarius</a>.</footer></div></body></html>
+with help from <a href=https://github.com/balajmarius>&copy;balajmarius</a>.</footer></div><script type=module>
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: false, theme: 'neutral' });
+    
+    document.querySelectorAll('code.language-mermaid').forEach(el => {
+        const pre = el.parentElement;
+        const div = document.createElement('pre');
+        div.className = 'mermaid';
+        div.textContent = el.textContent;
+        pre.parentElement.replaceChild(div, pre);
+    });
+    await mermaid.run();
+</script></body></html>

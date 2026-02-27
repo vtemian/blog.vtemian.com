@@ -12,4 +12,16 @@ Change font-family: Inter -&gt; IBM Plex Sans in tailwind.config.ts
 Change border-radius: 0.5rem -&gt; 0.25rem in src/components/Card.tsx
 </code></pre><p>It plans, it does not execute. You review the checklist, then apply the changes yourself or hand them off to another agent. Full control over what actually gets modified.</p><h2 id=three-agents-working-in-parallel>Three Agents Working in Parallel</h2><table><thead><tr><th>Agent</th><th>Role</th></tr></thead><tbody><tr><td><strong>reskin</strong></td><td>Orchestrator. Spawns subagents, compares findings against the skin definition, generates the transformation plan</td></tr><tr><td><strong>style-analyzer</strong></td><td>Scans CSS files, Tailwind config, and design tokens</td></tr><tr><td><strong>component-scanner</strong></td><td>Finds UI components, identifies styling patterns, detects the framework</td></tr></tbody></table><p>Both analysis agents run concurrently, so the workflow stays fast even on large projects.</p><h2 id=skins-as-data>Skins as Data</h2><p>Skin definitions are declarative files defining colors (palette and semantic), typography (fonts and scale), spacing, border radius, and optionally data visualization styles, component overrides, and design guidelines. Adding a new skin is just dropping a new definition file into the <code>skins/</code> directory.</p><p>The plugin ships with one skin (<code>nof1</code>, a neutral dashboard style), but the system is designed to be extended.</p><p><strong><a href=https://github.com/vtemian/opencode-reskin>Source on GitHub</a></strong></p><p>Another OpenCode plugin in the same family: <a href=https://blog.vtemian.com/project/micode/>micode</a> applies the multi-agent pattern to the full development workflow, not just styling.</p><p>Stay curious ☕</p></p></article></main><script>hljs.initHighlightingOnLoad()</script><footer class=footer>&copy; 2026 <a href=https://github.com/vtemian>Vlad Temian</a>,
 powered by <a href=https://gohugo.io/ target=_blank>Hugo</a>,
-with help from <a href=https://github.com/balajmarius>&copy;balajmarius</a>.</footer></div></body></html>
+with help from <a href=https://github.com/balajmarius>&copy;balajmarius</a>.</footer></div><script type=module>
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: false, theme: 'neutral' });
+    
+    document.querySelectorAll('code.language-mermaid').forEach(el => {
+        const pre = el.parentElement;
+        const div = document.createElement('pre');
+        div.className = 'mermaid';
+        div.textContent = el.textContent;
+        pre.parentElement.replaceChild(div, pre);
+    });
+    await mermaid.run();
+</script></body></html>
