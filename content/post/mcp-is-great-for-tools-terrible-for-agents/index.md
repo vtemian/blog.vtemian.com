@@ -1,7 +1,7 @@
 ---
 title: "MCP Is Great for Tools. Terrible for Agents."
 date: 2026-02-27T10:00:00+02:00
-description: "A technical deep dive into building claudebin as an MCP server for Claude Code. Covers the JSON-RPC wire protocol, session extraction, device authorization, and an honest comparison with OpenCode's direct plugin model."
+description: "Building claudebin as an MCP server for Claude Code. JSON-RPC protocol, session extraction, device auth, and an honest comparison with OpenCode's plugin model."
 keywords:
     - mcp
     - model context protocol
