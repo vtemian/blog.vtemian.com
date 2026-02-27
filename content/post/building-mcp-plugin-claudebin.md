@@ -26,6 +26,14 @@ This post is about what's underneath. Building an MCP server, shipping it as a C
 
 The [Model Context Protocol](https://modelcontextprotocol.io/) sits on top of [JSON-RPC 2.0](https://www.jsonrpc.org/specification). Claude Code spawns your server as a child process, pipes stdin/stdout, and exchanges newline-delimited JSON. No HTTP, no WebSockets, no port allocation. One child process per MCP server, lifecycle tied to the parent.
 
+```mermaid
+flowchart LR
+    CC[Claude Code] -->|stdin: JSON-RPC| MCP[MCP Server process]
+    MCP -->|stdout: JSON-RPC| CC
+    CC -->|stdin: JSON-RPC| MCP2[Another MCP Server]
+    MCP2 -->|stdout: JSON-RPC| CC
+```
+
 When Claude Code starts your server, it sends an `initialize` request:
 
 ```json
@@ -86,17 +94,21 @@ The memory trade-off: Node.js strings are UTF-16 internally, so a 50MB session b
 
 MCP servers run in a terminal. No browser window, no OAuth redirect URI. Claudebin uses a pattern similar to [RFC 8628 (Device Authorization Grant)](https://datatracker.ietf.org/doc/html/rfc8628):
 
-```
-Plugin                         Backend                      Browser
-  │                              │                            │
-  ├── POST /api/auth/start ────→ │                            │
-  ← { code: "abc", url: "..." } │                            │
-  ├── exec("open", url) ────────────────────────────────────→ │
-  │                              │                    User logs in
-  │                              │ ←── POST /api/auth/verify ─┤
-  ├── GET /api/auth/poll?code= → │                            │
-  │   (every 2s, up to 5min)     │                            │
-  ← { accessToken, refreshToken }│                            │
+```mermaid
+sequenceDiagram
+    participant P as Plugin
+    participant B as Backend
+    participant Br as Browser
+
+    P->>B: POST /api/auth/start
+    B-->>P: { code, authUrl }
+    P->>Br: exec("open", authUrl)
+    Br->>B: User logs in + POST /api/auth/verify
+    B->>B: Mark code as verified
+    loop Every 2s, up to 5min
+        P->>B: GET /api/auth/poll?code=abc
+    end
+    B-->>P: { accessToken, refreshToken, expiresAt }
 ```
 
 The one-time code correlates the CLI and browser session. Tokens are cached in `~/.claudebin/config.json` with `0o600` permissions (same pattern as `~/.ssh/`). Before every share, claudebin checks the cached token. If it's within 5 minutes of expiry, it refreshes proactively rather than failing mid-upload.
@@ -110,6 +122,23 @@ Why not WebSockets? Connection lifecycle management, stateful load balancing, ma
 I've also built [micode](https://github.com/vtemian/micode), a plugin for [OpenCode](https://opencode.ai/) with 22 specialized agents. The experience of building for both platforms exposed a fundamental design disagreement about what a "plugin" should be.
 
 In Claude Code, a plugin is a separate process that the LLM talks to over a protocol. In OpenCode, a plugin is code that runs inside the agent runtime. This isn't a minor implementation detail. It shapes everything.
+
+```mermaid
+flowchart LR
+    subgraph Claude Code
+        U1[User: /share] --> MD[Markdown file]
+        MD --> LLM[LLM interprets]
+        LLM --> RPC[JSON-RPC over stdio]
+        RPC --> ZOD[Zod validates]
+        ZOD --> FN1[Handler runs]
+    end
+
+    subgraph OpenCode
+        U2[User: /init] --> CFG[Config lookup]
+        CFG --> AGT[Agent receives prompt]
+        AGT --> FN2[Tool executes]
+    end
+```
 
 ### Dispatch: Deterministic vs Probabilistic
 
