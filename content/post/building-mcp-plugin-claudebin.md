@@ -69,7 +69,7 @@ Then Claude discovers tools via `tools/list` and invokes them via `tools/call` <
     "content":[{"type":"text","text":"https://claudebin.com/threads/abc123"}]}}
 ```
 
-MCP separates *protocol errors* (malformed JSON-RPC) from *tool errors* (your code ran but failed). Tool errors return a successful response with `isError: true` <sup><a href="#ref-4">[4]</a></sup>. The distinction matters because Claude can reason about tool errors and retry. Protocol errors are opaque.
+MCP separates *protocol errors* (unknown tools, malformed requests, server failures) from *tool errors* (your code ran but failed). Tool errors return a successful response with `isError: true` <sup><a href="#ref-4">[4]</a></sup>. The distinction matters because Claude can reason about tool errors and retry. Protocol errors rarely lead to successful recovery.
 
 One gotcha with the long-lived process model: `console.log` goes to stdout and corrupts the JSON-RPC stream <sup><a href="#ref-2">[2]</a></sup>. This bites every new MCP developer. Use `console.error` for debugging.
 
@@ -113,7 +113,7 @@ sequenceDiagram
     P->>B: POST /api/auth/start
     B-->>P: { code, authUrl }
     P->>Br: exec("open", authUrl)
-    Br->>B: User logs in + POST /api/auth/validate
+    Br->>B: User logs in via OAuth
     B->>B: Mark code as verified
     loop Every 2s, up to 5min
         P->>B: GET /api/auth/poll?code=abc
@@ -190,7 +190,7 @@ This matters in practice. Micode tracks file operations across tool calls and au
 
 ### State: Shared vs Isolated
 
-OpenCode plugins share the runtime. Tools access a `ToolContext` with session ID, abort signals, and plugin state. One tool can read what another tool wrote. Agents spawn subagents via `spawn_agent`, which creates fresh sessions but receives context explicitly through the prompt.
+OpenCode plugins share the runtime. Tools access a `ToolContext` with session ID and abort signals. Shared state lives in closures over the plugin scope — one tool can read what another tool wrote. Agents spawn subagents via `spawn_agent`, which creates fresh sessions but receives context explicitly through the prompt.
 
 MCP servers are isolated processes. If two tools need shared state, they go through the filesystem. There's no session context, no abort propagation, no shared memory. Claudebin manages its own auth state in `~/.claudebin/config.json` because there's nowhere else to put it.
 
