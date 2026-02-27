@@ -48,12 +48,12 @@ When Claude Code starts your server, it sends an `initialize` request:
 
 ```json
 → {"jsonrpc":"2.0","id":1,"method":"initialize","params":{
-    "protocolVersion":"2024-11-05",
+    "protocolVersion":"2025-11-25",
     "capabilities":{"roots":{"listChanged":true}},
     "clientInfo":{"name":"claude-code","version":"1.0.0"}}}
 
 ← {"jsonrpc":"2.0","id":1,"result":{
-    "protocolVersion":"2024-11-05",
+    "protocolVersion":"2025-11-25",
     "capabilities":{"tools":{}},
     "serverInfo":{"name":"claudebin","version":"1.0.0"}}}
 
@@ -230,11 +230,11 @@ Stay curious ☕
 
 <a id="ref-1"></a>[1] JSON-RPC 2.0 Specification — [jsonrpc.org/specification](https://www.jsonrpc.org/specification)
 
-<a id="ref-2"></a>[2] MCP Specification: Transports — [spec.modelcontextprotocol.io/specification/2024-11-05/basic/transports](https://spec.modelcontextprotocol.io/specification/2024-11-05/basic/transports/)
+<a id="ref-2"></a>[2] MCP Specification: Transports — [modelcontextprotocol.io/specification/2025-11-25/basic/transports](https://modelcontextprotocol.io/specification/2025-11-25/basic/transports)
 
-<a id="ref-3"></a>[3] MCP Specification: Lifecycle — [spec.modelcontextprotocol.io/specification/2024-11-05/basic/lifecycle](https://spec.modelcontextprotocol.io/specification/2024-11-05/basic/lifecycle/)
+<a id="ref-3"></a>[3] MCP Specification: Lifecycle — [modelcontextprotocol.io/specification/2025-11-25/basic/lifecycle](https://modelcontextprotocol.io/specification/2025-11-25/basic/lifecycle)
 
-<a id="ref-4"></a>[4] MCP Specification: Tools — [spec.modelcontextprotocol.io/specification/2024-11-05/server/tools](https://spec.modelcontextprotocol.io/specification/2024-11-05/server/tools/)
+<a id="ref-4"></a>[4] MCP Specification: Tools — [modelcontextprotocol.io/specification/2025-11-25/server/tools](https://modelcontextprotocol.io/specification/2025-11-25/server/tools)
 
 <a id="ref-5"></a>[5] Claudebin source code — [github.com/wunderlabs-dev/claudebin](https://github.com/wunderlabs-dev/claudebin)
 
