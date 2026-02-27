@@ -21,7 +21,7 @@ I build agentic programming tools. 15+ years of systems infrastructure experienc
 
 ### MCP Is Great for Tools. Terrible for Agents.
 
-- **URL**: https://blog.vtemian.com/post/building-mcp-plugin-claudebin/
+- **URL**: https://blog.vtemian.com/post/mcp-is-great-for-tools-terrible-for-agents/
 - **Published**: February 27, 2026
 - **Word Count**: 1769 words
 - **Tags**: mcp, agentic-programming, typescript, deep-dive
