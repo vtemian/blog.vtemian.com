@@ -86,11 +86,6 @@ def measure_block(draw, title, description, reading_time, fonts):
         total += (bbox[3] - bbox[1]) + 8
     total += 16  # gap after title
 
-    # Reading time pill
-    rt_text = f"{reading_time} min read"
-    rt_bbox = draw.textbbox((0, 0), rt_text, font=font_meta)
-    total += (rt_bbox[3] - rt_bbox[1]) + 14 + 16  # pill height + gap
-
     # Description
     if description:
         wrapped_desc = textwrap.wrap(description, width=60)
@@ -131,19 +126,6 @@ def generate_og(title, description, reading_time, output_path):
         y = bbox[3] + 8
     y += 16
 
-    # Reading time pill
-    rt_text = f"{reading_time} min read"
-    rt_bbox = draw.textbbox((0, 0), rt_text, font=font_meta)
-    rt_w = rt_bbox[2] - rt_bbox[0] + 20
-    rt_h = rt_bbox[3] - rt_bbox[1] + 12
-    draw.rounded_rectangle(
-        [(left, y), (left + rt_w, y + rt_h)],
-        radius=4,
-        fill=ACCENT_COLOR,
-    )
-    draw.text((left + 10, y + 4), rt_text, font=font_meta, fill=(255, 255, 255))
-    y += rt_h + 16
-
     # Description
     if description:
         wrapped_desc = textwrap.wrap(description, width=60)
@@ -162,10 +144,14 @@ def generate_og(title, description, reading_time, output_path):
         img.paste(avatar, (left, y), mask)
         draw.text((left + 55, y + 10), AUTHOR_NAME, font=font_author, fill=TITLE_COLOR)
 
-        # Dot separator + URL
+        # Dot separator + URL + reading time
         name_bbox = draw.textbbox((left + 55, y + 10), AUTHOR_NAME, font=font_author)
         dot_x = name_bbox[2] + 16
-        draw.text((dot_x, y + 10), f"·  {BLOG_URL}", font=font_author, fill=URL_COLOR)
+        url_text = f"·  {BLOG_URL}"
+        draw.text((dot_x, y + 10), url_text, font=font_author, fill=URL_COLOR)
+        url_bbox = draw.textbbox((dot_x, y + 10), url_text, font=font_author)
+        rt_x = url_bbox[2] + 16
+        draw.text((rt_x, y + 10), f"·  {reading_time} min read", font=font_author, fill=URL_COLOR)
 
     img.save(output_path, "PNG")
 
