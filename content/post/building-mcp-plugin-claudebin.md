@@ -163,7 +163,7 @@ In Claude Code, the slash command is natural language that Claude *interprets*. 
 | Debug experience      | Multi-layer, stderr only   | Standard debugging              |
 | Latency overhead      | ~1-2s (model thinking)     | Negligible                      |
 
-MCP earns its keep on language agnosticism and ecosystem portability. Claudebin is TypeScript. My [booking-mcp](https://github.com/vtemian/dd/tree/main/tools/booking-mcp) and [whoop-mcp](https://github.com/vtemian/dd/tree/main/tools/whoop-mcp) servers are Python with Playwright. MCP doesn't care. OpenCode plugins must be JS/TS compiled for Bun.
+MCP earns its keep on language agnosticism and ecosystem portability. Claudebin is TypeScript. I've also built MCP servers in Python with Playwright for browser automation. MCP doesn't care what language you use. OpenCode plugins must be JS/TS compiled for Bun.
 
 Process isolation matters too. An MCP server that crashes doesn't take down Claude Code. A segfaulting native module in an OpenCode plugin kills the entire process.
 
@@ -173,7 +173,7 @@ But the developer experience is worse. When your tool doesn't receive the right 
 
 MCP is the right choice when you value portability over performance. It's the wrong choice when you need tight integration, state sharing, and deterministic dispatch.
 
-I've shipped 3 MCP servers and an OpenCode plugin with 22 agents. If a tool needs to work across editors, MCP is the only game in town. If it only needs one platform, skip the protocol and go direct.
+I've shipped multiple MCP servers and an OpenCode plugin with 22 agents. If a tool needs to work across editors, MCP is the only game in town. If it only needs one platform, skip the protocol and go direct.
 
 MCP is to agent tooling what REST was to web services in 2008. Verbose, imperfect, too much ceremony for simple cases. But it's becoming the standard. Building against a standard, even an imperfect one, compounds over time.
 
