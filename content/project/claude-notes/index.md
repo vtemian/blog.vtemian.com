@@ -18,8 +18,6 @@ tags:
     - open-source
 ---
 
-{{< github-stats repo="vtemian/claude-notes" >}}
-
 I wanted to send a Claude Code session to a colleague. Show them the back-and-forth, the tool calls, how we solved a tricky bug together. But Claude Code stores everything as JSONL in `~/.claude/projects/`. Raw JSON lines. Not something you can just send to someone.
 
 So I built **[claude-notes](https://github.com/vtemian/claude-notes)**.

@@ -1,66 +1,106 @@
 {{ define "content" }}
 
-{{ $github := resources.Get "images/github.png" }}
-{{ $linkedin := resources.Get "images/linkedin.png" }}
-{{ $twitter := resources.Get "images/x.png" }}
-{{ $rss := resources.Get "images/rss.png" }}
+<div class="max-w-xl mx-auto py-12 px-5 flex flex-col gap-12">
 
-<div class="container">
-    <aside class="author">
-        <h1>{{ .Site.Params.author }} </h1>
-        <p class="social">
-            <a href="https://github.com/vtemian">
-                <img src="{{ $github.RelPermalink }}" alt="github" />
-            </a>
+    <svg width="0" height="0" class="absolute">
+        <defs>
+            <clipPath id="squircle" clipPathUnits="objectBoundingBox">
+                <path d="M0 0.5C-0.001 0.14 0.14 0 0.5 0C0.86 0 1.001 0.14 1 0.5C1.001 0.86 0.86 1 0.5 1C0.14 1 -0.001 0.86 0 0.5Z" />
+            </clipPath>
+        </defs>
+    </svg>
 
-            <a href="https://www.linkedin.com/in/vtemian">
-                <img src="{{ $linkedin.RelPermalink }}" alt="linkedin" />
-            </a>
+    <section class="flex items-center gap-4">
+        <img src="https://qed.builders/images/team/vlad-temian@2x.png" alt="Vlad Temian" class="w-14 h-14" style="clip-path: url(#squircle)">
+        <div>
+            <p>Vlad Temian</p>
+            <p>Chief Technology Officer</p>
+        </div>
+    </section>
 
-            <a href="https://www.twitter.com/vtemian">
-                <img src="{{ $twitter.RelPermalink }}" alt="twitter" />
-            </a>
+    <section>
+        <h2 class="font-mono text-xs text-muted tracking-wide mb-4">About</h2>
+        <p>I build agentic programming tools.</p>
+        <br>
+        <p>15+ years helping startups scale production infrastructure.</p>
+        <p>Former CTO of <a href="https://www.linkedin.com/company/qed-builders-software/" target="_blank" rel="noopener noreferrer" class="text-link border-b border-b-link-border hover:text-ink hover:border-b-ink transition-all duration-200 ease-out pb-0.5">qed.builders</a> (acquired by <a href="https://www.linkedin.com/company/thesandbox-game/" target="_blank" rel="noopener noreferrer" class="text-link border-b border-b-link-border hover:text-ink hover:border-b-ink transition-all duration-200 ease-out pb-0.5">The Sandbox</a>). Organizer at <a href="https://agentic.tm" target="_blank" rel="noopener noreferrer" class="text-link border-b border-b-link-border hover:text-ink hover:border-b-ink transition-all duration-200 ease-out pb-0.5">agentic.tm</a>. <a href="https://cursor.com" target="_blank" rel="noopener noreferrer" class="text-link border-b border-b-link-border hover:text-ink hover:border-b-ink transition-all duration-200 ease-out pb-0.5">Cursor</a> ambassador.</p>
+        <br>
+        <p>I believe everyone should be able to ship ideas.</p>
+    </section>
 
-            <a href="index.xml">
-                <img src="{{ $rss.RelPermalink }}" alt="rss" />
-            </a>
-
-            <a href="/resume.pdf" class="resume">
-                CV
-            </a>
-
-        </p>
-
-        <section class="about">
-            <p>I build <strong>agentic programming tools</strong>. 15+ years helping startups scale production infrastructure. Former <strong>CTO</strong> of <a href="https://www.linkedin.com/company/qed-builders-software/" target="_blank" rel="noopener noreferrer">qed.builders</a> (acquired by <a href="https://www.linkedin.com/company/thesandbox-game/" target="_blank" rel="noopener noreferrer">The Sandbox</a>). Organizer at <a href="https://agentic.tm" target="_blank" rel="noopener noreferrer"><strong>agentic.tm</strong></a>. <a href="https://cursor.com" target="_blank" rel="noopener noreferrer"><strong>Cursor</strong></a> ambassador. I believe everyone should be able to ship ideas.</p>
-        </section>
-
-    </aside>
-
-    {{/* Collect all content types */}}
-    {{ $posts := where .Site.RegularPages "Section" "post" }}
-    {{ $talks := where .Site.RegularPages "Section" "talk" }}
-    {{ $projects := where .Site.RegularPages "Section" "project" }}
-
-    {{/* Merge and sort by date */}}
-    {{ $all := $posts | union $talks | union $projects }}
-
-    <main class="feed">
+    <section>
+        <h2 class="font-mono text-xs text-muted tracking-wide mb-4">Writing</h2>
+        {{ $posts := where .Site.RegularPages "Section" "post" }}
+        {{ $talks := where .Site.RegularPages "Section" "talk" }}
+        {{ $projects := where .Site.RegularPages "Section" "project" }}
+        {{ $all := $posts | union $talks | union $projects }}
+        <div class="relative flex flex-col gap-1" id="writing-list">
+        <div id="writing-highlight" class="absolute bg-surface rounded-lg pointer-events-none opacity-0 transition-all duration-150"></div>
         {{ range $all.ByDate.Reverse }}
-        <article class="feed-item feed-item--{{ .Section }}">
-            <span class="feed-item__badge">{{ .Section }}</span>
-            <a href="{{ .RelPermalink }}" class="feed-item__link">
-                <div class="feed-item__content">
-                    <h2 class="feed-item__title">{{ .Title }}</h2>
-                    {{ with .Params.description }}
-                    <p class="feed-item__description">{{ . }}</p>
-                    {{ end }}
-                    <time class="feed-item__date">{{ .Date.Format "02 Jan 2006" }}</time>
-                </div>
-            </a>
-        </article>
+        <a href="{{ .RelPermalink }}" class="flex justify-between items-center gap-4 -mx-3 px-3 py-2 rounded-lg relative">
+            <div class="min-w-0">
+                <h3 class="truncate">{{ .Title }}</h3>
+                <p class="text-link text-xs">{{ .Date.Format "January 2006" }}</p>
+            </div>
+            <span class="text-xs text-muted border border-border rounded px-2 py-0.5 shrink-0 capitalize">{{ .Section }}</span>
+        </a>
         {{ end }}
-    </main>
+        </div>
+        <script>
+        (() => {
+            const list = document.getElementById('writing-list');
+            const highlight = document.getElementById('writing-highlight');
+
+            const positionHighlight = (item) => {
+                const { top, left, width, height } = item.getBoundingClientRect();
+                const parent = list.getBoundingClientRect();
+
+                Object.assign(highlight.style, {
+                    top: `${top - parent.top}px`,
+                    left: `${left - parent.left}px`,
+                    width: `${width}px`,
+                    height: `${height}px`,
+                });
+
+                highlight.classList.remove('opacity-0');
+                highlight.classList.add('opacity-100');
+            };
+
+            const hideHighlight = () => {
+                highlight.classList.remove('opacity-100');
+                highlight.classList.add('opacity-0');
+            };
+
+            list.querySelectorAll('a').forEach((item) => {
+                item.addEventListener('mouseenter', () => positionHighlight(item));
+            });
+
+            list.addEventListener('mouseleave', hideHighlight);
+        })();
+        </script>
+    </section>
+
+    <section>
+        <h2 class="font-mono text-xs text-muted tracking-wide mb-4">Contact</h2>
+        <div class="flex flex-col gap-2">
+            <div class="grid grid-cols-12 gap-2">
+                <span class="text-muted col-span-4">Email</span>
+                <a href="mailto:vlad@vtemian.com" class="col-span-8">vlad@vtemian.com</a>
+            </div>
+            <div class="grid grid-cols-12 gap-2">
+                <span class="text-muted col-span-4">LinkedIn</span>
+                <a href="https://www.linkedin.com/in/vtemian" class="col-span-8">/in/vtemian</a>
+            </div>
+            <div class="grid grid-cols-12 gap-2">
+                <span class="text-muted col-span-4">GitHub</span>
+                <a href="https://github.com/vtemian" class="col-span-8">vtemian</a>
+            </div>        
+            <div class="grid grid-cols-12 gap-2">
+                <span class="text-muted col-span-4">X</span>
+                <a href="https://www.twitter.com/vtemian" class="col-span-8">@vtemian</a>
+            </div>
+        </div>
+    </section>
 
     {{ partial "footer" .}}
 
