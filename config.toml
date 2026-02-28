@@ -1,6 +1,6 @@
 baseURL = "https://blog.vtemian.com/"
 languageCode = "en-us"
-title = "vtemian - blog"
+title = "Vlad Temian - Chief Technology Officer"
 enableRobotsTXT = true
 canonifyURLs = true
 metaDataFormat = "yaml"

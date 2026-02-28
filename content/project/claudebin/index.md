@@ -16,8 +16,6 @@ tags:
     - open-source
 ---
 
-{{< github-stats repo="wunderlabs-dev/claudebin.com" >}}
-
 <video controls playsinline width="100%" style="margin-bottom: 2rem;">
   <source src="demo.mp4" type="video/mp4">
 </video>

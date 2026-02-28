@@ -1,9 +1,9 @@
 {{ define "content" }}
 
-<div class="container">
-    <main class="article">
+<div class="max-w-xl mx-auto py-12 px-5">
+    <main>
         <header>
-            <a href="/">&larr; Go back</a>
+            <a href="/">Back</a>
             <h1>Talks</h1>
         </header>
 
@@ -11,19 +11,19 @@
         {{ $talksByYear := $talks.GroupByDate "2006" }}
 
         {{ range $talksByYear }}
-        <section class="talks-year">
+        <section>
             <h2>{{ .Key }}</h2>
-            <div class="talks-list">
+            <div>
                 {{ range .Pages.ByDate.Reverse }}
-                <article class="talk-item">
-                    <div class="talk-info">
+                <article>
+                    <div>
                         <a href="{{ .RelPermalink }}">{{ .Title }}</a>
-                        {{ with .Params.event }}<span class="talk-event">@ {{ . }}</span>{{ end }}
-                        <span class="talk-date">— {{ .Date.Format "January 2" }}</span>
+                        {{ with .Params.event }}<span>@ {{ . }}</span>{{ end }}
+                        <span>- {{ .Date.Format "January 2" }}</span>
                     </div>
-                    <div class="talk-links">
-                        {{ with .Params.slides }}<a href="{{ . }}" class="talk-link">slides</a>{{ end }}
-                        {{ with .Params.video }}<a href="{{ . }}" class="talk-link">video</a>{{ end }}
+                    <div>
+                        {{ with .Params.slides }}<a href="{{ . }}">slides</a>{{ end }}
+                        {{ with .Params.video }}<a href="{{ . }}">video</a>{{ end }}
                     </div>
                 </article>
                 {{ end }}

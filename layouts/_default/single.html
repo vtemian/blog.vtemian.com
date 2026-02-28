@@ -1,21 +1,15 @@
 {{ define "content" }}
-{{- $readingTime := math.Round (div .WordCount 200.0) }}
-{{- if lt $readingTime 1 }}{{ $readingTime = 1 }}{{ end }}
-
-<div class="container">
-    <main class="article">
-        <article>
-            <header>
-                <a href="/">&larr; Go back</a>
-                <h1>{{ .Title }}</h1>
-
-                <p class="article-date">{{ .Date.Format "02 Jan 2006" }} · {{ $readingTime }} min read</p>
-            </header>
-            <p>
-                {{ .Content }}
-            </p>
-        </article>
-    </main>
+<div class="max-w-2xl mx-auto py-12 px-5 flex flex-col gap-12">
+    <a href="/" class="font-mono text-xs text-muted tracking-wide">Back to home</a>
+    <article class="flex flex-col gap-12">
+        <header>
+            <h1 class="text-2xl">{{ .Title }}</h1>
+            <p class="text-link text-xs">{{ .Date.Format "January 2006" }}</p>
+        </header>
+        <div class="flex flex-col gap-4">
+            {{ .Content }}
+        </div>
+    </article>
     {{ partial "footer" .}}
 </div>
 
