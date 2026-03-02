@@ -228,18 +228,22 @@ Stay curious ☕
 
 ---
 
-**References**
+### References
 
-<a id="ref-1"></a>[1] JSON-RPC 2.0 Specification -[jsonrpc.org/specification](https://www.jsonrpc.org/specification)
+<div class="references">
 
-<a id="ref-2"></a>[2] MCP Specification: Transports -[modelcontextprotocol.io/specification/2025-11-25/basic/transports](https://modelcontextprotocol.io/specification/2025-11-25/basic/transports)
+<p id="ref-1"><span class="ref-num">[1]</span> JSON-RPC 2.0 Specification - <a href="https://www.jsonrpc.org/specification">jsonrpc.org/specification</a></p>
 
-<a id="ref-3"></a>[3] MCP Specification: Lifecycle -[modelcontextprotocol.io/specification/2025-11-25/basic/lifecycle](https://modelcontextprotocol.io/specification/2025-11-25/basic/lifecycle)
+<p id="ref-2"><span class="ref-num">[2]</span> MCP Specification: Transports - <a href="https://modelcontextprotocol.io/specification/2025-11-25/basic/transports">modelcontextprotocol.io/specification/2025-11-25/basic/transports</a></p>
 
-<a id="ref-4"></a>[4] MCP Specification: Tools -[modelcontextprotocol.io/specification/2025-11-25/server/tools](https://modelcontextprotocol.io/specification/2025-11-25/server/tools)
+<p id="ref-3"><span class="ref-num">[3]</span> MCP Specification: Lifecycle - <a href="https://modelcontextprotocol.io/specification/2025-11-25/basic/lifecycle">modelcontextprotocol.io/specification/2025-11-25/basic/lifecycle</a></p>
 
-<a id="ref-5"></a>[5] Claudebin source code -[github.com/wunderlabs-dev/claudebin](https://github.com/wunderlabs-dev/claudebin)
+<p id="ref-4"><span class="ref-num">[4]</span> MCP Specification: Tools - <a href="https://modelcontextprotocol.io/specification/2025-11-25/server/tools">modelcontextprotocol.io/specification/2025-11-25/server/tools</a></p>
 
-<a id="ref-6"></a>[6] JavaScript's internal character encoding: UCS-2 or UTF-16? -[mathiasbynens.be/notes/javascript-encoding](https://mathiasbynens.be/notes/javascript-encoding)
+<p id="ref-5"><span class="ref-num">[5]</span> Claudebin source code - <a href="https://github.com/wunderlabs-dev/claudebin">github.com/wunderlabs-dev/claudebin</a></p>
 
-<a id="ref-7"></a>[7] RFC 8628: OAuth 2.0 Device Authorization Grant -[datatracker.ietf.org/doc/html/rfc8628](https://datatracker.ietf.org/doc/html/rfc8628)
+<p id="ref-6"><span class="ref-num">[6]</span> JavaScript's internal character encoding: UCS-2 or UTF-16? - <a href="https://mathiasbynens.be/notes/javascript-encoding">mathiasbynens.be/notes/javascript-encoding</a></p>
+
+<p id="ref-7"><span class="ref-num">[7]</span> RFC 8628: OAuth 2.0 Device Authorization Grant - <a href="https://datatracker.ietf.org/doc/html/rfc8628">datatracker.ietf.org/doc/html/rfc8628</a></p>
+
+</div>

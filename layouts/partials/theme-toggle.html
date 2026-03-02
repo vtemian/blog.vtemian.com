@@ -1,0 +1,39 @@
+<button id="theme-toggle" aria-label="Toggle dark mode" class="relative flex h-8 w-8 cursor-pointer items-center justify-center text-muted transition-colors duration-200 hover:text-ink">
+    <svg id="icon-sun" class="absolute h-5 w-5 transition-all duration-300 ease-out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="5"/>
+        <line x1="12" y1="1" x2="12" y2="3"/>
+        <line x1="12" y1="21" x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1" y1="12" x2="3" y2="12"/>
+        <line x1="21" y1="12" x2="23" y2="12"/>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+    </svg>
+    <svg id="icon-moon" class="absolute h-5 w-5 transition-all duration-300 ease-out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+</button>
+
+<script>
+(() => {
+    const toggle = document.getElementById('theme-toggle');
+    const sun = document.getElementById('icon-sun');
+    const moon = document.getElementById('icon-moon');
+
+    const update = (dark) => {
+        sun.style.opacity = dark ? '1' : '0';
+        sun.style.transform = dark ? 'rotate(0deg)' : 'rotate(-90deg)';
+        moon.style.opacity = dark ? '0' : '1';
+        moon.style.transform = dark ? 'rotate(90deg)' : 'rotate(0deg)';
+    };
+
+    update(document.documentElement.classList.contains('dark'));
+
+    toggle.addEventListener('click', () => {
+        const dark = document.documentElement.classList.toggle('dark');
+        localStorage.setItem('theme', dark ? 'dark' : 'light');
+        update(dark);
+    });
+})();
+</script>

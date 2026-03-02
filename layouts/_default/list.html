@@ -1,6 +1,6 @@
 {{ define "content" }}
 
-<div class="max-w-xl mx-auto py-12 px-5 flex flex-col gap-12">
+<div class="mx-auto flex max-w-xl flex-col gap-12 px-5 py-12">
 
     <svg width="0" height="0" class="absolute">
         <defs>
@@ -11,39 +11,39 @@
     </svg>
 
     <section class="flex items-center gap-4">
-        <img src="https://qed.builders/images/team/vlad-temian@2x.png" alt="Vlad Temian" class="w-14 h-14" style="clip-path: url(#squircle)">
-        <div>
+        <img src="https://qed.builders/images/team/vlad-temian@2x.png" alt="Vlad Temian" class="h-14 w-14" style="clip-path: url(#squircle)">
+        <div class="flex-1">
             <p>Vlad Temian</p>
             <p>Centrist Tech Optimist</p>
         </div>
+        {{ partial "theme-toggle" . }}
     </section>
 
     <section>
-        <h2 class="font-mono text-xs text-muted tracking-wide mb-4">About</h2>
+        <h2 class="mb-4 font-mono text-xs tracking-wide text-muted">About</h2>
         <p>I build agentic programming tools.</p>
         <br>
-        <p>15+ years helping startups scale production infrastructure.
-        <br>Former CTO of <a href="https://www.linkedin.com/company/qed-builders-software/" target="_blank" rel="noopener noreferrer" class="text-link border-b border-b-link-border hover:text-ink hover:border-b-ink transition-all duration-200 ease-out pb-0.5">qed.builders</a> (acquired by <a href="https://www.linkedin.com/company/thesandbox-game/" target="_blank" rel="noopener noreferrer" class="text-link border-b border-b-link-border hover:text-ink hover:border-b-ink transition-all duration-200 ease-out pb-0.5">The Sandbox</a>).
-        <br>Organizer at <a href="https://agentic.tm" target="_blank" rel="noopener noreferrer" class="text-link border-b border-b-link-border hover:text-ink hover:border-b-ink transition-all duration-200 ease-out pb-0.5">agentic.tm</a>. <a href="https://cursor.com" target="_blank" rel="noopener noreferrer" class="text-link border-b border-b-link-border hover:text-ink hover:border-b-ink transition-all duration-200 ease-out pb-0.5">Cursor</a> ambassador.</p>
+        <p>15+ years helping startups scale production infrastructure.</p>
+        <p>Former CTO of <a href="https://www.linkedin.com/company/qed-builders-software/" target="_blank" rel="noopener noreferrer" class="border-b border-b-link-border pb-0.5 text-link transition-all duration-200 ease-out hover:border-b-ink hover:text-ink">qed.builders</a> (acquired by <a href="https://www.linkedin.com/company/thesandbox-game/" target="_blank" rel="noopener noreferrer" class="border-b border-b-link-border pb-0.5 text-link transition-all duration-200 ease-out hover:border-b-ink hover:text-ink">The Sandbox</a>). Organizer at <a href="https://agentic.tm" target="_blank" rel="noopener noreferrer" class="border-b border-b-link-border pb-0.5 text-link transition-all duration-200 ease-out hover:border-b-ink hover:text-ink">agentic.tm</a>. <a href="https://cursor.com" target="_blank" rel="noopener noreferrer" class="border-b border-b-link-border pb-0.5 text-link transition-all duration-200 ease-out hover:border-b-ink hover:text-ink">Cursor</a> ambassador.</p>
         <br>
         <p>I believe everyone should be able to ship ideas.</p>
     </section>
 
     <section>
-        <h2 class="font-mono text-xs text-muted tracking-wide mb-4">Writing</h2>
+        <h2 class="mb-4 font-mono text-xs tracking-wide text-muted">Writing</h2>
         {{ $posts := where .Site.RegularPages "Section" "post" }}
         {{ $talks := where .Site.RegularPages "Section" "talk" }}
         {{ $projects := where .Site.RegularPages "Section" "project" }}
         {{ $all := $posts | union $talks | union $projects }}
         <div class="relative flex flex-col gap-1" id="writing-list">
-        <div id="writing-highlight" class="absolute bg-surface rounded-lg pointer-events-none opacity-0 transition-all duration-150"></div>
+        <div id="writing-highlight" class="pointer-events-none absolute rounded-lg bg-surface opacity-0 transition-all duration-150"></div>
         {{ range $all.ByDate.Reverse }}
-        <a href="{{ .RelPermalink }}" class="flex justify-between items-center gap-4 -mx-3 px-3 py-2 rounded-lg relative">
+        <a href="{{ .RelPermalink }}" class="relative -mx-3 flex items-center justify-between gap-4 rounded-lg px-3 py-2 transition-colors duration-150">
             <div class="min-w-0">
                 <h3 class="truncate">{{ .Title }}</h3>
-                <p class="text-link text-xs">{{ .Date.Format "January 2006" }}</p>
+                <p class="text-xs text-link">{{ .Date.Format "January 2006" }}</p>
             </div>
-            <span class="text-xs text-muted border border-border rounded px-2 py-0.5 shrink-0 capitalize">{{ .Section }}</span>
+            <span class="shrink-0 rounded border border-border px-2 py-0.5 text-xs capitalize text-muted">{{ .Section }}</span>
         </a>
         {{ end }}
         </div>
@@ -82,22 +82,22 @@
     </section>
 
     <section>
-        <h2 class="font-mono text-xs text-muted tracking-wide mb-4">Contact</h2>
+        <h2 class="mb-4 font-mono text-xs tracking-wide text-muted">Contact</h2>
         <div class="flex flex-col gap-2">
             <div class="grid grid-cols-12 gap-2">
-                <span class="text-muted col-span-4">Email</span>
+                <span class="col-span-4 text-muted">Email</span>
                 <a href="mailto:me@vtemian.com" class="col-span-8">me@vtemian.com</a>
             </div>
             <div class="grid grid-cols-12 gap-2">
-                <span class="text-muted col-span-4">LinkedIn</span>
+                <span class="col-span-4 text-muted">LinkedIn</span>
                 <a href="https://www.linkedin.com/in/vtemian" class="col-span-8">/in/vtemian</a>
             </div>
             <div class="grid grid-cols-12 gap-2">
-                <span class="text-muted col-span-4">GitHub</span>
+                <span class="col-span-4 text-muted">GitHub</span>
                 <a href="https://github.com/vtemian" class="col-span-8">vtemian</a>
             </div>        
             <div class="grid grid-cols-12 gap-2">
-                <span class="text-muted col-span-4">X</span>
+                <span class="col-span-4 text-muted">X</span>
                 <a href="https://x.com/vtemian" class="col-span-8">@vtemian</a>
             </div>
         </div>
