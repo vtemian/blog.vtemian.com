@@ -2,6 +2,8 @@
 @source "../../layouts";
 @source "../../content";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-ink: #2c3b49;
   --color-muted: #60646F;
@@ -16,28 +18,40 @@
   --font-mono: "Geist Mono", ui-monospace, monospace;
 }
 
+.dark {
+  --color-ink: #EFEFEF;
+  --color-muted: #bec8de;
+  --color-border: #2e3038;
+  --color-surface: #1e2025;
+  --color-code-bg: #1e2025;
+  --color-code-border: #212224;
+  --color-bg: #151618;
+  --color-link: #7a8a9a;
+  --color-link-border: #212224;
+}
+
 pre code.hljs {
-  @apply rounded-none;
+  @apply rounded-none text-xs;
 }
 
 article div h1 {
-  @apply text-xl font-normal mt-6;
+  @apply mt-6 text-xl font-normal;
 }
 
 article div h2 {
-  @apply text-lg font-normal mt-6;
+  @apply mt-6 text-lg font-normal;
 }
 
 article div h3 {
-  @apply text-base font-normal mt-6;
+  @apply mt-6 text-base font-normal;
 }
 
 article div h4 {
-  @apply text-sm font-normal mt-6;
+  @apply mt-6 text-sm font-normal;
 }
 
 article div a {
-  @apply text-link border-b border-b-link-border hover:text-ink hover:border-b-ink transition-all duration-200 ease-out pb-0.5;
+  @apply border-b border-b-link-border pb-0.5 text-link transition-all duration-200 ease-out hover:border-b-ink hover:text-ink;
 }
 
 article div hr {
@@ -49,7 +63,7 @@ article div strong {
 }
 
 article div table {
-  @apply w-full border-separate border-spacing-0 overflow-hidden rounded-lg border border-link-border;
+  @apply w-full overflow-hidden border-separate border-spacing-0 rounded-lg border border-link-border;
 }
 
 article div th:not(:last-child),
@@ -72,7 +86,7 @@ article div td {
 }
 
 article div th {
-  @apply text-xs text-muted font-normal;
+  @apply font-normal text-xs text-muted;
 }
 
 article div tr {
@@ -84,13 +98,29 @@ article div tbody tr:hover {
 }
 
 article div ul {
-  @apply list-disc pl-5 flex flex-col gap-2;
+  @apply flex list-disc flex-col gap-2 pl-5;
 }
 
 article div ol {
-  @apply list-decimal pl-5 flex flex-col gap-2;
+  @apply flex list-decimal flex-col gap-2 pl-5;
+}
+
+article div sup {
+  @apply font-mono text-xs text-muted;
+}
+
+article div .mermaid {
+  @apply flex justify-center;
+}
+
+.references {
+  @apply flex flex-col gap-2 text-xs;
+}
+
+.references .ref-num {
+  @apply font-mono text-muted;
 }
 
 article div :not(pre) > code {
-  @apply whitespace-normal bg-code-bg border border-code-border break-words rounded px-0.5;
+  @apply break-words whitespace-normal rounded border border-code-border bg-code-bg px-0.5;
 }
