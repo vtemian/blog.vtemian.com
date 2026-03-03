@@ -265,7 +265,7 @@ Stay curious ☕
 - **Published**: February 18, 2026
 - **Word Count**: 1234 words
 - **Tags**: gpu programming, ai tools, webgpu, learning
-- **Summary**: Everyone talks about AI-assisted learning. Here's what it actually looks like. A 155-message journey from zero WebGPU knowledge to a working MNIST classifier, with the entire conversation captured and browsable.
+- **Summary**: Everyone talks about AI-assisted learning. Here's what it actually looks like. From zero WebGPU knowledge to a working MNIST classifier in 155 messages.
 
 
 Everyone has a story about how AI helped them learn something. "I asked ChatGPT to explain monads and it finally clicked." Cool. But where's the actual session? Where's the messy back-and-forth where you got confused, the AI corrected you, and you iterated until understanding emerged?
@@ -351,7 +351,7 @@ Stay curious ☕
 - **Published**: October 18, 2024
 - **Word Count**: 1746 words
 - **Tags**: blockchain, parallel blockchains, solana, sui, monad, sei, aptos, block-stm, state of parallel blockchains
-- **Summary**: This article explores parallel transaction execution in blockchain systems, explaining how blockchains like Solana, SUI, and Aptos handle transactions simultaneously to increase performance. It covers the differences between deterministic and optimistic methods, the challenges of conflict resolution, and how these approaches improve scalability and efficiency in blockchain technology.
+- **Summary**: How Solana, SUI, and Aptos execute transactions in parallel. Deterministic vs optimistic approaches, conflict resolution, and the trade-offs each design makes.
 
 
 In the last couple of years, we have seen the rise of [infrastructure](https://www.shoal.gg/p/parallel-execution-the-next-generation) projects in the blockchain space. One exciting development is [parallel blockchains](https://www.recvc.com/part-i-design-space-for-parallel-blockchains/), specifically those that execute a batch of transactions in parallel.
