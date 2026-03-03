@@ -1,7 +1,7 @@
 ---
 title: "Parallel Transaction Execution in Blockchains"
 date: 2024-10-18T15:32:57+02:00
-description: "This article explores parallel transaction execution in blockchain systems, explaining how blockchains like Solana, SUI, and Aptos handle transactions simultaneously to increase performance. It covers the differences between deterministic and optimistic methods, the challenges of conflict resolution, and how these approaches improve scalability and efficiency in blockchain technology."
+description: "How Solana, SUI, and Aptos execute transactions in parallel. Deterministic vs optimistic approaches, conflict resolution, and the trade-offs each design makes."
 keywords:
     - parallel blockchains
     - solana
