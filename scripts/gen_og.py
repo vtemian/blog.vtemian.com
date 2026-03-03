@@ -11,17 +11,16 @@ import glob
 import math
 import os
 import re
-import sys
 import textwrap
 
 from PIL import Image, ImageDraw, ImageFont
 
 # Blog color palette (from main.css)
-BG_COLOR = (241, 245, 249)       # --grey-lighter: #f1f5f9
-TITLE_COLOR = (30, 41, 59)       # --black: #1e293b
-DESC_COLOR = (100, 116, 139)     # --grey: #64748b
-ACCENT_COLOR = (59, 130, 246)    # --blue: #3b82f6
-URL_COLOR = (148, 163, 184)      # muted slate
+BG_COLOR = (252, 252, 252)       # --color-bg: #fcfcfc
+TITLE_COLOR = (44, 59, 73)       # --color-ink: #2c3b49
+DESC_COLOR = (96, 100, 111)      # --color-muted: #60646F
+MUTED_COLOR = (138, 153, 168)    # --color-link: #8a99a8
+BORDER_COLOR = (232, 232, 236)   # --color-border: #E8E8EC
 
 W, H = 1200, 630
 AVATAR_PATH = os.path.join(os.path.dirname(__file__), "avatar.png")
@@ -30,18 +29,19 @@ BLOG_URL = "blog.vtemian.com"
 OUTPUT_NAME = "og.png"
 
 
+FONTS_DIR = os.path.join(os.path.dirname(__file__), "fonts")
+
+
 def get_font(size, bold=False):
-    candidates = []
+    weight = "Bold" if bold else "Regular"
+    candidates = [
+        os.path.join(FONTS_DIR, f"Geist-{weight}.ttf"),              # bundled Geist
+        f"/usr/share/fonts/truetype/dejavu/DejaVuSans-{weight}.ttf", # Linux (CI)
+    ]
     if bold:
-        candidates = [
-            "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",  # Linux (CI)
-            "/System/Library/Fonts/Supplemental/Arial Bold.ttf",      # macOS
-        ]
+        candidates.append("/System/Library/Fonts/Supplemental/Arial Bold.ttf")
     else:
-        candidates = [
-            "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",       # Linux (CI)
-            "/System/Library/Fonts/Supplemental/Arial.ttf",           # macOS
-        ]
+        candidates.append("/System/Library/Fonts/Supplemental/Arial.ttf")
     for p in candidates:
         try:
             return ImageFont.truetype(p, size)
@@ -100,6 +100,15 @@ def measure_block(draw, title, description, reading_time, fonts):
     return total
 
 
+def make_squircle_mask(size, radius=10):
+    """Create a squircle (rounded-rect) alpha mask."""
+    mask = Image.new("L", (size, size), 0)
+    ImageDraw.Draw(mask).rounded_rectangle(
+        [(0, 0), (size - 1, size - 1)], radius=radius, fill=255
+    )
+    return mask
+
+
 def generate_og(title, description, reading_time, output_path):
     img = Image.new("RGB", (W, H), BG_COLOR)
     draw = ImageDraw.Draw(img)
@@ -108,9 +117,6 @@ def generate_og(title, description, reading_time, output_path):
     font_desc = get_font(24)
     font_meta = get_font(18)
     font_author = get_font(22)
-
-    # Left accent bar
-    draw.rectangle([(0, 0), (5, H)], fill=ACCENT_COLOR)
 
     # Measure content height for vertical centering
     total_h = measure_block(draw, title, description, reading_time,
@@ -135,23 +141,24 @@ def generate_og(title, description, reading_time, output_path):
             y = bbox[3] + 6
     y += 20
 
-    # Author row - avatar + name + URL, all on one line
+    # Author row - avatar + name + URL + reading time
     if os.path.exists(AVATAR_PATH):
         avatar = Image.open(AVATAR_PATH).convert("RGB")
         avatar = avatar.resize((44, 44), Image.LANCZOS)
-        mask = Image.new("L", (44, 44), 0)
-        ImageDraw.Draw(mask).ellipse((0, 0, 44, 44), fill=255)
+        mask = make_squircle_mask(44, radius=10)
         img.paste(avatar, (left, y), mask)
         draw.text((left + 55, y + 10), AUTHOR_NAME, font=font_author, fill=TITLE_COLOR)
 
-        # Dot separator + URL + reading time
         name_bbox = draw.textbbox((left + 55, y + 10), AUTHOR_NAME, font=font_author)
         dot_x = name_bbox[2] + 16
         url_text = f"·  {BLOG_URL}"
-        draw.text((dot_x, y + 10), url_text, font=font_author, fill=URL_COLOR)
+        draw.text((dot_x, y + 10), url_text, font=font_author, fill=MUTED_COLOR)
         url_bbox = draw.textbbox((dot_x, y + 10), url_text, font=font_author)
         rt_x = url_bbox[2] + 16
-        draw.text((rt_x, y + 10), f"·  {reading_time} min read", font=font_author, fill=URL_COLOR)
+        draw.text((rt_x, y + 10), f"·  {reading_time} min read", font=font_author, fill=MUTED_COLOR)
+
+    # Subtle bottom separator line
+    draw.line([(left, H - 30), (W - left, H - 30)], fill=BORDER_COLOR, width=1)
 
     img.save(output_path, "PNG")
 

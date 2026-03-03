@@ -32,11 +32,16 @@
 <meta property="og:type" content="website">
 {{- end }}
 
-{{/* Open Graph Image - use post image if available */}}
+{{/* Open Graph Image - use post image, fall back to generated og.png */}}
 {{- $ogImage := "" }}
 {{- with .Params.images }}
   {{- $firstImage := index . 0 }}
   {{- with $.Resources.GetMatch $firstImage }}
+    {{- $ogImage = .Permalink }}
+  {{- end }}
+{{- end }}
+{{- if not $ogImage }}
+  {{- with .Resources.GetMatch "og.png" }}
     {{- $ogImage = .Permalink }}
   {{- end }}
 {{- end }}
