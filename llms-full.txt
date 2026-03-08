@@ -264,16 +264,16 @@ Stay curious ☕
 
 - **URL**: https://blog.vtemian.com/post/vibe-infer/
 - **Published**: February 18, 2026
-- **Word Count**: 1263 words
-- **Tags**: gpu programming, ai tools, webgpu, learning
+- **Word Count**: 1558 words
+- **Tags**: gpu programming, ai tools, webgpu, wgsl, vibe-coding, learning
 - **Summary**: Everyone talks about AI-assisted learning. Here's what it actually looks like. From zero WebGPU knowledge to a working MNIST classifier in 155 messages.
 
 
-Everyone has a story about how AI helped them learn something. "I asked ChatGPT to explain monads and it finally clicked." Cool. But where's the actual session? Where's the messy back-and-forth where you got confused, the AI corrected you, and you iterated until understanding emerged?
+Everyone has a story about how AI helped them learn something. "I asked ChatGPT to explain monads and it finally clicked." But these stories are almost always sanitized after the fact. You get the polished takeaway, but you lose the "messy middle"—the confusion, the corrections, and the specific failure modes that actually lead to understanding.
 
-Most AI-assisted learning stories are sanitized after the fact. You get the polished takeaway, not the process. The repo is called [vibe-infer](https://github.com/vtemian/vibe-infer) and that's intentional irony, because what happened here is the opposite of vibe coding. I wrote every line of GPU code. The AI was my tutor, not my ghostwriter.
+This post is the opposite of the "vibe coding" trend where the AI writes the code and you just ship it. I call this repo [vibe-infer](https://github.com/vtemian/vibe-infer) as a piece of intentional irony. I wrote every single line of GPU code. The AI was my tutor, not my ghostwriter.
 
-This article shows the receipts. 155 messages, captured in full, from zero WebGPU knowledge to a working MNIST classifier running compute shaders in the browser.
+This is the receipt: 155 messages, captured in full, from zero WebGPU knowledge to a working MNIST classifier running compute shaders in the browser.
 
 ## Why GPU Programming?
 
@@ -299,7 +299,40 @@ With the ground rules set, three dynamics emerged.
 
 ## The Journey: 8 Lessons from Zero to Inference
 
-The session naturally organized itself into eight progressive lessons.
+The session naturally organized itself into eight progressive lessons, each building on the last until I had a full neural network running on the GPU.
+
+### **The Softmax Wall: A Deep Dive into WGSL**
+
+The hardest part wasn't the matrix multiplication; it was Softmax. Unlike a simple ReLU, where every thread is independent, Softmax requires every output element to know about every *other* element in the vector.
+
+On a CPU, this is a simple loop. On a GPU, you have to worry about numerical stability. If you naively exponentiate a value like `80`, you get a number larger than the maximum value for a 32-bit float. The entire network collapses into `NaN`.
+
+I had to implement a **numerically stable Softmax**, which involves finding the maximum value in a vector first, subtracting it from every element, and *then* exponentiating. This is how the actual WGSL kernel looks:
+
+```wgsl
+@compute @workgroup_size(64)
+fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
+    let i = global_id.x;
+    if (i >= params.input_size) { return; }
+
+    // 1. Find max (for numerical stability)
+    var max_val = -3.402823466e+38f; // min float
+    for (var k = 0u; k < params.input_size; k = k + 1u) {
+        max_val = max(max_val, input[k]);
+    }
+
+    // 2. Compute sum of exponentials
+    var sum = 0.0f;
+    for (var k = 0u; k < params.input_size; k = k + 1u) {
+        sum = sum + exp(input[k] - max_val);
+    }
+
+    // 3. Normalize and output
+    output[i] = exp(input[i] - max_val) / sum;
+}
+```
+
+This isn't the most optimized way to do it (a parallel reduction would be faster), but it's the version where I finally understood how GPU memory barriers and float limits work. Claude didn't just give me this code; it watched me struggle with `NaN` outputs for thirty messages until I understood *why* I needed the `max_val` subtraction.
 
 It started with **WebGPU Bootstrap**: acquiring a GPU adapter and device. The "hello world" of GPU programming. Then a **First Compute Shader** that added two numbers on the GPU. Simple, but it proved the entire pipeline worked: buffer creation, shader compilation, command encoding, dispatch, and result readback.
 
