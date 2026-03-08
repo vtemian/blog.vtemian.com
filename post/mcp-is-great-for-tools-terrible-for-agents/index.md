@@ -10,9 +10,9 @@ tags: [mcp, agentic-programming, typescript, deep-dive]
 # MCP Is Great for Tools. Terrible for Agents.
 
 
-I built [Claudebin](https://claudebin.com) because I was tired of losing the "messy middle" of my Claude Code sessions. You debug a race condition, the agent rewrites three files, and the transcript is gone the moment you close the terminal. Claudebin turns those ephemeral sessions into shareable URLs. Run `/claudebin:share`, and you get a permanent link to the exact moment things clicked.
+We (Balaj Marius and I) built [Claudebin](https://claudebin.com) because we were tired of losing the "messy middle" of our Claude Code sessions. You debug a race condition, the agent rewrites three files, and the transcript is gone the moment you close the terminal. Claudebin turns those ephemeral sessions into shareable URLs. Run `/claudebin:share`, and you get a permanent link to the exact moment things clicked.
 
-But this post isn't just about the tool. It's about what I learned while building an MCP server from scratch, the hidden frustrations of the JSON-RPC stream, and a fundamental realization: the Model Context Protocol (MCP) is the right model for tools, but it might be the wrong one for agents.
+But this post isn't just about the tool. It's about what we learned while building an MCP server from scratch, the hidden frustrations of the JSON-RPC stream, and a fundamental realization: the Model Context Protocol (MCP) is the right model for tools, but it might be the wrong one for agents.
 
 **TL;DR**
 

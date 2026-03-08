@@ -3,32 +3,27 @@ title: "Riding Existing Waves: My Indie Hacking Journey with Sisif.ai"
 date: 2026-01-22
 author: Vlad Temian
 url: https://blog.vtemian.com/talk/indie-hacking-update/
-description: "How I went from 0 paying customers to growing MRR by abandoning traditional marketing and riding existing distribution waves"
-tags: [indie-hacking, saas, ai, marketing]
-event: "Indie TM #2"
+description: "How I went from 0 to growing MRR by abandoning traditional marketing and riding existing distribution waves. A former CTO's lesson in Platform-Led Growth."
+tags: [indie-hacking, saas, marketing, distribution, strategy]
 ---
 
 # Riding Existing Waves: My Indie Hacking Journey with Sisif.ai
 
 
-I sold my company in late 2024. After 15 years of building production code, being CTO at QED (acquired by The Sandbox), and working with companies like Gorgias, I had one clear lesson: **product drives value, not technical implementation**.
+After 15 years of building production infrastructure—including a stint as CTO at QED (acquired by The Sandbox)—I thought I knew how to build a product. I was wrong. I knew how to build *systems*, but I had zero idea how to build *distribution*.
 
-So I started a side project. Something I could build and ship fast. Something that solves a real problem.
+This talk is the story of **sisif.ai**, and how I had to unlearn everything about being a CTO to find my first paying customers.
 
-## The Side Project: Sisif.ai
+## The CTO's Unlearning: Distribution > Technicality
 
-**[sisif.ai](https://sisif.ai)** is an AI video generation API. Text prompt in, video out. Simple.
+Coming from a high-scale engineering background, my instinct was to "over-build." I wanted clean code, perfect infrastructure, and a robust CI/CD pipeline. But in the world of indie hacking, **nobody cares about your unit test coverage if you have zero customers.**
 
-![Sisif.ai demo](sisif-scroll.gif)
+I had to shift my mindset from **Technical-First** to **Distribution-First**. My "CTO brain" told me to optimize the video rendering engine; my "Founder brain" told me to find a way to get the product in front of people who were already looking for it. 
 
-Most AI video tools are built for clicking around in browsers. But developers want to automate — batch generation, workflow integration, programmatic control. That's the gap I saw.
-
-Three steps: submit a text prompt, receive a webhook when it's done, download your video. Multiple resolutions. Pay per use, no subscription required.
-
-I started building in December 2024 and launched in early 2025. Built it with **SaaS Pegasus**, a Django boilerplate by Cory Zue — who's been building in public since 2017 and runs at a $122/hour effective rate. No AI coding agents for this one. Just good old Django.
+The lesson: **Distribution is the only feature that matters when you're at zero.**
 
 ## The Marketing Playbook (That Didn't Work)
-
+...
 I did everything the indie hacking playbook says:
 
 - **Twitter/X content** — posted regularly, shared progress
@@ -74,10 +69,17 @@ I published **2 workflow templates** on the n8n creator hub:
 1. **TikTok video creation pipeline** — GPT-4o-mini generates the script, Sisif.ai creates the video, posts automatically
 2. **Instagram Reels automation** — same stack, different output format
 
+## Platform-Led Growth: The "External SEO" Play
+
+The **n8n template strategy** was my breakthrough. Instead of waiting for Google to index a new domain, I used **Platform-Led Growth (PLG)**.
+
+I published workflow templates on the n8n creator hub that solved specific problems: TikTok automation and Instagram Reels. This isn't just distribution; it's **External SEO**. n8n already ranks for these keywords. By placing my product *inside* their marketplace, I bypassed the "Google Sandbox" period and started getting thousands of views overnight.
+
 ![n8n TikTok workflow](n8n-tiktok-workflow.png)
 
-The results? **15,000 views** on the TikTok template. **4,000 views** on the Instagram one. That's **19,000 eyeballs** on my product — more than I'd get from years of tweeting.
+This is the **"Ride Existing Waves"** philosophy in practice. Instead of building an audience from zero, you tap into established ecosystems where your users are already looking for solutions.
 
+...
 These aren't vanity metrics. n8n users are exactly my target audience: developers and technical founders who want to automate video creation. They're already in a buying mindset — they're looking for tools to plug into their workflows.
 
 The conversion funnel is simple: user discovers template → tries it → needs API access → signs up for Sisif.ai. No cold outreach. No content calendar. No algorithm to game.

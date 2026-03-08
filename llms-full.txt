@@ -23,14 +23,14 @@ I build agentic programming tools. 15+ years of systems infrastructure experienc
 
 - **URL**: https://blog.vtemian.com/post/mcp-is-great-for-tools-terrible-for-agents/
 - **Published**: February 27, 2026
-- **Word Count**: 1864 words
+- **Word Count**: 1868 words
 - **Tags**: mcp, agentic-programming, typescript, deep-dive
 - **Summary**: Building claudebin as an MCP server for Claude Code. JSON-RPC protocol, session extraction, device auth, and an honest comparison with OpenCode's plugin model.
 
 
-I built [Claudebin](https://claudebin.com) because I was tired of losing the "messy middle" of my Claude Code sessions. You debug a race condition, the agent rewrites three files, and the transcript is gone the moment you close the terminal. Claudebin turns those ephemeral sessions into shareable URLs. Run `/claudebin:share`, and you get a permanent link to the exact moment things clicked.
+We (Balaj Marius and I) built [Claudebin](https://claudebin.com) because we were tired of losing the "messy middle" of our Claude Code sessions. You debug a race condition, the agent rewrites three files, and the transcript is gone the moment you close the terminal. Claudebin turns those ephemeral sessions into shareable URLs. Run `/claudebin:share`, and you get a permanent link to the exact moment things clicked.
 
-But this post isn't just about the tool. It's about what I learned while building an MCP server from scratch, the hidden frustrations of the JSON-RPC stream, and a fundamental realization: the Model Context Protocol (MCP) is the right model for tools, but it might be the wrong one for agents.
+But this post isn't just about the tool. It's about what we learned while building an MCP server from scratch, the hidden frustrations of the JSON-RPC stream, and a fundamental realization: the Model Context Protocol (MCP) is the right model for tools, but it might be the wrong one for agents.
 
 **TL;DR**
 
@@ -264,7 +264,7 @@ Stay curious ☕
 
 - **URL**: https://blog.vtemian.com/post/vibe-infer/
 - **Published**: February 18, 2026
-- **Word Count**: 1558 words
+- **Word Count**: 1559 words
 - **Tags**: gpu programming, ai tools, webgpu, wgsl, vibe-coding, learning
 - **Summary**: Everyone talks about AI-assisted learning. Here's what it actually looks like. From zero WebGPU knowledge to a working MNIST classifier in 155 messages.
 
@@ -372,7 +372,7 @@ Digit 7, classified at 99.95% confidence. Eight lessons of compute shaders, buff
 
 You can [try the live demo](https://vtemian.github.io/vibe-infer/) or browse [the source code](https://github.com/vtemian/vibe-infer). Every GPU line was written by hand. The repo includes a [LESSONS.md](https://github.com/vtemian/vibe-infer/blob/main/LESSONS.md) file summarizing what each lesson covered.
 
-The entire 155-message session is captured and browsable at [claudebin.com](https://claudebin.com/threads/jmdbMowNTz). I built [claudebin](https://github.com/wunderlabs-dev/claudebin.com) with [Marius](https://github.com/balajmarius) as an open-source tool for sharing Claude Code sessions. If you're using Claude Code and want to share a session with your team or publicly, it's one command to publish and get a shareable link.
+The entire 155-message session is captured and browsable at [claudebin.com](https://claudebin.com/threads/jmdbMowNTz). I built [claudebin](https://github.com/wunderlabs-dev/claudebin.com) with [Balaj Marius](https://balajmarius.com/) as an open-source tool for sharing Claude Code sessions. If you're using Claude Code and want to share a session with your team or publicly, it's one command to publish and get a shareable link.
 
 Stay curious ☕
 
@@ -2633,28 +2633,23 @@ And this is the first step. Exposing myself to the Internet. To the people that 
 
 - **URL**: https://blog.vtemian.com/talk/indie-hacking-update/
 - **Date**: January 22, 2026
-- **Event**: Indie TM #2
-- **Summary**: How I went from 0 paying customers to growing MRR by abandoning traditional marketing and riding existing distribution waves
+- **Summary**: How I went from 0 to growing MRR by abandoning traditional marketing and riding existing distribution waves. A former CTO's lesson in Platform-Led Growth.
 
 
-I sold my company in late 2024. After 15 years of building production code, being CTO at QED (acquired by The Sandbox), and working with companies like Gorgias, I had one clear lesson: **product drives value, not technical implementation**.
+After 15 years of building production infrastructure—including a stint as CTO at QED (acquired by The Sandbox)—I thought I knew how to build a product. I was wrong. I knew how to build *systems*, but I had zero idea how to build *distribution*.
 
-So I started a side project. Something I could build and ship fast. Something that solves a real problem.
+This talk is the story of **sisif.ai**, and how I had to unlearn everything about being a CTO to find my first paying customers.
 
-## The Side Project: Sisif.ai
+## The CTO's Unlearning: Distribution > Technicality
 
-**[sisif.ai](https://sisif.ai)** is an AI video generation API. Text prompt in, video out. Simple.
+Coming from a high-scale engineering background, my instinct was to "over-build." I wanted clean code, perfect infrastructure, and a robust CI/CD pipeline. But in the world of indie hacking, **nobody cares about your unit test coverage if you have zero customers.**
 
-![Sisif.ai demo](sisif-scroll.gif)
+I had to shift my mindset from **Technical-First** to **Distribution-First**. My "CTO brain" told me to optimize the video rendering engine; my "Founder brain" told me to find a way to get the product in front of people who were already looking for it. 
 
-Most AI video tools are built for clicking around in browsers. But developers want to automate — batch generation, workflow integration, programmatic control. That's the gap I saw.
-
-Three steps: submit a text prompt, receive a webhook when it's done, download your video. Multiple resolutions. Pay per use, no subscription required.
-
-I started building in December 2024 and launched in early 2025. Built it with **SaaS Pegasus**, a Django boilerplate by Cory Zue — who's been building in public since 2017 and runs at a $122/hour effective rate. No AI coding agents for this one. Just good old Django.
+The lesson: **Distribution is the only feature that matters when you're at zero.**
 
 ## The Marketing Playbook (That Didn't Work)
-
+...
 I did everything the indie hacking playbook says:
 
 - **Twitter/X content** — posted regularly, shared progress
@@ -2700,10 +2695,17 @@ I published **2 workflow templates** on the n8n creator hub:
 1. **TikTok video creation pipeline** — GPT-4o-mini generates the script, Sisif.ai creates the video, posts automatically
 2. **Instagram Reels automation** — same stack, different output format
 
+## Platform-Led Growth: The "External SEO" Play
+
+The **n8n template strategy** was my breakthrough. Instead of waiting for Google to index a new domain, I used **Platform-Led Growth (PLG)**.
+
+I published workflow templates on the n8n creator hub that solved specific problems: TikTok automation and Instagram Reels. This isn't just distribution; it's **External SEO**. n8n already ranks for these keywords. By placing my product *inside* their marketplace, I bypassed the "Google Sandbox" period and started getting thousands of views overnight.
+
 ![n8n TikTok workflow](n8n-tiktok-workflow.png)
 
-The results? **15,000 views** on the TikTok template. **4,000 views** on the Instagram one. That's **19,000 eyeballs** on my product — more than I'd get from years of tweeting.
+This is the **"Ride Existing Waves"** philosophy in practice. Instead of building an audience from zero, you tap into established ecosystems where your users are already looking for solutions.
 
+...
 These aren't vanity metrics. n8n users are exactly my target audience: developers and technical founders who want to automate video creation. They're already in a buying mindset — they're looking for tools to plug into their workflows.
 
 The conversion funnel is simple: user discovers template → tries it → needs API access → signs up for Sisif.ai. No cold outreach. No content calendar. No algorithm to game.
@@ -2755,7 +2757,7 @@ Find me at [@vtemian](https://twitter.com/vtemian) or check out [sisif.ai](https
 
 - **URL**: https://blog.vtemian.com/talk/technical-debt-is-cheap/
 - **Date**: October 27, 2025
-- **Summary**: I gave myself 3 hours to see if AI coding tools could tackle a legacy Laravel app. Here's what actually happened.
+- **Summary**: Can AI tools tackle a 2,000-line legacy Laravel controller in 3 hours? A case study in AI-driven refactoring and modernizing technical debt.
 
 
 March 17th, 2025. My regular work was done for the day. I had three hours before I needed to stop.
@@ -2766,69 +2768,40 @@ But I had this project. The one everyone has. Making money for years, users depe
 
 So I pointed Claude Code at it. Not because I had to. Not because anyone asked. Just to see if the hype was real.
 
-## The Codebase
+## The Codebase: A Shared Trauma
 
-An old Laravel app. Controllers weren't controllers. They were novels. One function: **2,000 lines**. Files literally named `HomeController-2.php` and `HomeController - Copie.php`.
+The project was a classic legacy Laravel app—the kind that makes money, has real users, and keeps you awake at night. Controllers weren't controllers; they were **2,000-line novels**. 
 
-![Messy codebase with duplicate controllers](duplicates.png)
+- **Naming Chaos:** Files literally named `HomeController-2.php` and `HomeController - Copie.php`.
+- **Linguistic Debt:** Variables in Romanian (`$prenume_utilizator`), comments in English, and error messages in... who knows.
+- **Frontend Hell:** jQuery nested so deep it felt like a fractal. HTML strings embedded directly in PHP. One missing tag and the entire world explodes.
 
-![Thousands of lines in a single controller](monolith.png)
+No validation. No tests. Deployed via FTP. I'm not shaming this codebase—it was actually adding real value. But the interest on this technical debt was compounding every month.
 
-Variables in Romanian. Comments in English. Error messages in... who knows. HTML embedded directly in PHP strings. One missing closing tag and the entire page explodes.
+## The Three-Hour Transformation
 
-The frontend? jQuery callbacks nested so deep you need a map.
+I set a timer. Paid $20 for API tokens. No designer, no DevOps team. Just me and an agentic tool.
 
-![jQuery callback hell](callbacks.png)
+### 1. **Infrastructure: From FTP to Docker**
+Something that usually takes a full afternoon was done before I finished my first coffee. Dockerfiles, `docker-compose.yml`, and environment variable mapping appeared in minutes. We moved from "raw files on a server" to a modern, containerized local dev environment.
 
-No validation. No tests. Deployed via FTP.
+### 2. **Refactoring: Decomposing the Monolith**
+That 2,000-line controller? Claude analyzed the business logic, identified the boundaries, and split it into focused controllers and extracted service classes. It was like watching a sculptor carve a statue out of a block of marble. It translated the Romanian variables, added type hints, and generated clean doc blocks.
 
-I'm not shaming this project. It was adding real value. Making money. Serving users. I'd bet you have at least one codebase exactly like this. **Why fix something that's working, right?**
+### 3. **The Economics: Refactoring as a Commodity**
+This is the real takeaway: **AI has changed the interest rate on technical debt.** 
 
-That's the trap. Technical debt compounds. Every month it sits there, the cost of touching it grows.
+If the cost to fix a legacy app drops from "three weeks for a team" to "three hours for one person," then technical debt is no longer a scary liability—it's an asset you haven't processed yet. We can now afford to modernization projects that were previously too expensive to justify.
 
-## Three Hours
+...
 
-I paid $20 for API tokens. They didn't have subscriptions yet. Set a timer.
-
-**The deployment.** FTP. No containers, no version control for infrastructure, just raw files on a server. I asked Claude to modernize it. Within minutes: Docker setup, docker-compose, environment variables. Something that usually takes an afternoon was done before I finished my coffee.
-
-**The controllers.** That 2,000-line file? Authentication, business logic, database queries, email, PDF generation. All in one beautiful monument to "I'll refactor this later." Claude analyzed the structure, identified boundaries, split it into focused controllers, extracted service classes.
-
-![Clean architecture with service classes](services.png)
-
-I asked it to translate everything to English. `$prenume_utilizator` became `$userFirstName`. Functions got doc blocks. Type hints appeared everywhere.
-
-**The frontend.** jQuery spaghetti mixed with Blade templates mixed with inline PHP. Started conservative: "Extract this jQuery and add Tailwind." It worked. Then I pushed further: "Convert these to Vue."
-
-The Vue code wasn't perfect. Neither was the Tailwind. We were starting from jQuery callbacks and PHP-embedded HTML. But it worked. It was maintainable.
-
-![Modern Vue components](vue.png)
-
-I stopped after three hours. Looked at what we'd done. Modern dependencies. Running in Docker. Clean architecture. Readable code. **Way faster than before.**
-
-One guy. No designer. No DevOps team. No frontend specialist. **Three hours.**
-
-## What Happened Next
-
-I couldn't unsee it. Every abandoned project, every "we'll fix it later" codebase, every side project I'd shelved because "who has the time?" Suddenly felt possible.
-
-I forked **[gitfs](https://github.com/vtemian/gitfs)**, my oldest fun project. A FUSE filesystem in Python 2.7. No release for 6 years. Fuck it. Fire up Claude. In a week of evenings: Python 3, FUSE 3 support, released on Launchpad for Ubuntu and Debian.
-
-![GitFS v1.0.0 release](gitfs.png)
-
-Then new projects started flowing. **[sisif.ai](https://sisif.ai)** for AI video generation. **[cleaninvoices.com](https://cleaninvoices.com)** for invoice processing. **[vatguard.com](https://vatguard.com)** for VAT validation. **[formulare.ai](https://formulare.xyz)** for Romanian form generation. My GitHub graph lit up like a Christmas tree.
-
-![sisif.ai AI video generator](sisif.png)
-
-## The Catch
+## The "Human-in-the-Loop" Catch
 
 You still need to know what you're doing.
 
-Claude didn't replace my judgment. I made every architectural decision. I validated every change. I understood the domain. Someone without Laravel or Docker experience would have gotten plausible-looking garbage.
+AI tools amplify what you already know. They take the grunt work—the tedious refactoring, the boilerplate, the repetitive transformations—and compress hours into minutes. But Claude didn't replace my judgment. I made every architectural decision. I validated every change. 
 
-These tools amplify what you already know. They take the grunt work. The tedious refactoring, the boilerplate, the repetitive transformations. They compress hours into minutes. Solo developers can tackle projects that used to need teams.
-
-That's not hype. That's just math.
+Without senior Laravel or Docker experience, you'll just get plausible-looking garbage. But with it? You're a force multiplier of one.
 
 ---
 

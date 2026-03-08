@@ -46,7 +46,7 @@ This is the "messy middle" of building for agentic tools. claudebin handles the 
 - **MCP Server:** A Node.js plugin that Claude Code pipes JSON-RPC to over stdio.
 - **Title Generation:** An LLM pipeline analyzes the first few messages to generate a relevant, searchable title.
 
-Built by [Wunderlabs](https://github.com/wunderlabs-dev). Free, MIT licensed, not affiliated with Anthropic.
+Built by [Vlad Temian](https://vtemian.com) and [Balaj Marius](https://balajmarius.com/) at [Wunderlabs](https://github.com/wunderlabs-dev). Free, MIT licensed, not affiliated with Anthropic.
 
 **[Source on GitHub](https://github.com/wunderlabs-dev/claudebin.com)** | **[claudebin.com](https://claudebin.com)**
 
