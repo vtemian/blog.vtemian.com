@@ -3,8 +3,8 @@ title: "opencode-reskin: multi-agent CSS analysis for OpenCode"
 date: 2026-01-02
 author: Vlad Temian
 url: https://blog.vtemian.com/project/opencode-reskin/
-description: "An OpenCode plugin that analyzes a web project's visual styling and generates a concrete transformation plan to match a target design system. Three agents, zero guesswork."
-tags: [ai, tools, open-source]
+description: "opencode-reskin: Multi-agent CSS analysis and design system migration for OpenCode. Automatically generate a transformation plan to reskin any web project."
+tags: [ai, tools, open-source, agentic-programming, design-systems]
 ---
 
 # opencode-reskin: multi-agent CSS analysis for OpenCode
@@ -14,26 +14,32 @@ tags: [ai, tools, open-source]
   <source src="demo.mp4" type="video/mp4">
 </video>
 
-Reskinning a web project manually is tedious. You open the target design, then spend hours hunting through CSS files, Tailwind configs, and component styles, trying to figure out what needs to change and where. It's the kind of work that's simple in theory but death by a thousand paper cuts in practice.
+Reskinning a web project manually is "death by a thousand paper cuts." You spend hours hunting through Tailwind configs, global CSS files, and component-level styles, trying to figure out what needs to change to match a new design system. It's tedious, error-prone, and exactly the kind of work humans shouldn't be doing.
 
-**[opencode-reskin](https://github.com/vtemian/opencode-reskin)** automates the analysis and planning.
+**[opencode-reskin](https://github.com/vtemian/opencode-reskin)** automates the "archaeology" and planning.
 
-## One Command, Full Plan
+## One Command, Deterministic Plan
 
 ```bash
 /skin nof1
 ```
 
-That's it. The plugin scans your project's current styling, compares it against the target skin definition, and produces a markdown checklist of exact changes:
+The plugin scans your project, compares it against a target design system (skin), and produces a **concrete transformation plan**. No guesswork. No "maybe." You get a markdown checklist of exact changes:
+- `Change --background: #0f172a -> #ffffff in src/styles/globals.css`
+- `Change font-family: Inter -> IBM Plex Sans in tailwind.config.ts`
+- `Change border-radius: 0.5rem -> 0.25rem in src/components/Card.tsx`
 
-```
-Change --background: #0f172a -> #ffffff in src/styles/globals.css
-Change font-family: Inter -> IBM Plex Sans in tailwind.config.ts
-Change border-radius: 0.5rem -> 0.25rem in src/components/Card.tsx
-```
+## The Multi-Agent Strategy: Why it Matters
 
-It plans, it does not execute. You review the checklist, then apply the changes yourself or hand them off to another agent. Full control over what actually gets modified.
+A single LLM prompt often fails at large-scale design migrations because it can't hold the entire CSS/Component tree in context. **opencode-reskin** solves this by orchestrating three specialized agents:
 
+- **Style Analyzer**: Scans global CSS, Tailwind configs, and design tokens to build the "base" styling profile.
+- **Component Scanner**: Identifies UI patterns and framework-specific styling (e.g., Shadcn, Radix) to see how styles are actually consumed.
+- **The Orchestrator**: Compares both findings against the target skin and generates the final, unified checklist.
+
+By splitting the "Base CSS" from the "Component Consumption," the tool avoids the hallucinations common in single-agent architectures.
+
+...
 ## Three Agents Working in Parallel
 
 | Agent | Role |
