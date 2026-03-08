@@ -12,6 +12,6 @@
 
 {{ partial "seo_schema" . }}
 
-<title>{{.Title}}</title>
+<title>{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} | {{ .Site.Title }}{{ end }}</title>
 
 {{ partial "stylesheets.html" . }}

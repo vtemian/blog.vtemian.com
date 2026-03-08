@@ -20,19 +20,18 @@ images:
     - og.png
 ---
 
-Claude Code sessions live as `.jsonl` files under `~/.claude/projects/`. They're ephemeral. You debug a race condition, the agent rewrites three files, and then it's gone. [Claudebin](https://claudebin.com) turns any session into a shareable URL. Run `/claudebin:share`, get back a permanent link.
+I built [Claudebin](https://claudebin.com) because I was tired of losing the "messy middle" of my Claude Code sessions. You debug a race condition, the agent rewrites three files, and the transcript is gone the moment you close the terminal. Claudebin turns those ephemeral sessions into shareable URLs. Run `/claudebin:share`, and you get a permanent link to the exact moment things clicked.
 
-This post is about what's underneath. Building an MCP server, shipping it as a Claude Code plugin, and where the architecture shines vs where it falls apart.
+But this post isn't just about the tool. It's about what I learned while building an MCP server from scratch, the hidden frustrations of the JSON-RPC stream, and a fundamental realization: the Model Context Protocol (MCP) is the right model for tools, but it might be the wrong one for agents.
 
 **TL;DR**
 
-- MCP is JSON-RPC 2.0 over stdio. Your plugin is a child process that Claude Code pipes JSON to. Simple, isolated, language-agnostic.
+- MCP is JSON-RPC 2.0 over stdio. Your plugin is a child process that Claude Code pipes JSON to. Simple, isolated, and language-agnostic.
 - Claude Code's slash commands are non-deterministic. A markdown file instructs the LLM to call your tool. The dispatch goes through model reasoning. It works. Usually.
-- `console.log` in an MCP server corrupts the JSON-RPC stream. You will learn this the hard way.
-- Claude Code plugins can't observe, intercept, or modify agent behavior. No lifecycle hooks. You get a pipe and a schema. That's it.
-- OpenCode plugins run in-process with 11+ hooks, shared state, and deterministic dispatch. The DX is better. The portability is worse.
-- MCP is the right model for tools. OpenCode's model is the right one for agent systems. Claude Code only offers MCP. If you need more than a simple tool, you're fighting the architecture.
-- The ideal platform would offer both. Neither does that today.
+- **The Stdio Trap:** A single `console.log` in an MCP server corrupts the JSON-RPC stream. I spent an hour debugging a "server failure" only to realize my own debug logs were blowing up the pipe.
+- Claude Code plugins can't observe, intercept, or modify agent behavior. You get a pipe and a schema. No lifecycle hooks. No shared state.
+- OpenCode plugins run in-process with 11+ hooks. The DX is better for complex systems, but the portability is worse.
+- **My Verdict:** If you need more than a simple tool, you're fighting the architecture.
 
 ## MCP: JSON-RPC 2.0 Over stdio
 
@@ -77,9 +76,11 @@ One gotcha with the long-lived process model: `console.log` goes to stdout and c
 
 ## Session Extraction
 
-The genuinely hard part of claudebin is figuring out where Claude stores sessions and extracting the right one.
+The genuinely hard part of building Claudebin wasn't the protocol—it was the archaeology. I had to figure out exactly where Claude Code hides its session data and how to extract it without breaking anything.
 
-Sessions are `.jsonl` files under `~/.claude/projects/`. The directory name is a normalized project path. `/Users/vlad/projects/my-app` becomes `-Users-vlad-projects-my-app`. Every non-alphanumeric character (including the leading slash) maps to a dash. One regex, one pass:
+Sessions live as `.jsonl` files under `~/.claude/projects/`. But the directory names aren't human-readable; they're normalized project paths. I found that `/Users/vlad/projects/my-app` becomes `-Users-vlad-projects-my-app`. Every non-alphanumeric character (including that leading slash) maps to a dash.
+
+I didn't find this in any documentation. I found it by digging through the Claude Code source and verifying it against my own filesystem. One regex, one pass:
 
 ```typescript
 const normalizeProjectPath = (projectPath: string): string => {
@@ -87,9 +88,9 @@ const normalizeProjectPath = (projectPath: string): string => {
 };
 ```
 
-This is undocumented. I found it by reading Claude Code's source <sup><a href="#ref-5">[5]</a></sup> and verifying against the filesystem. Getting it wrong means a silent "session not found" error.
+Getting this wrong means a silent "session not found" error, which is a terrible user experience. Claudebin has to handle this normalization perfectly to find the right project folder.
 
-The directory contains multiple files:
+Inside, things get even messier:
 
 ```
 ~/.claude/projects/Users-vlad-projects-my-app/
@@ -98,9 +99,9 @@ The directory contains multiple files:
 ├── agent-e5f6g7h8.jsonl   # Another subagent
 ```
 
-Claudebin filters out `agent-*` files and picks the most recent by `mtime`. Each JSONL line is a self-contained message object (user message, assistant response, tool call, tool result). The file is read as a UTF-8 string and sent as-is to the backend for rendering.
+I had to write logic to filter out those `agent-*` files and pick the most recent one by `mtime`. Each line is a self-contained JSON object. I read the whole file as a UTF-8 string and ship it to the backend.
 
-The memory trade-off: Node.js strings are UTF-16 internally <sup><a href="#ref-6">[6]</a></sup>, so a 50MB session becomes ~100MB of heap. Add JSON serialization for the HTTP body and you hit ~200MB peak. A streaming upload would fix this, but for typical sessions (100KB-5MB) it wasn't worth the complexity. The 50MB limit is a client-side safety valve.
+**The Memory Reality Check:** Node.js strings are UTF-16 internally, so a 50MB session suddenly eats ~100MB of heap. By the time you JSON-serialize the HTTP body, you're hitting a 200MB peak. I considered a streaming upload, but for the typical 5MB session, the complexity wasn't worth the trade-off. I settled on a 50MB client-side safety valve to keep things fast and predictable.
 
 ## Device Authorization
 

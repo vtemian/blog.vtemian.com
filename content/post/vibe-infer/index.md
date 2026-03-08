@@ -34,7 +34,7 @@ I wanted to build a neural network from scratch on the GPU. Not by importing a f
 
 ## The Approach: Claude as Tutor
 
-I used [Claude Code](https://claude.ai/code), Anthropic's agentic coding tool, as a pair programming partner. But the first thing I established was the dynamic: Claude guides, I write. It explains concepts, reviews my code, catches mistakes. It does not write GPU code for me.
+I used [Claude Code](https://claude.ai/code), Anthropic's agentic coding tool, as a pair programming partner. But the first thing I established was the dynamic: Claude guides, I write. It explains concepts, reviews my code, catches mistakes. It does not write GPU code for me. (I've written a deeper dive into why Claude Code's choice of [MCP for its plugin architecture](https://blog.vtemian.com/post/mcp-is-great-for-tools-terrible-for-agents/) makes it great for tools but presents challenges for more complex agentic behaviors).
 
 <iframe style="width:100%;height:1000px;border:none;" src="https://claudebin.com/threads/jmdbMowNTz/embed?from=7&to=10"></iframe>
 

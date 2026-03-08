@@ -2,7 +2,7 @@
 title: "Claudebin Embed Test"
 date: 2026-02-06T12:00:00+02:00
 description: "Testing the embedded feature for Claudebin"
-_build:
+build:
   list: never
 ---
 
