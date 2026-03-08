@@ -1,36 +1,54 @@
 ---
 title: "octto: browser UI for brainstorming with OpenCode agents"
 date: 2026-01-02T00:00:00+03:00
-description: "An OpenCode plugin that replaces terminal-based brainstorming with a browser UI. 14 rich input types, parallel exploration branches, and a 5x speedup over typing."
-images: []
+description: "octto: A browser-based UX for agentic brainstorming. Replace terminal-based back-and-forth with 14 rich input types and parallel exploration branches."
 keywords:
     - octto
     - opencode
     - agentic programming
-    - ai tools
+    - ai ux
+    - structured brainstorming
+    - llm interface
+    - human-in-the-loop
     - developer tools
-    - brainstorming
-    - ui
+    - ai gui
 tags:
     - ai
     - tools
     - open-source
+    - agentic-programming
+    - ux
+images:
+    - og.png
 ---
 
 <video autoplay loop muted playsinline width="100%" style="margin-bottom: 2rem;">
   <source src="demo.mp4" type="video/mp4">
 </video>
 
-Brainstorming with AI agents in a terminal is slow and painful. You type a paragraph, the agent asks a question, you type another paragraph, it asks another question. Ten minutes of back-and-forth just to agree on an approach. Most of that time is spent typing things that could have been a single click.
+Brainstorming with AI agents in a terminal is slow and painful. You type a paragraph, the agent asks a question, you type another paragraph... it's a 10-minute back-and-forth just to agree on an approach. Most of that time is spent in "prose-churn"—typing things that should have been a single click.
 
-**[octto](https://github.com/vtemian/octto)** opens a browser window instead.
+**[octto](https://github.com/vtemian/octto)** turns those 10 minutes of typing into 2 minutes of clicking.
 
-## Stop Typing, Start Clicking
+## Agentic UI: Why Chat is a Bottleneck
 
-When you describe an idea to the agent, octto opens a browser UI that presents structured, visual questions. Instead of typing "I think option B is better because...", you click a radio button. Instead of describing priority order in prose, you drag items into a ranked list. Instead of explaining a code preference, you review a side-by-side diff and click approve.
+We've been conditioned to think "AI = Chatbox," but prose is one of the most inefficient interfaces for structured decision-making. Chat is linear, ambiguous, and requires constant re-typing. 
 
-14 input types replace free-form text: radio buttons, checkboxes, sliders, drag-to-rank, star ratings, thumbs up/down, option cards with pros and cons, side-by-side code diffs, syntax-highlighted code editors, text fields, image uploads, and file pickers.
+I built **octto** on a different philosophy: **Agentic UI**. The agent shouldn't just talk to you; it should present you with the most efficient interface for the task at hand. 
+- **Beyond Prose**: Instead of "Option B is better because...", just click a button.
+- **Parallel Exploration**: Chat is serial. octto is tree-structured. It splits your request into 2-4 branches simultaneously.
+- **Visual Synthesis**: Side-by-side diffs, drag-and-drop rankings, and rich sliders replace descriptive text.
 
+## 14 Rich Input Types
+
+octto replaces free-form text with a library of 14 structured inputs designed for fast "Human-in-the-Loop" decisions:
+- **Decision Controls**: Radio buttons, checkboxes, and thumbs up/down for rapid approval.
+- **Structured Ranking**: Drag items into a ranked list to set priorities.
+- **Code Review**: Side-by-side diffs and syntax-highlighted editors.
+- **Rich Media**: Image uploads and file pickers for direct context.
+- **Dynamic Pros/Cons**: Option cards that summarize trade-offs visually.
+
+...
 ## Parallel Exploration
 
 The real speedup comes from parallel branching. Instead of exploring one question at a time, octto splits your request into 2-4 exploration branches. All initial questions appear at once. You answer them in any order. Some branches finish in 2 questions, others need 4. It's a tree-structured exploration, not a linear conversation.
