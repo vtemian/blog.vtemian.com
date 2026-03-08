@@ -1,51 +1,66 @@
 ---
 title: "claude-notes: claude code sessions to html"
 date: 2025-06-25T19:46:00+03:00
-description: "A CLI tool to transform Claude Code transcripts into readable HTML. Built because I wanted to share and replay my coding sessions."
-images:
-    - screenshot.png
+description: "claude-notes: A local CLI tool to transform Claude Code JSONL transcripts into readable, searchable HTML. Replay and document your AI coding sessions."
 keywords:
     - claude code
-    - claude notes
+    - claude-notes
     - ai tools
+    - jsonl to html
+    - claude session viewer
     - developer tools
     - cli
     - python
+    - uvx
     - open source
 tags:
     - ai
     - tools
     - open-source
+    - documentation
+    - python
+images:
+    - og.png
 ---
 
-I wanted to send a Claude Code session to a colleague. Show them the back-and-forth, the tool calls, how we solved a tricky bug together. But Claude Code stores everything as JSONL in `~/.claude/projects/`. Raw JSON lines. Not something you can just send to someone.
+Claude Code is fast, but it's hard to look back. I found myself frequently wanting to show a colleague the exact "messy middle" of a session—the specific tool call or terminal output that finally led to a solution. 
 
-So I built **[claude-notes](https://github.com/vtemian/claude-notes)**.
+But Claude stores everything as raw `.jsonl` files in `~/.claude/projects/`. Not exactly something you can link in a PR.
 
+**[claude-notes](https://github.com/vtemian/claude-notes)** is a local CLI tool that turns those JSON lines into readable, searchable, and shareable HTML.
+
+## Debugging Replay: Seeing the Process
+
+The value isn't just in the final code; it's in the **process**. By converting the transcript into a clean HTML view, I can "replay" the debugging logic:
+- Which bash commands did the agent run?
+- What were the specific tool outputs it reacted to?
+- Where did it hallucinate, and how was it corrected?
+
+## A Modern Python Workflow
+
+I built this with **Python**, **Rich** (for the terminal view), and **Jinja2** (for the HTML output). The distribution is built for modern developer speed using `uvx`. No environment setup, no `pip install`. 
+
+**Render to HTML:**
 ```bash
 uvx claude-notes show --format html --output session.html
+```
+
+**Quick Terminal Replay:**
+```bash
+uvx claude-notes show
 ```
 
 <video autoplay loop muted playsinline width="100%" style="margin-bottom: 2rem;">
   <source src="html-output.mp4" type="video/mp4">
 </video>
 
-I also find myself wanting to scroll through past sessions in the terminal. Sometimes I forget how I solved something and want to look it up quickly:
+## Actual Exported Session
 
-```bash
-uvx claude-notes show
-```
-
-<video autoplay loop muted playsinline width="100%" style="margin-bottom: 2rem;">
-  <source src="terminal-output.mp4" type="video/mp4">
-</video>
-
-## Example
-
-Here's an actual exported session. Scroll through it or [open full screen](/examples/claude-notes-conversation.html).
+Below is a live export of a Claude Code session. You can [open it full screen](/examples/claude-notes-conversation.html).
 
 <iframe src="/examples/claude-notes-conversation.html" width="100%" height="600" style="border: 1px solid #ccc; border-radius: 8px;"></iframe>
 
+...
 ## Implementation
 
 Nothing fancy. Python with Rich for terminal rendering and Jinja2 for HTML templates. Point it at a project directory, it finds the JSONL files and renders them.

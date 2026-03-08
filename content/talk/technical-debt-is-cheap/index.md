@@ -2,27 +2,25 @@
 title: "Technical Debt is Cheap"
 date: 2025-10-27T10:00:00+02:00
 lastmod: 2026-02-10T12:00:00+02:00
-description: "I gave myself 3 hours to see if AI coding tools could tackle a legacy Laravel app. Here's what actually happened."
-images:
-    - vue.png
-event: ""
-event_url: ""
-slides: ""
-video: ""
+description: "Can AI tools tackle a 2,000-line legacy Laravel controller in 3 hours? A case study in AI-driven refactoring and modernizing technical debt."
 keywords:
-    - agentic programming
-    - ai tools
-    - claude code
     - technical debt
-    - refactoring
-    - solo developer
+    - ai refactoring
+    - claude code case study
+    - legacy code modernization
     - laravel refactoring
-    - indie hacker
+    - agentic programming
+    - ai coding tools
+    - solo developer productivity
+    - dockerizing legacy apps
 tags:
     - ai
     - productivity
     - refactoring
-    - indie-hacking
+    - laravel
+    - case-study
+images:
+    - og.png
 ---
 
 March 17th, 2025. My regular work was done for the day. I had three hours before I needed to stop.
@@ -33,69 +31,40 @@ But I had this project. The one everyone has. Making money for years, users depe
 
 So I pointed Claude Code at it. Not because I had to. Not because anyone asked. Just to see if the hype was real.
 
-## The Codebase
+## The Codebase: A Shared Trauma
 
-An old Laravel app. Controllers weren't controllers. They were novels. One function: **2,000 lines**. Files literally named `HomeController-2.php` and `HomeController - Copie.php`.
+The project was a classic legacy Laravel app—the kind that makes money, has real users, and keeps you awake at night. Controllers weren't controllers; they were **2,000-line novels**. 
 
-![Messy codebase with duplicate controllers](duplicates.png)
+- **Naming Chaos:** Files literally named `HomeController-2.php` and `HomeController - Copie.php`.
+- **Linguistic Debt:** Variables in Romanian (`$prenume_utilizator`), comments in English, and error messages in... who knows.
+- **Frontend Hell:** jQuery nested so deep it felt like a fractal. HTML strings embedded directly in PHP. One missing tag and the entire world explodes.
 
-![Thousands of lines in a single controller](monolith.png)
+No validation. No tests. Deployed via FTP. I'm not shaming this codebase—it was actually adding real value. But the interest on this technical debt was compounding every month.
 
-Variables in Romanian. Comments in English. Error messages in... who knows. HTML embedded directly in PHP strings. One missing closing tag and the entire page explodes.
+## The Three-Hour Transformation
 
-The frontend? jQuery callbacks nested so deep you need a map.
+I set a timer. Paid $20 for API tokens. No designer, no DevOps team. Just me and an agentic tool.
 
-![jQuery callback hell](callbacks.png)
+### 1. **Infrastructure: From FTP to Docker**
+Something that usually takes a full afternoon was done before I finished my first coffee. Dockerfiles, `docker-compose.yml`, and environment variable mapping appeared in minutes. We moved from "raw files on a server" to a modern, containerized local dev environment.
 
-No validation. No tests. Deployed via FTP.
+### 2. **Refactoring: Decomposing the Monolith**
+That 2,000-line controller? Claude analyzed the business logic, identified the boundaries, and split it into focused controllers and extracted service classes. It was like watching a sculptor carve a statue out of a block of marble. It translated the Romanian variables, added type hints, and generated clean doc blocks.
 
-I'm not shaming this project. It was adding real value. Making money. Serving users. I'd bet you have at least one codebase exactly like this. **Why fix something that's working, right?**
+### 3. **The Economics: Refactoring as a Commodity**
+This is the real takeaway: **AI has changed the interest rate on technical debt.** 
 
-That's the trap. Technical debt compounds. Every month it sits there, the cost of touching it grows.
+If the cost to fix a legacy app drops from "three weeks for a team" to "three hours for one person," then technical debt is no longer a scary liability—it's an asset you haven't processed yet. We can now afford to modernization projects that were previously too expensive to justify.
 
-## Three Hours
+...
 
-I paid $20 for API tokens. They didn't have subscriptions yet. Set a timer.
-
-**The deployment.** FTP. No containers, no version control for infrastructure, just raw files on a server. I asked Claude to modernize it. Within minutes: Docker setup, docker-compose, environment variables. Something that usually takes an afternoon was done before I finished my coffee.
-
-**The controllers.** That 2,000-line file? Authentication, business logic, database queries, email, PDF generation. All in one beautiful monument to "I'll refactor this later." Claude analyzed the structure, identified boundaries, split it into focused controllers, extracted service classes.
-
-![Clean architecture with service classes](services.png)
-
-I asked it to translate everything to English. `$prenume_utilizator` became `$userFirstName`. Functions got doc blocks. Type hints appeared everywhere.
-
-**The frontend.** jQuery spaghetti mixed with Blade templates mixed with inline PHP. Started conservative: "Extract this jQuery and add Tailwind." It worked. Then I pushed further: "Convert these to Vue."
-
-The Vue code wasn't perfect. Neither was the Tailwind. We were starting from jQuery callbacks and PHP-embedded HTML. But it worked. It was maintainable.
-
-![Modern Vue components](vue.png)
-
-I stopped after three hours. Looked at what we'd done. Modern dependencies. Running in Docker. Clean architecture. Readable code. **Way faster than before.**
-
-One guy. No designer. No DevOps team. No frontend specialist. **Three hours.**
-
-## What Happened Next
-
-I couldn't unsee it. Every abandoned project, every "we'll fix it later" codebase, every side project I'd shelved because "who has the time?" Suddenly felt possible.
-
-I forked **[gitfs](https://github.com/vtemian/gitfs)**, my oldest fun project. A FUSE filesystem in Python 2.7. No release for 6 years. Fuck it. Fire up Claude. In a week of evenings: Python 3, FUSE 3 support, released on Launchpad for Ubuntu and Debian.
-
-![GitFS v1.0.0 release](gitfs.png)
-
-Then new projects started flowing. **[sisif.ai](https://sisif.ai)** for AI video generation. **[cleaninvoices.com](https://cleaninvoices.com)** for invoice processing. **[vatguard.com](https://vatguard.com)** for VAT validation. **[formulare.ai](https://formulare.xyz)** for Romanian form generation. My GitHub graph lit up like a Christmas tree.
-
-![sisif.ai AI video generator](sisif.png)
-
-## The Catch
+## The "Human-in-the-Loop" Catch
 
 You still need to know what you're doing.
 
-Claude didn't replace my judgment. I made every architectural decision. I validated every change. I understood the domain. Someone without Laravel or Docker experience would have gotten plausible-looking garbage.
+AI tools amplify what you already know. They take the grunt work—the tedious refactoring, the boilerplate, the repetitive transformations—and compress hours into minutes. But Claude didn't replace my judgment. I made every architectural decision. I validated every change. 
 
-These tools amplify what you already know. They take the grunt work. The tedious refactoring, the boilerplate, the repetitive transformations. They compress hours into minutes. Solo developers can tackle projects that used to need teams.
-
-That's not hype. That's just math.
+Without senior Laravel or Docker experience, you'll just get plausible-looking garbage. But with it? You're a force multiplier of one.
 
 ---
 
