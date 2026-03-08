@@ -164,44 +164,54 @@ def generate_og(title, description, reading_time, output_path):
 
 
 def main():
-    content_dir = os.path.join(os.path.dirname(__file__), "..", "content", "post")
-    content_dir = os.path.abspath(content_dir)
-
-    # Find all page bundles (directories with index.md)
-    bundles = glob.glob(os.path.join(content_dir, "*/index.md"))
-    # Also find standalone .md files
-    standalones = glob.glob(os.path.join(content_dir, "*.md"))
-
+    content_dirs = [
+        os.path.join(os.path.dirname(__file__), "..", "content", "post"),
+        os.path.join(os.path.dirname(__file__), "..", "content", "project"),
+        os.path.join(os.path.dirname(__file__), "..", "content", "talk"),
+    ]
+    
     generated = 0
-
-    for md_path in bundles:
-        post_dir = os.path.dirname(md_path)
-        output_path = os.path.join(post_dir, OUTPUT_NAME)
-
-        if os.path.exists(output_path):
+    
+    for content_dir in content_dirs:
+        content_dir = os.path.abspath(content_dir)
+        if not os.path.exists(content_dir):
             continue
+            
+        # Find all page bundles (directories with index.md)
+        bundles = glob.glob(os.path.join(content_dir, "**/index.md"), recursive=True)
+        # Also find standalone .md files
+        standalones = glob.glob(os.path.join(content_dir, "*.md"))
 
-        with open(md_path, "r") as f:
-            content = f.read()
+        for md_path in bundles:
+            post_dir = os.path.dirname(md_path)
+            output_path = os.path.join(post_dir, OUTPUT_NAME)
 
-        meta = parse_frontmatter(content)
-        if not meta or not meta["title"]:
-            continue
+            if os.path.exists(output_path):
+                continue
 
-        generate_og(meta["title"], meta["description"], meta["reading_time"], output_path)
-        generated += 1
-        print(f"  Generated: {os.path.relpath(output_path, content_dir)}")
+            with open(md_path, "r") as f:
+                content = f.read()
 
-    # For standalone .md files, convert to bundle first
-    for md_path in standalones:
-        basename = os.path.splitext(os.path.basename(md_path))[0]
-        bundle_dir = os.path.join(content_dir, basename)
+            meta = parse_frontmatter(content)
+            if not meta or not meta["title"]:
+                continue
 
-        if os.path.exists(bundle_dir):
-            continue  # already a bundle
+            generate_og(meta["title"], meta["description"], meta["reading_time"], output_path)
+            generated += 1
+            print(f"  Generated: {os.path.relpath(output_path, content_dir)}")
 
-        # Don't auto-convert, just skip
-        print(f"  Skipped (not a bundle): {basename}.md")
+        # For standalone .md files, convert to bundle first
+        for md_path in standalones:
+            if os.path.basename(md_path) == "_index.md":
+                continue
+            basename = os.path.splitext(os.path.basename(md_path))[0]
+            bundle_dir = os.path.join(content_dir, basename)
+
+            if os.path.exists(bundle_dir):
+                continue  # already a bundle
+
+            # Don't auto-convert, just skip
+            print(f"  Skipped (not a bundle): {basename}.md")
 
     print(f"Generated {generated} OG image(s)")
 
