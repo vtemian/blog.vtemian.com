@@ -18,7 +18,7 @@ Every AI coding tool stores transcripts differently. **Cursor** dumps JSONL file
 
 ## Passive Observability: Why We Parse Transcripts
 
-Most observability tools like LangSmith or AgentOps require "active" instrumentation—you have to wrap your LLM calls or instrument the agent's code. But what if you don't own the code?
+Most observability tools like LangSmith or AgentOps require "active" instrumentation. You have to wrap your LLM calls or instrument the agent's code. But what if you don't own the code?
 
 Tools like **Cursor** and **Claude Code** are proprietary or complex to modify. You can't easily inject tracing code into them. **AgentProbe** takes a different approach: **Passive Observability**. It watches the artifacts these tools *already* leave behind (transcripts, logs, files) and reconstructs the agent's lifecycle from those signals.
 
