@@ -2,7 +2,7 @@
 title: "agentprobe: real-time observability for Cursor, Claude Code and other AI agents"
 date: 2026-03-09T00:00:00+03:00
 lastmod: 2026-03-09T00:00:00+03:00
-description: "Monitor AI coding agents like Cursor and Claude Code in real-time. AgentProbe is a TypeScript library that parses transcripts into event streams for dashboards, TUIs, and multi-agent monitoring."
+description: "Monitor AI coding agents like Cursor and Claude Code in real-time. A TypeScript library that parses transcripts into normalized event streams for dashboards and TUIs."
 keywords:
     - agentprobe
     - ai agent observability
