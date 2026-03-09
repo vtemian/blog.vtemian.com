@@ -1,5 +1,5 @@
 ---
-title: "AgentProbe: Real-Time Observability for Cursor, Claude Code, and AI Agents"
+title: "agentprobe: real-time observability for Cursor, Claude Code and other AI agents"
 date: 2026-03-09
 author: Vlad Temian
 url: https://blog.vtemian.com/project/agentprobe/
@@ -7,7 +7,7 @@ description: "Monitor AI coding agents like Cursor and Claude Code in real-time.
 tags: [ai, tools, open-source, agentic-programming, typescript, observability]
 ---
 
-# AgentProbe: Real-Time Observability for Cursor, Claude Code, and AI Agents
+# agentprobe: real-time observability for Cursor, Claude Code and other AI agents
 
 
 You want to build a dashboard that shows what your coding agents are doing. Or a TUI. Or a Cursor plugin. Or an OpenCode extension. The biggest challenge with AI agents today is **trust**. How do you know what your agent is doing when it's deep in a 50-file refactoring? You need a clean, real-time stream of agent state: who's running, who's idle, who just finished, who just failed.
