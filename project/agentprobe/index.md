@@ -3,7 +3,7 @@ title: "agentprobe: real-time observability for Cursor, Claude Code and other AI
 date: 2026-03-09
 author: Vlad Temian
 url: https://blog.vtemian.com/project/agentprobe/
-description: "Monitor AI coding agents like Cursor and Claude Code in real-time. AgentProbe is a TypeScript library that parses transcripts into event streams for dashboards, TUIs, and multi-agent monitoring."
+description: "Monitor AI coding agents like Cursor and Claude Code in real-time. A TypeScript library that parses transcripts into normalized event streams for dashboards and TUIs."
 tags: [ai, tools, open-source, agentic-programming, typescript, observability]
 ---
 
