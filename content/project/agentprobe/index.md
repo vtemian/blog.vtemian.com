@@ -28,6 +28,10 @@ images:
     - og.png
 ---
 
+<video controls playsinline width="100%" style="margin-bottom: 2rem;">
+  <source src="demo.mp4" type="video/mp4">
+</video>
+
 You want to build a dashboard that shows what your coding agents are doing. Or a TUI. Or a Cursor plugin. Or an OpenCode extension. The biggest challenge with AI agents today is **trust**. How do you know what your agent is doing when it's deep in a 50-file refactoring? You need a clean, real-time stream of agent state: who's running, who's idle, who just finished, who just failed.
 
 Every AI coding tool stores transcripts differently. **Cursor** dumps JSONL files with mixed formats. **Claude Code** has its own structure. **OpenCode** another. Parsing each one, tracking state changes, and handling edge cases is plumbing you shouldn't repeat in every tool you build.
