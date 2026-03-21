@@ -9,6 +9,8 @@ The common thread: AI shouldn't just write code; it should follow a workflow tha
 
 ### Featured Projects
 
+- **[cursouls](/project/cursouls/)**: A pixel cafe in your sidebar. Ambient awareness for Cursor, Claude Code, Codex, and OpenCode agents.
+- **[agentprobe](/project/agentprobe/)**: Real-time observability library for AI coding agents. The engine behind Cursouls.
 - **[micode](/project/micode/)**: Structured agent workflows (brainstorm/plan/implement) for Claude and OpenCode.
 - **[claudebin](/project/claudebin/)**: The "share button" for Claude Code sessions. Publish and embed terminal conversations.
 - **[octto](/project/octto/)**: A browser-based UX for agentic exploration, replacing the terminal for complex brainstorming.
