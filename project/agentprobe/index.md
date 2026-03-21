@@ -119,7 +119,7 @@ Yes, AgentProbe is MIT licensed and available on GitHub and npm.
 
 **[Source on GitHub](https://github.com/vtemian/agentprobe)** · **[npm: @agentprobe/core](https://www.npmjs.com/package/@agentprobe/core)**
 
-For the structured workflow that AgentProbe can observe, including context harnessing, planning, and parallel execution, see [micode](/project/micode/). For brainstorming in a browser UI, see [octto](/project/octto/).
+The first tool built on AgentProbe is **[Cursouls](/project/cursouls/)**, a Cursor extension that turns your agents into pixel characters in a cozy cafe sidebar. For the structured workflow that AgentProbe can observe, including context harnessing, planning, and parallel execution, see [micode](/project/micode/). For brainstorming in a browser UI, see [octto](/project/octto/).
 
 Stay curious ☕
 
