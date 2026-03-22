@@ -1,13 +1,13 @@
 ---
-title: "cursouls: ambient awareness for your AI agents"
+title: "cursouls: a pixel cafe for your AI agents"
 date: 2026-03-20
 author: Vlad Temian
 url: https://blog.vtemian.com/project/cursouls/
-description: "Born from Cafe Cursor meetups. A Cursor extension that gives your AI agents their own pixel cafe in the sidebar. Glance at it to see who's working, who's done, and who needs attention."
+description: "Born from Cafe Cursor meetups. A fun Cursor extension that gives your AI agents their own pixel cafe in the sidebar."
 tags: [ai, tools, open-source, agentic-programming, cursor, typescript]
 ---
 
-# cursouls: ambient awareness for your AI agents
+# cursouls: a pixel cafe for your AI agents
 
 
 <video controls playsinline width="100%" style="margin-bottom: 2rem;">
@@ -18,43 +18,23 @@ I run **Cafe Cursor** events as a Cursor ambassador. Developers gather at a real
 
 At some point the obvious question came up: your agents write code, fix bugs, and run tests all day. They're your hardest workers. Why don't *they* get a cafe?
 
-**[Cursouls](https://cursouls.xyz)** is the answer. A pixel cafe that lives in your sidebar, where each AI agent becomes a tiny character you can see. When they work, they animate. When they finish, they celebrate. When they fail, you know instantly. When they need clarification, they let you know. It's a digital Cafe Cursor for the agents themselves.
+**[Cursouls](https://cursouls.xyz)** is a fun project, not trying to solve a specific problem. It's a pixel cafe that lives in your sidebar, where each AI agent becomes a tiny character you can see. When they work, they animate. When they finish, they celebrate. When they fail, you know instantly. When they need clarification, they let you know. It's a digital Cafe Cursor for the agents themselves.
 
 10x engineers monitor logs. You watch your guys vibe.
 
-## Read the Room, Not the Logs
+## What It Looks Like
 
-Six visual states, zero configuration. Install the extension, open a workspace, and the cafe populates automatically as agents join.
+Install the extension, open a workspace, and the cafe populates on its own. No configuration.
 
-| Your agent is...       | The cafe shows...                                    |
-| ---------------------- | ---------------------------------------------------- |
-| Starting a new task    | Character spawns into the cafe (48-frame entrance)   |
-| Writing or editing code| Character works busily at their spot                 |
-| Idle, between tasks    | Character hangs out, waiting for the next job        |
-| Task completed         | Character celebrates (unique 39-frame animation)     |
-| Task failed            | Character shows visible distress                     |
-| Needs clarification    | Character signals confusion, waiting for your input  |
+Each agent gets a unique pixel character skin and a random name when it joins. When an agent starts working, the character animates. When it finishes, it celebrates. When it fails, it looks distressed. When it needs clarification, it signals confusion. You hover over a character to see what it's working on. You drag to pan the scene. You click the barista counter because why not.
 
-Hover over a character to see its task summary as a scrolling marquee. Drag to pan the scene with spring physics. Click the barista counter because why not.
+It works with **Cursor**, **Claude Code**, **Codex**, and **OpenCode** agents, all in the same cafe at once. Powered by [@agentprobe/core](https://www.npmjs.com/package/@agentprobe/core), which watches the transcript files these tools already leave behind. No API keys, no patches.
 
-## Every Major AI Agent, One Cafe
+## How We Built It
 
-Most extensions lock you into a single AI provider. Cursouls works with all of them at once, side by side in the same scene.
+The cafe is a pixel scene rendered from a single sprite atlas. Frame-by-frame animations driven by CSS background positioning. Framer Motion handles the draggable scene with spring physics. A dialog box with typewriter-effect text announces events as they happen. The whole thing feels like a game, not a panel.
 
-- **Cursor** agents
-- **Claude Code** agents
-- **Codex** agents
-- **OpenCode** agents
-
-This is powered by [@agentprobe/core](https://www.npmjs.com/package/@agentprobe/core), which handles provider detection and lifecycle tracking automatically. Cursouls is a pure consumer of AgentProbe's event stream. Swap the provider, same pixel character.
-
-## The Cafe Is Alive
-
-This is not a static dashboard. The cafe is a pixel scene with furniture, plants, a barista counter, and room to breathe.
-
-Each agent gets one of 4 unique character skins. A dialog box with typewriter-effect text announces events as they happen. Random aliases (via Faker) give agents memorable names when they join. The whole thing feels like a game, not a panel.
-
-Under the hood, a sprite atlas drives frame-by-frame animations. CSS background positioning renders each frame from a single sheet. Framer Motion handles the draggable scene with elastic spring physics. React context distributes agent state. Zod validates every message crossing the extension/webview bridge.
+We leaned into the vibe. Random aliases via Faker give each agent a memorable name. Four character skins. Furniture, plants, a barista counter. It's deliberately more whimsical than practical.
 
 ## Install
 
