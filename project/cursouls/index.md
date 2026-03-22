@@ -16,9 +16,7 @@ tags: [ai, tools, open-source, agentic-programming, cursor, typescript]
 
 I run **Cafe Cursor** events as a Cursor ambassador. Developers gather at a real cafe, drink coffee, and talk about how they're building with Cursor. There's something about the format that works. People share screens, trade prompts, debug each other's agent workflows. The cafe is the context.
 
-At some point the obvious question came up: your agents write code, fix bugs, and run tests all day. They're your hardest workers. Why don't *they* get a cafe?
-
-**[Cursouls](https://cursouls.xyz)** is a fun project, not trying to solve a specific problem. It's a pixel cafe that lives in your sidebar, where each AI agent becomes a tiny character you can see. When they work, they animate. When they finish, they celebrate. When they fail, you know instantly. When they need clarification, they let you know. It's a digital Cafe Cursor for the agents themselves.
+**[Cursouls](https://cursouls.xyz)** is a fun project, not trying to solve a specific problem. It's a pixel cafe that lives in your sidebar, where each AI agent becomes a tiny character you can see. When they work, they animate. When they finish, they celebrate. When they fail, you know instantly. When they need clarification, they let you know.
 
 10x engineers monitor logs. You watch your guys vibe.
 

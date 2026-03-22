@@ -2,4 +2,4 @@
  &lt;source src="demo.mp4" type="video/mp4">
 &lt;/video>
 &lt;p>I run &lt;strong>Cafe Cursor&lt;/strong> events as a Cursor ambassador. Developers gather at a real cafe, drink coffee, and talk about how they&amp;rsquo;re building with Cursor. There&amp;rsquo;s something about the format that works. People share screens, trade prompts, debug each other&amp;rsquo;s agent workflows. The cafe is the context.&lt;/p>
-&lt;p>At some point the obvious question came up: your agents write code, fix bugs, and run tests all day. They&amp;rsquo;re your hardest workers. Why don&amp;rsquo;t &lt;em>they&lt;/em> get a cafe?&lt;/p></description></item></channel></rss>
+&lt;p>&lt;strong>&lt;a href="https://cursouls.xyz">Cursouls&lt;/a>&lt;/strong> is a fun project, not trying to solve a specific problem. It&amp;rsquo;s a pixel cafe that lives in your sidebar, where each AI agent becomes a tiny character you can see. When they work, they animate. When they finish, they celebrate. When they fail, you know instantly. When they need clarification, they let you know.&lt;/p></description></item></channel></rss>
