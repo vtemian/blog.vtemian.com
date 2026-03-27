@@ -2633,7 +2633,7 @@ And this is the first step. Exposing myself to the Internet. To the people that 
 
 - **URL**: https://blog.vtemian.com/talk/will-ai-automate-the-sdlc-by-2030/
 - **Date**: March 27, 2026
-- **Summary**: I argued PRO at a live debate in Timisoara. Here's my case, fact-checked with verified references: RL scaling, tool usage generalization, and why the closed bugfix loop is the finish line.
+- **Summary**: My PRO argument from a live debate in Timisoara, fact-checked with verified references.
 
 
 ![Debating at All-Stack Hangout](debate-1.jpeg)
