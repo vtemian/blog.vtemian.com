@@ -20,7 +20,7 @@ tags:
 
 ![Debating at All-Stack Hangout](debate-1.jpeg)
 
-Last night I debated "Will AI fully automate the Software Development Life Cycle by 2030?" at [All-Stack Hangout](https://luma.com/hl1u9s3a) in Timisoara, organized by [Victory Square Partners](https://www.linkedin.com/company/victorysquarepartners/). I was on the PRO side, alongside [Alexandru Binzar](https://www.linkedin.com/in/alexbinzar/) (CEO, Hibyte). Against us: [Cristian Toma](https://www.linkedin.com/in/tomacristian/) (20-year software engineer) and [Marius Balaj](https://www.linkedin.com/in/marius-balaj/) (UI engineer turned founder). Lavinia Cioloca moderated.
+Last night I debated "Will AI fully automate the Software Development Life Cycle by 2030?" at [All-Stack Hangout](https://luma.com/hl1u9s3a) in Timisoara, organized by [Victory Square Partners](https://www.linkedin.com/company/victorysquarepartners/). I was on the PRO side, alongside [Alexandru Binzar](https://www.linkedin.com/in/alexbinzar/) (CEO, Hibyte). Against us: [Cristian Toma](https://www.linkedin.com/in/tomacristian/) (20-year software engineer) and [Marius Balaj](https://www.linkedin.com/in/marius-balaj/) (UI engineer turned founder). [Lavinia Cioloca](https://www.linkedin.com/in/laviniacioloca/) moderated.
 
 What started as a structured debate turned into a real conversation. This post is my case, expanded and fact-checked.
 
