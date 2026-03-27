@@ -4,7 +4,7 @@ date: 2026-03-27
 author: Vlad Temian
 url: https://blog.vtemian.com/post/will-ai-automate-the-sdlc-by-2030/
 description: "I argued PRO at a live debate in Timisoara. Here's my case, fact-checked with verified references: RL scaling, tool usage generalization, and why the closed bugfix loop is the finish line."
-tags: [ai, agentic-programming, deep-dive]
+tags: [ai, agentic-programming, deep-dive, talk]
 ---
 
 # Why I Think Software Development Will Be Automated by 2030

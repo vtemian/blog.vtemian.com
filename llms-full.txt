@@ -24,7 +24,7 @@ I build agentic programming tools. 15+ years of systems infrastructure experienc
 - **URL**: https://blog.vtemian.com/post/will-ai-automate-the-sdlc-by-2030/
 - **Published**: March 27, 2026
 - **Word Count**: 1282 words
-- **Tags**: ai, agentic-programming, deep-dive
+- **Tags**: ai, agentic-programming, deep-dive, talk
 - **Summary**: I argued PRO at a live debate in Timisoara. Here's my case, fact-checked with verified references: RL scaling, tool usage generalization, and why the closed bugfix loop is the finish line.
 
 
