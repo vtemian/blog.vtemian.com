@@ -2,7 +2,7 @@
 title: "Why I Think Software Development Will Be Automated by 2030"
 date: 2026-03-27
 author: Vlad Temian
-url: https://blog.vtemian.com/talk/will-ai-automate-the-sdlc-by-2030/
+url: https://blog.vtemian.com/talk/why-i-think-software-development-will-be-automated-by-2030/
 description: "My PRO argument from a live debate in Timisoara, fact-checked with verified references."
 tags: [ai, agentic-programming, deep-dive, talk]
 ---

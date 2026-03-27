@@ -2631,7 +2631,7 @@ And this is the first step. Exposing myself to the Internet. To the people that 
 
 ### Why I Think Software Development Will Be Automated by 2030
 
-- **URL**: https://blog.vtemian.com/talk/will-ai-automate-the-sdlc-by-2030/
+- **URL**: https://blog.vtemian.com/talk/why-i-think-software-development-will-be-automated-by-2030/
 - **Date**: March 27, 2026
 - **Summary**: My PRO argument from a live debate in Timisoara, fact-checked with verified references.
 
