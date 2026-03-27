@@ -14,7 +14,6 @@ This file provides an overview of the blog content for LLMs and AI assistants.
 
 Each post is available as markdown at `{url}index.md` for LLM consumption.
 
-- [Why I Think Software Development Will Be Automated by 2030](https://blog.vtemian.com/post/will-ai-automate-the-sdlc-by-2030/) ([md](https://blog.vtemian.com/post/will-ai-automate-the-sdlc-by-2030/index.md)): I argued PRO at a live debate in Timisoara. Here's my case, fact-checked with verified references: RL scaling, tool usage generalization, and why the closed bugfix loop is the finish line.
 - [MCP Is Great for Tools. Terrible for Agents.](https://blog.vtemian.com/post/mcp-is-great-for-tools-terrible-for-agents/) ([md](https://blog.vtemian.com/post/mcp-is-great-for-tools-terrible-for-agents/index.md)): Building claudebin as an MCP server for Claude Code. JSON-RPC protocol, session extraction, device auth, and an honest comparison with OpenCode's plugin model.
 - [vibe-infer: Learning GPU Programming with Claude Code](https://blog.vtemian.com/post/vibe-infer/) ([md](https://blog.vtemian.com/post/vibe-infer/index.md)): Everyone talks about AI-assisted learning. Here's what it actually looks like. From zero WebGPU knowledge to a working MNIST classifier in 155 messages.
 - [Parallel Transaction Execution in Blockchains](https://blog.vtemian.com/post/parallel-transaction-execution-in-blockchains/) ([md](https://blog.vtemian.com/post/parallel-transaction-execution-in-blockchains/index.md)): How Solana, SUI, and Aptos execute transactions in parallel. Deterministic vs optimistic approaches, conflict resolution, and the trade-offs each design makes.
@@ -28,6 +27,7 @@ Each post is available as markdown at `{url}index.md` for LLM consumption.
 
 Each talk is available as markdown at `{url}index.md` for LLM consumption.
 
+- [Why I Think Software Development Will Be Automated by 2030](https://blog.vtemian.com/talk/will-ai-automate-the-sdlc-by-2030/) ([md](https://blog.vtemian.com/talk/will-ai-automate-the-sdlc-by-2030/index.md)): I argued PRO at a live debate in Timisoara. Here's my case, fact-checked with verified references: RL scaling, tool usage generalization, and why the closed bugfix loop is the finish line.
 - [Riding Existing Waves: My Indie Hacking Journey with Sisif.ai](https://blog.vtemian.com/talk/indie-hacking-update/) ([md](https://blog.vtemian.com/talk/indie-hacking-update/index.md)): How I went from 0 to growing MRR by abandoning traditional marketing and riding existing distribution waves. A former CTO's lesson in Platform-Led Growth.
 - [Technical Debt is Cheap](https://blog.vtemian.com/talk/technical-debt-is-cheap/) ([md](https://blog.vtemian.com/talk/technical-debt-is-cheap/index.md)): Can AI tools tackle a 2,000-line legacy Laravel controller in 3 hours? A case study in AI-driven refactoring and modernizing technical debt.
 
