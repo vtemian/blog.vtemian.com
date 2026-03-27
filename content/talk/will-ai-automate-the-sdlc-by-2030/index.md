@@ -1,7 +1,7 @@
 ---
 title: "Why I Think Software Development Will Be Automated by 2030"
 date: 2026-03-27T10:00:00+02:00
-description: "I argued PRO at a live debate in Timisoara. Here's my case, fact-checked with verified references: RL scaling, tool usage generalization, and why the closed bugfix loop is the finish line."
+description: "My PRO argument from a live debate in Timisoara, fact-checked with verified references."
 keywords:
     - ai sdlc automation
     - reinforcement learning
