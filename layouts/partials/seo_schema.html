@@ -46,7 +46,7 @@
   {{- end }}
 {{- end }}
 {{- with $ogImage }}
-<meta property="og:image" content="{{ . }}">
+<meta property="og:image" content="{{ . }}?v={{ now.Unix }}">
 {{- end }}
 
 {{/* Twitter Card */}}
@@ -54,7 +54,7 @@
 <meta name="twitter:title" content="{{ .Title }}">
 <meta name="twitter:description" content="{{ trim $description "\n\r\t " }}">
 {{- with $ogImage }}
-<meta name="twitter:image" content="{{ . }}">
+<meta name="twitter:image" content="{{ . }}?v={{ now.Unix }}">
 {{- end }}
 
 {{/* JSON-LD Structured Data */}}
