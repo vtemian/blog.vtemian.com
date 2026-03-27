@@ -15,6 +15,7 @@ tags:
     - ai
     - agentic-programming
     - deep-dive
+    - talk
 ---
 
 ![Debating at All-Stack Hangout](debate-1.jpeg)
