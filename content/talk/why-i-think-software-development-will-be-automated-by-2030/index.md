@@ -117,6 +117,8 @@ The question isn't whether the SDLC gets automated. It's whether 4 years is enou
 
 I'd bet on less.
 
+If you're curious how I actually use AI coding tools day to day, I wrote about [my harness engineering setup](/post/harness-engineering/) — the configuration, workflows, and boundaries that make it work.
+
 ![The audience](debate-5.jpeg)
 
 Stay curious ☕
