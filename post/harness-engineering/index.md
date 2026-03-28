@@ -321,7 +321,9 @@ As Addy Osmani puts it: "Without checks, an agent might merrily introduce bugs o
 You can see this two-layer approach in my open source projects:
 - [agentprobe](https://github.com/vtemian/agentprobe/blob/main/CLAUDE.md): strict TypeScript rules (no `any`, max 40 lines, factory functions) enforced by Biome
 - [blog.vtemian.com](https://github.com/vtemian/blog.vtemian.com/blob/content/CLAUDE.md): Hugo build commands + content conventions
-- [claude-notes](https://github.com/vtemian/claude-notes/blob/main/CLAUDE.md): TypeScript CLI tool for transforming Claude Code transcripts
+- [claudebin.com](https://github.com/wunderlabs-dev/claudebin.com/blob/main/CLAUDE.md): session sharing platform for Claude Code transcripts
+- [cursouls](https://github.com/wunderlabs-dev/cursouls/blob/main/CLAUDE.md): pixel art agent visualization for VS Code
+- [claude-notes](https://github.com/vtemian/claude-notes/blob/main/CLAUDE.md): TypeScript CLI for transforming Claude Code transcripts
 - [blueprints.md](https://github.com/vtemian/blueprints.md/blob/main/CLAUDE.md): markdown-to-code generator with strict architecture boundaries
 
 ### Don't Let AI Do Everything
