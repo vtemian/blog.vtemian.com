@@ -12,7 +12,7 @@ tags: [ai, agentic-programming, deep-dive]
 
 I have tech friends, good developers, who tried Claude Code or Cursor or Codex. They gave it a task, it wrote some code, the code was wrong, and they told me "AI coding doesn't work." I hear this a lot.
 
-But I use Claude Code every day. It writes code, runs tests, manages my git workflow, plans my day, helps me prepare debates. We're using the same models. So why are our experiences so different?
+But I use Claude Code every day. It writes code, runs tests, manages my git workflow, plans my day, helps me [prepare debates](/talk/why-i-think-software-development-will-be-automated-by-2030/). We're using the same models. So why are our experiences so different?
 
 The difference is what OpenAI calls "harness engineering" <sup><a href="#ref-1">[1]</a></sup>: the discipline of designing environments, boundaries, and feedback loops that let AI agents do reliable work.
 
