@@ -14,6 +14,7 @@ This file provides an overview of the blog content for LLMs and AI assistants.
 
 Each post is available as markdown at `{url}index.md` for LLM consumption.
 
+- [Harness Engineering: Why Your AI Coding Setup Matters More Than the Model](https://blog.vtemian.com/post/harness-engineering/) ([md](https://blog.vtemian.com/post/harness-engineering/index.md)): My tech friends tried AI coding tools and said they don't work. We use the same models. The difference is the harness. Here's my full setup.
 - [MCP Is Great for Tools. Terrible for Agents.](https://blog.vtemian.com/post/mcp-is-great-for-tools-terrible-for-agents/) ([md](https://blog.vtemian.com/post/mcp-is-great-for-tools-terrible-for-agents/index.md)): Building claudebin as an MCP server for Claude Code. JSON-RPC protocol, session extraction, device auth, and an honest comparison with OpenCode's plugin model.
 - [vibe-infer: Learning GPU Programming with Claude Code](https://blog.vtemian.com/post/vibe-infer/) ([md](https://blog.vtemian.com/post/vibe-infer/index.md)): Everyone talks about AI-assisted learning. Here's what it actually looks like. From zero WebGPU knowledge to a working MNIST classifier in 155 messages.
 - [Parallel Transaction Execution in Blockchains](https://blog.vtemian.com/post/parallel-transaction-execution-in-blockchains/) ([md](https://blog.vtemian.com/post/parallel-transaction-execution-in-blockchains/index.md)): How Solana, SUI, and Aptos execute transactions in parallel. Deterministic vs optimistic approaches, conflict resolution, and the trade-offs each design makes.
