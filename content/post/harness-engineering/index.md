@@ -323,6 +323,7 @@ Why two layers? Because AI-generated code carries 1.7x more defects per PR than 
 As Addy Osmani puts it: "Without checks, an agent might merrily introduce bugs or failing builds while thinking it succeeded" <sup><a href="#ref-7">[7]</a></sup>. CodeScene's research adds: "AI performs best in healthy code. Enabling AI acceleration requires more rigor, more structure, not less" <sup><a href="#ref-8">[8]</a></sup>.
 
 You can see this two-layer approach in my open source projects:
+- [lint-claude](https://github.com/vtemian/lint-claude): enforces your CLAUDE.md guidelines using Claude AI — the automated enforcement layer this article describes
 - [agentprobe](https://github.com/vtemian/agentprobe/blob/main/CLAUDE.md): strict TypeScript rules (no `any`, max 40 lines, factory functions) enforced by Biome
 - [blog.vtemian.com](https://github.com/vtemian/blog.vtemian.com/blob/content/CLAUDE.md): Hugo build commands + content conventions
 - [claudebin.com](https://github.com/wunderlabs-dev/claudebin.com/blob/main/CLAUDE.md): session sharing platform for Claude Code transcripts
