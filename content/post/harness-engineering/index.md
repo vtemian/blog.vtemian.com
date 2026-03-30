@@ -41,6 +41,43 @@ flowchart LR
     D -->|knows your rules| E[Code That Fits]
 ```
 
+## The Mental Shift
+
+Before we get into configuration, there's a mindset change that everything else depends on.
+
+Most people use AI coding tools like a search engine. They ask a question, get an answer, copy it into their project. Or they describe a task, get code back, paste it in, and debug it themselves. The AI generates. The human operates.
+
+Flip it.
+
+Your job is to provide workflows, tools, and boundaries. The AI's job is to do everything else: write code, run the project, read logs, query the database, check production, deploy, fix bugs. You don't operate. You direct.
+
+This means giving Claude access to everything you have access to. Logs. Database. Local environment. Production. Deployment pipeline. GitHub. Monitoring. If you can see it, Claude should be able to see it.
+
+Why? Because context is everything. When Claude can start the project, see the startup logs, hit an error, read the stack trace, check the database state, and trace the issue end-to-end, it builds the correct context by itself. When you copy-paste a log snippet into the chat, you're filtering. You're deciding what's relevant. And you might be wrong.
+
+The difference isn't capability. The model is the same. The difference is context. And context comes from access.
+
+```mermaid
+flowchart LR
+    subgraph before["Before: You are the middleman"]
+        direction TB
+        P1[Project] -->|you run| Y1[You]
+        Y1 -->|copy logs| C1[Claude]
+        C1 -->|code snippet| Y1
+        Y1 -->|paste + debug| P1
+    end
+
+    subgraph after["After: Claude operates directly"]
+        direction TB
+        C2[Claude] -->|make dev| P2[Project]
+        P2 -->|logs, errors| C2
+        C2 -->|fix + verify| P2
+    end
+
+    style before fill:#f4e8e8,stroke:#5a2d2d
+    style after fill:#e8f4e8,stroke:#2d5a2d
+```
+
 ## Part 1: User-Level CLAUDE.md
 
 Your user-level `CLAUDE.md` lives at `~/.claude/CLAUDE.md`. It loads into every conversation, every project. This is where you define who you are, how you work, and what you won't tolerate.
@@ -126,45 +163,6 @@ flowchart TD
 ```
 
 Each level adds specificity. Global sets the baseline. Project overrides or extends. Folder narrows further.
-
-## The Mental Shift
-
-Before we get into project-level configuration, there's a mindset change that everything else depends on.
-
-Most people use AI coding tools like a search engine. They ask a question, get an answer, copy it into their project. Or they describe a task, get code back, paste it in, and debug it themselves. The AI generates. The human operates.
-
-Flip it.
-
-Your job is to provide workflows, tools, and boundaries. The AI's job is to do everything else: write code, run the project, read logs, query the database, check production, deploy, fix bugs. You don't operate. You direct.
-
-This means giving Claude access to everything you have access to. Logs. Database. Local environment. Production. Deployment pipeline. GitHub. Monitoring. If you can see it, Claude should be able to see it.
-
-Why? Because context is everything. When Claude can start the project, see the startup logs, hit an error, read the stack trace, check the database state, and trace the issue end-to-end, it builds the correct context by itself. When you copy-paste a log snippet into the chat, you're filtering. You're deciding what's relevant. And you might be wrong.
-
-I used to do this: run the project, see an error, copy the log, paste it to Claude, explain what I was trying to do. Three messages of back-and-forth before Claude even understood the problem. Now I say "start the project and fix whatever's broken." One message. Claude runs it, sees everything, fixes it.
-
-The difference isn't capability. The model is the same. The difference is context. And context comes from access.
-
-```mermaid
-flowchart LR
-    subgraph before["Before: You are the middleman"]
-        direction TB
-        P1[Project] -->|you run| Y1[You]
-        Y1 -->|copy logs| C1[Claude]
-        C1 -->|code snippet| Y1
-        Y1 -->|paste + debug| P1
-    end
-
-    subgraph after["After: Claude operates directly"]
-        direction TB
-        C2[Claude] -->|make dev| P2[Project]
-        P2 -->|logs, errors| C2
-        C2 -->|fix + verify| P2
-    end
-
-    style before fill:#f4e8e8,stroke:#5a2d2d
-    style after fill:#e8f4e8,stroke:#2d5a2d
-```
 
 ## Part 2: Project-Level CLAUDE.md
 
@@ -332,9 +330,9 @@ You can see this two-layer approach in my open source projects:
 - [claude-notes](https://github.com/vtemian/claude-notes/blob/main/CLAUDE.md): TypeScript CLI for transforming Claude Code transcripts
 - [blueprints.md](https://github.com/vtemian/blueprints.md/blob/main/CLAUDE.md): markdown-to-code generator with strict architecture boundaries
 
-### Don't Let AI Do Everything
+### Set the Guardrails
 
-This sounds counterintuitive, but defining what Claude should NOT do is as important as defining what it should do.
+Defining what Claude should NOT do is as important as defining what it should do.
 
 ```markdown
 ## Boundaries
