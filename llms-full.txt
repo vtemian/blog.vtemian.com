@@ -23,16 +23,16 @@ I build agentic programming tools. 15+ years of systems infrastructure experienc
 
 - **URL**: https://blog.vtemian.com/post/disposable-tools-manifesto/
 - **Published**: April 5, 2026
-- **Word Count**: 1157 words
+- **Word Count**: 1257 words
 - **Tags**: ai tools, saas, software economics, vibe-coding
 - **Summary**: I built 15 products in 6 months and made zero revenue. Here's what I learned about why SaaS is dying and what's replacing it.
 
 
-A friend of mine told me something a few weeks ago that I haven't been able to shake. We were talking about AI tooling, evaluation, benchmarks, the usual. And he said: "I don't work on the tool. The tool is a means to an end, not the end. Disposable tooling."
+I built 15 developer tools in six months. All of them work. None of them matter.
 
-His take was simple: he doesn't build polished tool repositories. He builds what he needs, uses it, and moves on. The tool is not the product. The tool is scaffolding.
+Not because they're bad. Because the world changed underneath them while I was shipping. A friend put it bluntly: "I don't work on the tool. The tool is a means to an end, not the end. Disposable tooling."
 
-That sentence broke something in me. Because I've spent the last six months doing the exact opposite.
+He doesn't build polished tool repositories. He builds what he needs, uses it, and moves on. The tool is scaffolding, not the building.
 
 ## 15 products. 0 revenue.
 
@@ -48,13 +48,17 @@ In the past six months, I've shipped roughly 8,000 GitHub contributions across 1
 
 Every single one of these works. They're tested, documented, published. And every single one of them generates zero revenue.
 
-I kept telling myself the next project would be different. That I was building a portfolio, learning in public, establishing credibility. But my friend's words forced me to look at it honestly: I was building refined tools in a world that increasingly wants disposable ones.
+Here's the part that stings: I built most of these with AI agents. They didn't take months. They took days. I wasn't slowly hand-crafting artisan software. I was shipping fast, with modern tools, into a void.
+
+Take agentprobe. It gives you real-time observability for AI coding agents. Four provider integrations, clean API, published on npm. And here's the thing: if you actually need real-time notifications from your agents, you don't install agentprobe. You just ask Claude to implement that specific piece for your specific setup. It takes 20 minutes. Why would you add a dependency when the solution tailored to your exact problem is just as fast to build?
+
+That's the uncomfortable realization. **The problem isn't build speed. The problem is that generic solutions lose to specific ones when specific is just as cheap.** I wasn't competing with other developers. I was competing with the user's own Claude session.
 
 ## The IDE is now Claude
 
 Here's what changed. A year ago, if you wanted a script to parse your bank statements into a spreadsheet, you had two options: find a SaaS that does it (and pay $15/month), or spend an evening writing a parser. Today, you open Claude, paste a sample statement, and have a working parser in 10 minutes. Not a prototype. A working tool, tailored to your exact bank format.
 
-That's a trivial example. But the same applies to everything I built. Someone with Claude Code could replicate 90% of claudebin's functionality in a single conversation. Same for agentprobe. For micode. For most of what I shipped. The honest truth: these are problems that no longer need permanent solutions. They need disposable ones.
+That's a trivial example, but the pattern scales. Every tool I built solves a real problem. The issue is that the user can now solve their exact version of that problem, with their exact constraints, faster than they can evaluate whether my generic version fits. **If your tool survives longer than the problem it solves, you over-engineered it.**
 
 Software became so cheap to produce that paying a monthly subscription for a simple tool makes less and less sense. Andrej Karpathy [called it "vibe coding"](https://x.com/karpathy/status/1886192184808149383): you describe what you want, the AI builds it, and you move on. Why subscribe to a SaaS that sort-of does what you need when you can generate exactly what you need, tailored to your specific problem, in minutes?
 
@@ -90,15 +94,15 @@ Disposable tools need their Kubernetes.
 
 ## I don't have the answer
 
-I'm not going to wrap this up with a neat conclusion, because I don't have one. I spent six months building tools that the world increasingly doesn't need in their polished, permanent form. That's a hard thing to admit when you've poured real effort into them.
+I'm not going to wrap this up with a neat conclusion, because I don't have one. I spent six months building tools that the world no longer needs in their polished, permanent form. That's a hard thing to admit when you've poured real effort into them.
 
-What I do know:
+But here's what I keep coming back to:
 
 The cost of producing software is approaching zero. Google reported that [25% of its new code](https://blog.google/technology/ai/google-gemini-ai-update-december-2024/) is now AI-generated. GitHub's research showed developers [complete tasks 55% faster](https://github.blog/news-insights/research/research-quantifying-github-copilots-impact-on-developer-productivity-and-happiness/) with Copilot. That changes everything about how we think about tools, products, and what's worth paying for. The SaaS model built on "we'll maintain this tool so you don't have to" loses its value when maintaining it yourself takes minutes, not months.
 
 Something new is forming. Agent-ready tools, disposable by design, running on infrastructure that doesn't exist yet. I don't know exactly what it looks like. But I know that building another polished developer tool isn't it.
 
-My friend was right. The tool is not the end. It never was.
+Reusable tools are a tax on speed. My friend was right. The tool is not the end. It never was.
 
 
 ---
