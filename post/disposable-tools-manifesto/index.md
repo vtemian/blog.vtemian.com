@@ -20,13 +20,13 @@ That sentence broke something in me. Because I've spent the last six months doin
 
 In the past six months, I've shipped roughly 8,000 GitHub contributions across 15 projects. MCP servers, browser extensions, CLI plugins, observation libraries, desktop apps. Here's a partial list:
 
-- **[claudebin](https://claudebin.com/)**: a session-sharing tool for Claude Code.
-- **[agentprobe](https://www.npmjs.com/package/agentprobe)**: an observation library for AI coding agents. Four provider integrations, published on npm.
-- **micode**: a structured AI coding workflow plugin for OpenCode. Version 0.9.1.
-- **octto**: an interactive browser-based brainstorming tool. Version 0.3.1.
-- **claude-notes**: a note-taking system built around Claude Code conversations.
+- **[claudebin](https://claudebin.com/)** ([write-up](/project/claudebin/)): a session-sharing tool for Claude Code.
+- **[agentprobe](https://www.npmjs.com/package/agentprobe)** ([write-up](/project/agentprobe/)): an observation library for AI coding agents. Four provider integrations, published on npm.
+- **micode** ([write-up](/project/micode/)): a structured AI coding workflow plugin for OpenCode. Version 0.9.1.
+- **octto** ([write-up](/project/octto/)): an interactive browser-based brainstorming tool. Version 0.3.1.
+- **claude-notes** ([write-up](/project/claude-notes/)): a note-taking system built around Claude Code conversations.
 - **[wunderlabs](https://wunderlabs.dev/)**: a platform for building and sharing AI agent workflows.
-- **[cursouls](https://cursouls.xyz/)**: a pixel-art agent visualization extension for VS Code.
+- **[cursouls](https://cursouls.xyz/)** ([write-up](/project/cursouls/)): a pixel-art agent visualization extension for VS Code.
 
 Every single one of these works. They're tested, documented, published. And every single one of them generates zero revenue.
 
