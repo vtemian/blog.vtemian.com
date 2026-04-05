@@ -23,7 +23,7 @@ I build agentic programming tools. 15+ years of systems infrastructure experienc
 
 - **URL**: https://blog.vtemian.com/post/disposable-tools-manifesto/
 - **Published**: April 5, 2026
-- **Word Count**: 949 words
+- **Word Count**: 1133 words
 - **Tags**: ai tools, saas, software economics, vibe-coding
 - **Summary**: I built 15 products in 6 months and made zero revenue. Here's what I learned about why SaaS is dying and what's replacing it.
 
@@ -58,9 +58,9 @@ I know this because I built [claudebin](https://claudebin.com/). It took me sign
 
 The same applies to agentprobe. To micode. To most of what I built. The honest truth: these are problems that no longer need permanent solutions. They need disposable ones.
 
-Software became so cheap to produce that paying a monthly subscription for a simple tool makes less and less sense. Why subscribe to a SaaS that sort-of does what you need when you can generate exactly what you need, tailored to your specific problem, in minutes?
+Software became so cheap to produce that paying a monthly subscription for a simple tool makes less and less sense. Andrej Karpathy [called it "vibe coding"](https://x.com/karpathy/status/1886192184808149383): you describe what you want, the AI builds it, and you move on. Why subscribe to a SaaS that sort-of does what you need when you can generate exactly what you need, tailored to your specific problem, in minutes?
 
-I did the research. I went looking for new SaaS products built with Lovable, Base44, or Bolt that have meaningful revenue. I couldn't find any. Yet Lovable and Base44 themselves are printing money. The platforms that help you build disposable tools are thriving. The disposable tools themselves are not businesses.
+I did the research. I went looking for new SaaS products built with [Lovable](https://lovable.dev), [Base44](https://base44.com), or [Bolt](https://bolt.new) that have meaningful revenue at scale. I found micro-wins (a few paying customers here, a handful of lifetime deals there), but nothing approaching a real SaaS business. Yet the platforms themselves are printing money: Lovable hit [$300M ARR](https://sacra.com/c/lovable/) and a $6.6B valuation. Bolt.new [reached $40M ARR](https://www.nocode.mba/articles/bolt-vs-lovable) in its first six months. The platforms that help you build disposable tools are thriving. The disposable tools themselves are not businesses.
 
 ## From dev tools to agent-ready tools
 
@@ -70,7 +70,7 @@ The value isn't gone. It moved. It shifted from developer tools (things humans u
 
 The difference is subtle but important. A developer tool has a UI, documentation, onboarding. An agent-ready tool has an API, clear inputs and outputs, and can be called programmatically. The user never touches it. They say "Claude, deploy this" or "Claude, use this style" and the agent figures out which tools to invoke.
 
-MCP is one implementation of this, but the pattern is broader. Any tool that an AI agent can discover, understand, and call autonomously is an agent-ready tool. The value proposition changed: you're not selling to a human who evaluates your landing page. You're making your capability available to an agent that evaluates your interface programmatically.
+MCP is one implementation of this, and it's growing fast: [97 million monthly SDK downloads](https://www.pento.ai/blog/a-year-of-mcp-2025-review), 10,000+ public servers, and [governance under the Linux Foundation](https://www.anthropic.com/news/donating-the-model-context-protocol-and-establishing-of-the-agentic-ai-foundation) with backing from Anthropic, OpenAI, Google, Microsoft, and AWS. But the pattern is broader than any single protocol. Any tool that an AI agent can discover, understand, and call autonomously is an agent-ready tool. The value proposition changed: you're not selling to a human who evaluates your landing page. You're making your capability available to an agent that evaluates your interface programmatically.
 
 ## The real opportunity: the environment
 
@@ -84,9 +84,9 @@ Think about it. You generate a tool in Claude in 20 minutes. Great. Now what?
 - How do you preview what it does before trusting it?
 - How do you keep costs down when you're spinning up tools daily?
 
-Hosting, integrations, previews, cost reduction. The infrastructure layer for disposable tools. Nobody has built this well yet.
+Hosting, integrations, previews, cost reduction. The infrastructure layer for disposable tools. Some companies are starting to build pieces of this. [E2B](https://e2b.dev) raised [$35M to build secure sandboxes](https://e2b.dev/blog/series-a) for AI-generated code, using Firecracker microVMs that spin up in under 200ms. They're [used by 88% of Fortune 100 companies](https://venturebeat.com/ai/how-e2b-became-essential-to-88-of-fortune-100-companies-and-raised-21-million). [Val Town](https://www.val.town/) lets you deploy small functions without worrying about infrastructure. But nobody has put the full picture together yet.
 
-The analogy: containers didn't win because Docker was a great tool. Containers won because Kubernetes, AWS ECS, and the entire ecosystem around them made it trivial to run containers at scale. The container itself is disposable. The orchestration layer is the business.
+The analogy: containers didn't win because Docker was a great tool. Containers won because Kubernetes, AWS ECS, and the entire ecosystem around them made it trivial to run containers at scale. The container itself is disposable. The orchestration layer is the business. Docker popularized containers but [failed to capture the orchestration layer](https://techcrunch.com/2019/11/13/mirantis-acquires-docker-enterprise/), had to sell its enterprise business, and nearly died. The value accrued to the platform, not the tool.
 
 Disposable tools need their Kubernetes.
 
@@ -96,7 +96,7 @@ I'm not going to wrap this up with a neat conclusion, because I don't have one. 
 
 What I do know:
 
-The cost of producing software is approaching zero. That changes everything about how we think about tools, products, and what's worth paying for. The SaaS model built on "we'll maintain this tool so you don't have to" loses its value when maintaining it yourself takes minutes, not months.
+The cost of producing software is approaching zero. Google reported that [25% of its new code](https://blog.google/technology/ai/google-gemini-ai-update-december-2024/) is now AI-generated. GitHub's research showed developers [complete tasks 55% faster](https://github.blog/news-insights/research/research-quantifying-github-copilots-impact-on-developer-productivity-and-happiness/) with Copilot. That changes everything about how we think about tools, products, and what's worth paying for. The SaaS model built on "we'll maintain this tool so you don't have to" loses its value when maintaining it yourself takes minutes, not months.
 
 Something new is forming. Agent-ready tools, disposable by design, running on infrastructure that doesn't exist yet. I don't know exactly what it looks like. But I know that building another polished developer tool isn't it.
 
