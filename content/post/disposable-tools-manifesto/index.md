@@ -16,7 +16,7 @@ tags:
     - saas
     - software economics
     - vibe-coding
-draft: true
+draft: false
 ---
 
 A friend of mine, Cristi Toma, told me something a few weeks ago that I haven't been able to shake. We were talking about AI tooling, evaluation, benchmarks, the usual. And he said: "I don't work on the tool. The tool is a means to an end, not the end. Disposable tooling."
