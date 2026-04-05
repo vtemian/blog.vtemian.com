@@ -25,7 +25,7 @@ In the past six months, I've shipped roughly 8,000 GitHub contributions across 1
 - **micode** ([write-up](/project/micode/)): a structured AI coding workflow plugin for OpenCode. Version 0.9.1.
 - **octto** ([write-up](/project/octto/)): an interactive browser-based brainstorming tool. Version 0.3.1.
 - **claude-notes** ([write-up](/project/claude-notes/)): a note-taking system built around Claude Code conversations.
-- **[wunderlabs](https://wunderlabs.dev/)**: a platform for building and sharing AI agent workflows.
+- **[wunderlabs](https://wunderlabs.dev/)**: Lovable for existing codebases.
 - **[cursouls](https://cursouls.xyz/)** ([write-up](/project/cursouls/)): a pixel-art agent visualization extension for VS Code.
 
 Every single one of these works. They're tested, documented, published. And every single one of them generates zero revenue.
