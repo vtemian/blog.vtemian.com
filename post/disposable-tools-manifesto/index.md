@@ -24,7 +24,7 @@ In the past six months, I've shipped roughly 8,000 GitHub contributions across 1
 - **[agentprobe](https://www.npmjs.com/package/agentprobe)** ([write-up](/project/agentprobe/)): an observation library for AI coding agents. Four provider integrations, published on npm.
 - **micode** ([write-up](/project/micode/)): a structured AI coding workflow plugin for OpenCode. Version 0.9.1.
 - **octto** ([write-up](/project/octto/)): an interactive browser-based brainstorming tool. Version 0.3.1.
-- **claude-notes** ([write-up](/project/claude-notes/)): a note-taking system built around Claude Code conversations.
+- **[claude-notes](https://github.com/vtemian/claude-notes)** ([write-up](/project/claude-notes/)): a CLI tool to transform Claude Code JSONL transcripts into readable, searchable HTML.
 - **[wunderlabs](https://wunderlabs.dev/)**: Lovable for existing codebases.
 - **[cursouls](https://cursouls.xyz/)** ([write-up](/project/cursouls/)): a pixel-art agent visualization extension for VS Code.
 
