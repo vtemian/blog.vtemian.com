@@ -3,22 +3,22 @@ title: "The Disposable Tools Manifesto"
 date: 2026-04-05
 author: Vlad Temian
 url: https://blog.vtemian.com/post/disposable-tools-manifesto/
-description: "I built 15 products in 6 months and made zero revenue. Here's what I learned about why SaaS is dying and what's replacing it."
+description: "I built 20+ tools in 6 months and made zero revenue. Here's what I learned about why SaaS is dying and what's replacing it."
 tags: [ai tools, saas, software economics, vibe-coding]
 ---
 
 # The Disposable Tools Manifesto
 
 
-I built 15 developer tools in six months. All of them work. None of them matter.
+I built 20+ developer tools in six months. All of them work. None of them matter.
 
 Not because they're bad. Because the world changed underneath them while I was shipping. A friend put it bluntly: "I don't work on the tool. The tool is a means to an end, not the end. Disposable tooling."
 
 He doesn't build polished tool repositories. He builds what he needs, uses it, and moves on. The tool is scaffolding, not the building.
 
-## 15 products. 0 revenue.
+## 20+ products. 0 revenue.
 
-In the past six months, I've shipped roughly 8,000 GitHub contributions across 15 projects. MCP servers, browser extensions, CLI plugins, observation libraries, desktop apps. Here's a partial list:
+In the past six months, I've shipped roughly 8,000 GitHub contributions across 20+ projects. MCP servers, browser extensions, CLI plugins, observation libraries, desktop apps. Here's a partial list:
 
 - **[claudebin](https://claudebin.com/)** ([write-up](/project/claudebin/)): a session-sharing tool for Claude Code.
 - **[agentprobe](https://www.npmjs.com/package/agentprobe)** ([write-up](/project/agentprobe/)): an observation library for AI coding agents. Four provider integrations, published on npm.
