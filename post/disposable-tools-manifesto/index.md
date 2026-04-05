@@ -34,11 +34,9 @@ I kept telling myself the next project would be different. That I was building a
 
 ## The IDE is now Claude
 
-Here's what changed. Two years ago, if you wanted a tool to share Claude Code sessions, you had two options: find a SaaS that does it, or spend a week building one. Today, you open Claude, describe what you need, and have a working tool in 20 minutes. Not a prototype. A working tool.
+Here's what changed. A year ago, if you wanted a script to parse your bank statements into a spreadsheet, you had two options: find a SaaS that does it (and pay $15/month), or spend an evening writing a parser. Today, you open Claude, paste a sample statement, and have a working parser in 10 minutes. Not a prototype. A working tool, tailored to your exact bank format.
 
-I know this because I built [claudebin](https://claudebin.com/). It took me significantly longer than 20 minutes. I wrote tests, set up a proper package, published it, built a web UI. And someone with Claude Code could replicate 90% of its functionality in a single conversation.
-
-The same applies to agentprobe. To micode. To most of what I built. The honest truth: these are problems that no longer need permanent solutions. They need disposable ones.
+That's a trivial example. But the same applies to everything I built. Someone with Claude Code could replicate 90% of claudebin's functionality in a single conversation. Same for agentprobe. For micode. For most of what I shipped. The honest truth: these are problems that no longer need permanent solutions. They need disposable ones.
 
 Software became so cheap to produce that paying a monthly subscription for a simple tool makes less and less sense. Andrej Karpathy [called it "vibe coding"](https://x.com/karpathy/status/1886192184808149383): you describe what you want, the AI builds it, and you move on. Why subscribe to a SaaS that sort-of does what you need when you can generate exactly what you need, tailored to your specific problem, in minutes?
 
