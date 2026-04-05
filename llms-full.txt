@@ -23,7 +23,7 @@ I build agentic programming tools. 15+ years of systems infrastructure experienc
 
 - **URL**: https://blog.vtemian.com/post/disposable-tools-manifesto/
 - **Published**: April 5, 2026
-- **Word Count**: 1131 words
+- **Word Count**: 1157 words
 - **Tags**: ai tools, saas, software economics, vibe-coding
 - **Summary**: I built 15 products in 6 months and made zero revenue. Here's what I learned about why SaaS is dying and what's replacing it.
 
@@ -68,7 +68,7 @@ The value isn't gone. It moved. It shifted from developer tools (things humans u
 
 The difference is subtle but important. A developer tool has a UI, documentation, onboarding. An agent-ready tool has an API, clear inputs and outputs, and can be called programmatically. The user never touches it. They say "Claude, deploy this" or "Claude, use this style" and the agent figures out which tools to invoke.
 
-MCP is one implementation of this, and it's growing fast: [97 million monthly SDK downloads](https://www.pento.ai/blog/a-year-of-mcp-2025-review), 10,000+ public servers, and [governance under the Linux Foundation](https://www.anthropic.com/news/donating-the-model-context-protocol-and-establishing-of-the-agentic-ai-foundation) with backing from Anthropic, OpenAI, Google, Microsoft, and AWS. But the pattern is broader than any single protocol. Any tool that an AI agent can discover, understand, and call autonomously is an agent-ready tool. The value proposition changed: you're not selling to a human who evaluates your landing page. You're making your capability available to an agent that evaluates your interface programmatically.
+MCP is one implementation of this, and it's growing fast: [97 million monthly SDK downloads](https://www.pento.ai/blog/a-year-of-mcp-2025-review), 10,000+ public servers, and [governance under the Linux Foundation](https://www.anthropic.com/news/donating-the-model-context-protocol-and-establishing-of-the-agentic-ai-foundation) with backing from Anthropic, OpenAI, Google, Microsoft, and AWS. Projects like [OpenClaw](https://github.com/openclaw/openclaw) are attempting to be distribution layers for agent tools, routing MCP-compatible skills to millions of users across WhatsApp, Telegram, and Slack. But the pattern is broader than any single protocol or runtime. Any tool that an AI agent can discover, understand, and call autonomously is an agent-ready tool. The value proposition changed: you're not selling to a human who evaluates your landing page. You're making your capability available to an agent that evaluates your interface programmatically.
 
 ## The real opportunity: the environment
 
