@@ -1,6 +1,6 @@
 ---
 title: "The Disposable Tools Manifesto"
-date: 2026-04-05T12:00:00+02:00
+date: 2026-04-05T08:00:00+02:00
 description: "I built 15 products in 6 months and made zero revenue. Here's what I learned about why SaaS is dying and what's replacing it."
 keywords:
     - disposable tools
