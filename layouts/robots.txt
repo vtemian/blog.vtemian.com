@@ -1,4 +1,6 @@
 User-agent: *
+Allow: /
+Disallow: /examples/
 
 Sitemap: {{ "sitemap.xml" | absURL }}
 
