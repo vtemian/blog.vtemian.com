@@ -7,10 +7,16 @@ metaDataFormat = "yaml"
 
 [params]
 	author = "Vlad Temian"
+	jobTitle = "Centrist Tech Optimist"
+	email = "me@vtemian.com"
 	github = "vtemian"
+	twitter = "vtemian"
+	linkedin = "vtemian"
+	avatar = "https://qed.builders/images/team/vlad-temian@2x.png"
 	description = "I build agentic programming tools. 15+ years of systems infrastructure experience, now focused on making AI agents reliable and accessible for developers. Former CTO, open-source builder, community organizer at agentic.tm."
 	keywords = ["vtemian", "agentic programming", "ai tools", "claude code", "developer tools", "open source"]
 	tags = ["vtemian", "agentic programming", "ai tools", "developer tools"]
+	knowsAbout = ["agentic programming", "AI tools", "Claude Code", "Cursor", "developer tools", "systems infrastructure", "open source"]
 
 [sitemap]
   changefreq = "weekly"

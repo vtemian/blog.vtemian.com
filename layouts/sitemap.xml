@@ -1,0 +1,56 @@
+{{ printf "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\" ?>" | safeHTML }}
+{{/*
+  Custom sitemap with per-section priorities and lastmod, mirroring the
+  signal we send via JSON-LD.
+
+  Priority rubric (0.0 - 1.0):
+    - Home                          1.0   (most important)
+    - Section indexes (/post/...)   0.9
+    - Single posts                  0.8
+    - Talks / projects              0.7
+    - Taxonomy term pages           0.4
+    - Anything else                 0.5 (Hugo default)
+
+  Change frequency rubric:
+    - Home / sections               daily
+    - Posts / talks / projects      monthly
+    - Taxonomy / terms              weekly
+*/}}
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  {{- range .Data.Pages }}
+    {{- if .Permalink }}
+      {{- $priority := 0.5 }}
+      {{- $changefreq := "weekly" }}
+      {{- if .IsHome }}
+        {{- $priority = 1.0 }}
+        {{- $changefreq = "daily" }}
+      {{- else if .IsSection }}
+        {{- $priority = 0.9 }}
+        {{- $changefreq = "daily" }}
+      {{- else if .IsPage }}
+        {{- if eq .Section "post" }}
+          {{- $priority = 0.8 }}
+          {{- $changefreq = "monthly" }}
+        {{- else if or (eq .Section "talk") (eq .Section "project") }}
+          {{- $priority = 0.7 }}
+          {{- $changefreq = "monthly" }}
+        {{- else }}
+          {{- $priority = 0.6 }}
+          {{- $changefreq = "monthly" }}
+        {{- end }}
+      {{- else }}
+        {{- $priority = 0.4 }}
+        {{- $changefreq = "weekly" }}
+      {{- end }}
+  <url>
+    <loc>{{ .Permalink }}</loc>
+    {{- if not .Lastmod.IsZero }}
+    <lastmod>{{ safeHTML ( .Lastmod.Format "2006-01-02T15:04:05-07:00" ) }}</lastmod>
+    {{- end }}
+    <changefreq>{{ $changefreq }}</changefreq>
+    <priority>{{ $priority }}</priority>
+  </url>
+    {{- end }}
+  {{- end }}
+</urlset>
