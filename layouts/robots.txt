@@ -2,6 +2,10 @@ User-agent: *
 Allow: /
 Disallow: /examples/
 
+# AI content usage preferences
+# See https://contentsignals.org for the specification
+Content-Signal: ai-train=yes, search=yes, ai-input=yes
+
 Sitemap: {{ "sitemap.xml" | absURL }}
 
 # LLM-friendly content
