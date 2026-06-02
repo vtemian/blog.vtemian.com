@@ -17,7 +17,7 @@ tags:
     - software economics
     - agentic-programming
     - ai
-draft: true
+draft: false
 ---
 
 Claude Code isn't a coding tool. The people using it best right now barely touch code. They run factory floors, legal teams, HR, finance, operations. They don't think of it as software. They think of it as *the thing that does the work*.
