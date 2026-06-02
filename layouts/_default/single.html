@@ -30,10 +30,27 @@
 <script>
     // Reveal blueprint diagrams (figure[data-dgm]) as they scroll into view.
     (function () {
+        var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var countUp = function (el) {
+            var to = parseInt(el.getAttribute('data-to'), 10);
+            var from = parseInt(el.getAttribute('data-from') || '0', 10);
+            if (isNaN(to)) return;
+            if (reduce) { el.textContent = to; return; }
+            var dur = 1100, start = null;
+            var step = function (ts) {
+                if (start === null) start = ts;
+                var p = Math.min(1, (ts - start) / dur);
+                var eased = 1 - Math.pow(1 - p, 3);
+                el.textContent = Math.round(from + (to - from) * eased);
+                if (p < 1) requestAnimationFrame(step);
+            };
+            requestAnimationFrame(step);
+        };
         var obs = new IntersectionObserver(function (entries) {
             entries.forEach(function (entry) {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('dgm-in');
+                    entry.target.querySelectorAll('.dgm-count').forEach(countUp);
                     obs.unobserve(entry.target);
                 }
             });
