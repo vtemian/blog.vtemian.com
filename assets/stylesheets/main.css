@@ -197,6 +197,22 @@ article div figure[data-dgm] {
   letter-spacing: 0.04em;
 }
 
+/* On narrow screens, horizontal flows stack and arrows point down */
+@media (max-width: 640px) {
+  .dgm-flow {
+    flex-direction: column;
+  }
+
+  .dgm-flow .dgm-pill {
+    width: 100%;
+    max-width: 14rem;
+  }
+
+  .dgm-flow .dgm-arrow {
+    transform: rotate(90deg);
+  }
+}
+
 /* Hover-to-focus: sharpen the hovered box, dim its siblings */
 .dgm-box,
 .dgm-pill {
