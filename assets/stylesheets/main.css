@@ -245,28 +245,7 @@ article div figure[data-dgm]:has(.dgm-pill:hover) .dgm-pill:not(:hover) {
   }
 }
 
-/* Living accents: the wasteful loop spins, the scarce link pulses */
-.dgm-spin {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1em;
-  height: 1em;
-  line-height: 1;
-  vertical-align: middle;
-  transform-origin: 50% 50%;
-}
-
-.dgm-in .dgm-spin {
-  animation: dgm-spin 6s linear infinite;
-}
-
-@keyframes dgm-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
+/* Living accent: the scarce link pulses */
 .dgm-in .dgm-pulse {
   animation: dgm-pulse 2.4s ease-in-out infinite;
 }
@@ -282,7 +261,6 @@ article div figure[data-dgm]:has(.dgm-pill:hover) .dgm-pill:not(:hover) {
 
 @media (prefers-reduced-motion: reduce) {
   .dgm-in .dgm-tool,
-  .dgm-in .dgm-spin,
   .dgm-in .dgm-pulse {
     animation: none;
   }
