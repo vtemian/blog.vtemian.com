@@ -3,7 +3,7 @@ title: "Claude Code Isn't About Code"
 date: 2026-06-02
 author: Vlad Temian
 url: https://blog.vtemian.com/post/claude-code-isnt-about-code/
-description: "Two months ago I said disposable tools need their Kubernetes, and I didn't have the answer. Then YC published theirs: stop building interfaces, build tools for agents. Here's what that means, and why the economy won't feel it for a decade."
+description: "The people getting the most out of Claude Code aren't writing code. Some notes on where the value moved, picking up where the disposable tools manifesto left off."
 tags: [ai tools, software economics, agentic-programming, ai]
 ---
 

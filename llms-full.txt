@@ -25,7 +25,7 @@ I build agentic programming tools. 15+ years of systems infrastructure experienc
 - **Published**: June 2, 2026
 - **Word Count**: 1430 words
 - **Tags**: ai tools, software economics, agentic-programming, ai
-- **Summary**: Two months ago I said disposable tools need their Kubernetes, and I didn't have the answer. Then YC published theirs: stop building interfaces, build tools for agents. Here's what that means, and why the economy won't feel it for a decade.
+- **Summary**: The people getting the most out of Claude Code aren't writing code. Some notes on where the value moved, picking up where the disposable tools manifesto left off.
 
 
 Claude Code isn't a coding tool. The people using it best right now barely touch code. They run factory floors, legal teams, HR, finance, operations. They don't think of it as software. They think of it as *the thing that does the work*.
