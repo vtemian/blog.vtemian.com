@@ -59,7 +59,7 @@ article div hr {
 }
 
 article div strong {
-  @apply font-normal;
+  @apply font-semibold;
 }
 
 article div table {
@@ -111,6 +111,90 @@ article div sup {
 
 article div .mermaid {
   @apply flex justify-center;
+}
+
+article div figure[data-dgm] {
+  @apply mx-auto my-2 border border-border bg-surface p-5 font-mono;
+}
+
+.dgm-anim {
+  @apply translate-y-1 opacity-0 transition duration-300 ease-out;
+}
+
+.dgm-in .dgm-anim {
+  @apply translate-y-0 opacity-100;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dgm-anim {
+    @apply translate-y-0 opacity-100 transition-none;
+  }
+}
+
+.dgm-old {
+  @apply text-muted;
+}
+
+.dgm-new {
+  @apply text-ink;
+}
+
+.dgm-key {
+  @apply text-muted;
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+}
+
+.dgm-unit {
+  @apply flex w-full flex-col items-center gap-2;
+  max-width: 12rem;
+}
+
+.dgm-box {
+  @apply flex w-full flex-col items-center justify-center gap-2 border p-3;
+  border-color: currentColor;
+}
+
+.dgm-nest {
+  @apply flex items-center justify-center border bg-bg px-2.5 py-1.5;
+  border-color: currentColor;
+}
+
+.dgm-pill {
+  @apply border px-2.5 py-1.5 text-center;
+  border-color: currentColor;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+}
+
+.dgm-lbl {
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-align: center;
+}
+
+.dgm-sub {
+  @apply mt-1 block text-muted;
+  font-size: 0.62rem;
+  letter-spacing: normal;
+}
+
+.dgm-note {
+  @apply text-center text-xs text-muted;
+}
+
+.dgm-arrow {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.dgm-rule {
+  @apply w-full border-t border-border;
+}
+
+.dgm-foot {
+  @apply mt-6 w-full border-t border-border pt-4 text-center text-xs text-muted;
+  letter-spacing: 0.04em;
 }
 
 .references {
