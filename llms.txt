@@ -14,6 +14,7 @@ This file provides an overview of the blog content for LLMs and AI assistants.
 
 Each post is available as markdown at `{url}index.md` for LLM consumption.
 
+- [Claude Code Isn't About Code](https://blog.vtemian.com/post/claude-code-isnt-about-code/) ([md](https://blog.vtemian.com/post/claude-code-isnt-about-code/index.md)): Two months ago I said disposable tools need their Kubernetes, and I didn't have the answer. Then YC published theirs: stop building interfaces, build tools for agents. Here's what that means, and why the economy won't feel it for a decade.
 - [Fight Slop with Clarity](https://blog.vtemian.com/post/fight-slop-with-clarity/) ([md](https://blog.vtemian.com/post/fight-slop-with-clarity/index.md)): AI made slop cheap. We made more of it, faster. Clarity is the only input that doesn't degrade when you multiply it.
 - [The Disposable Tools Manifesto](https://blog.vtemian.com/post/disposable-tools-manifesto/) ([md](https://blog.vtemian.com/post/disposable-tools-manifesto/index.md)): I built 20+ tools in 6 months and made zero revenue. Here's what I learned about why SaaS is dying and what's replacing it.
 - [Harness Engineering: Why Your AI Coding Setup Matters More Than the Model](https://blog.vtemian.com/post/harness-engineering/) ([md](https://blog.vtemian.com/post/harness-engineering/index.md)): My tech friends tried AI coding tools and said they don't work. We use the same models. The difference is the harness. Here's my full setup.
