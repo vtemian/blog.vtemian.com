@@ -1109,9 +1109,6 @@
   .py-0 {
     padding-block: calc(var(--spacing) * 0);
   }
-  .py-0\.5 {
-    padding-block: calc(var(--spacing) * 0.5);
-  }
   .py-1 {
     padding-block: calc(var(--spacing) * 1);
   }
@@ -1579,6 +1576,48 @@
   --color-bg: #151618;
   --color-link: #7a8a9a;
   --color-link-border: #212224;
+}
+.kind {
+  flex-shrink: 0;
+  border-radius: 0.25rem;
+  padding-inline: calc(var(--spacing) * 2);
+  padding-block: calc(var(--spacing) * 0.5);
+  font-size: var(--text-xs);
+  line-height: var(--tw-leading, var(--text-xs--line-height));
+  text-transform: capitalize;
+}
+.kind-post {
+  color: #154f65;
+  background-color: color-mix(in srgb, #154f65 10%, transparent);
+}
+.kind-project {
+  color: #55673f;
+  background-color: color-mix(in srgb, #55673f 12%, transparent);
+}
+.kind-talk {
+  color: #b74735;
+  background-color: color-mix(in srgb, #b74735 10%, transparent);
+}
+.kind-til {
+  text-transform: uppercase;
+  color: #8a6110;
+  background-color: color-mix(in srgb, #d79b2d 20%, transparent);
+}
+.dark .kind-post {
+  color: #7fb3c8;
+  background-color: color-mix(in srgb, #7fb3c8 12%, transparent);
+}
+.dark .kind-project {
+  color: #9db184;
+  background-color: color-mix(in srgb, #9db184 12%, transparent);
+}
+.dark .kind-talk {
+  color: #d9765f;
+  background-color: color-mix(in srgb, #d9765f 14%, transparent);
+}
+.dark .kind-til {
+  color: #e0ab48;
+  background-color: color-mix(in srgb, #e0ab48 14%, transparent);
 }
 pre code.hljs {
   border-radius: 0;

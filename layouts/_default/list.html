@@ -43,7 +43,8 @@
                 <h3 class="truncate">{{ .Title }}</h3>
                 <p class="text-xs text-link">{{ .Date.Format "January 2006" }}</p>
             </div>
-            <span class="shrink-0 rounded border border-border px-2 py-0.5 text-xs capitalize text-muted">{{ .Section }}</span>
+            {{ $kind := default .Section .Params.kind }}
+            <span class="kind kind-{{ $kind }}">{{ $kind }}</span>
         </a>
         {{ end }}
         </div>
