@@ -422,6 +422,53 @@ article div :not(pre) > code {
   margin: 1.3rem 0 0.4rem;
 }
 
+/* The other way into a note. Where the pencil goes round a phrase, this one
+   points at it from the margin: a red arrow drawn beside the paragraph, aimed
+   at the word. Nine circled phrases on one page is a page of circled phrases,
+   so the two marks share the work. */
+.arrow {
+  position: relative;
+  display: inline;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  border-bottom: 1.5px solid #d9584a;
+}
+
+.dark .arrow { border-bottom-color: #ef8578; }
+
+.arrow:hover { border-bottom-color: #b4483c; background: color-mix(in srgb, #d9584a 8%, transparent); }
+.arrow[aria-expanded="true"] { border-bottom-style: dotted; }
+
+/* Absolute, in the article body rather than the paragraph, so a mark in the
+   margin never pushes a line of text around. Aimed from the template. */
+.arrow-mark {
+  position: absolute;
+  width: 110px;
+  height: 42px;
+  color: #d9584a;
+  pointer-events: auto;
+  cursor: pointer;
+  overflow: visible;
+  z-index: 2;
+  transition: opacity 0.15s;
+}
+
+.dark .arrow-mark { color: #ef8578; }
+
+/* A hand does not draw level. */
+.arrow-mark { rotate: -3deg; }
+
+.arrow-mark:hover { color: #b4483c; }
+
+/* No margin to draw in on a narrow screen, so the underline carries it alone. */
+@media (max-width: 900px) {
+  .arrow-mark { display: none; }
+}
+
 /* A phrase circled in blue pencil. Two passes rather than one, at different
    angles and neither of them closing cleanly, because a hand that circles a
    word goes round twice and does not meet its own start. Both loops paint over
@@ -588,7 +635,7 @@ article { counter-reset: sidenote-counter; }
 
 .sidenote { display: none; }
 
-.sidenote::before {
+.sidenote-inner::before {
   content: counter(sidenote-counter);
   font-family: var(--font-mono);
   font-size: 0.65em;
@@ -618,88 +665,21 @@ article { counter-reset: sidenote-counter; }
     color: var(--color-muted);
     text-align: left;
   }
-}
 
-/* No gutter to put it in, so it opens under the paragraph instead. */
-@media (max-width: 1119px) {
-  .anno:hover .sidenote,
-  .anno-mark:focus ~ .sidenote,
-  .anno-toggle:checked ~ .sidenote {
+  /* A note long enough to be worth reading is taller than the paragraph it
+     hangs off, so it will reach the next one's note. The panel paints its own
+     background and sits above, rather than the two interleaving. */
+  .sidenote-inner {
     display: block;
-    margin: 0.75rem 0;
-    padding-left: 0.75rem;
+    position: relative;
+    z-index: 5;
+    padding: 0.5rem 0.7rem 0.55rem;
+    background: var(--color-bg);
     border-left: 2px solid var(--color-border);
-    font-size: 0.9rem;
-    color: var(--color-muted);
   }
-}
 
-/* Margin annotations. The note always lives in the right gutter, revealed on
-   hover or focus. It floats rather than being absolutely positioned: a float
-   keeps the vertical position of the line it belongs to, and the negative
-   margin puts it wholly outside the text column, so showing one never moves
-   the paragraph being read. */
-article { counter-reset: sidenote-counter; }
-
-.anno-mark {
-  cursor: help;
-  counter-increment: sidenote-counter;
-  border-bottom: 1px solid var(--color-link-border);
-  transition: border-color 0.15s, background 0.15s;
-}
-
-.anno-mark:empty { border-bottom: 0; }
-
-.anno-mark::after {
-  content: counter(sidenote-counter);
-  vertical-align: super;
-  font-family: var(--font-mono);
-  font-size: 0.65em;
-  color: var(--color-link);
-  padding-left: 0.15em;
-}
-
-.anno:hover .anno-mark,
-.anno-mark:focus {
-  border-bottom-color: var(--color-link);
-  background: var(--color-surface);
-  outline: none;
-}
-
-.anno-toggle { position: absolute; opacity: 0; pointer-events: none; }
-
-.sidenote { display: none; }
-
-.sidenote::before {
-  content: counter(sidenote-counter);
-  font-family: var(--font-mono);
-  font-size: 0.65em;
-  vertical-align: super;
-  color: var(--color-link);
-  padding-right: 0.3em;
-}
-
-/* The gutter exists: 42rem column plus 15rem of margin. */
-@media (min-width: 1120px) {
-  .anno:hover .sidenote,
-  .anno-mark:focus ~ .sidenote,
-  .anno-toggle:checked ~ .sidenote {
-    display: block;
-    float: right;
-    width: 13rem;
-    margin: 0.2rem -15rem 0 0;
-    /* Zero height so the float cannot grow its paragraph. Each paragraph is a
-       flex item and therefore its own formatting context, which contains its
-       floats: with a real height the note reserved that space in the article
-       and opened a gap under the line. The content overflows into the gutter,
-       which is empty anyway. */
-    height: 0;
-    overflow: visible;
-    font-size: 0.78rem;
-    line-height: 1.5;
-    color: var(--color-muted);
-    text-align: left;
-  }
+  /* Paragraph break without a paragraph, for the reason in note.html. */
+  .sn-br { display: block; height: 0.55rem; }
 }
 
 /* No gutter to put it in, so it opens under the paragraph instead. */
@@ -859,7 +839,7 @@ article { counter-reset: sidenote-counter; }
   display: flex;
   align-items: center;
   gap: 0.32rem;
-  padding: 0.45rem 0.6rem;
+  padding: 0.35rem 0.5rem;
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
 }
@@ -1093,17 +1073,20 @@ article { counter-reset: sidenote-counter; }
 /* And clear of the paper's edge, so it does not look glued to the post-it. */
 .is-wide .deeper .anno:hover .sidenote,
 .is-wide .deeper .anno-mark:focus ~ .sidenote,
-.is-wide .deeper .anno-toggle:checked ~ .sidenote { margin-right: -14rem; }
+.is-wide .deeper .anno-toggle:checked ~ .sidenote { margin-right: -14.2rem; }
 .deeper .anno-mark::after,
-.deeper .sidenote::before { content: none; }
+.deeper .sidenote-inner::before { content: none; }
+
+/* On the paper, not on the page behind it. */
+.deeper .sidenote-inner { background: var(--paper); border-left-color: #e4d9b4; }
 
 /* The gutter is a real track now, so annotations stop guessing at viewport
    width and simply hang in it. */
 .is-wide .anno:hover .sidenote,
 .is-wide .anno-mark:focus ~ .sidenote,
 .is-wide .anno-toggle:checked ~ .sidenote {
-  margin-right: -13rem;
-  width: 11.5rem;
+  margin-right: -13.6rem;
+  width: 12.5rem;
 }
 
 @media (max-width: 900px) {
@@ -1238,6 +1221,180 @@ article { counter-reset: sidenote-counter; }
 @media (max-width: 640px) {
   .ml-name { display: none; }
   .ml-cap { padding-left: 0; }
+}
+
+/* One position, three heads. The two word rows hold the same sentence, so the
+   gap between them is the whole point: the text head is always further along
+   than the audio head, and the drawing trails both. */
+.hd {
+  --sound: #55673f;
+  --text: #154f65;
+  --draw: #b74735;
+  margin: 1.15rem 0;
+}
+
+.dark .hd { --sound: #6cc95f; --text: #57a7dd; --draw: #ff7259; }
+
+.hd-body {
+  display: grid;
+  grid-template-columns: 5rem minmax(0, 1fr);
+  gap: 0 0.9rem;
+}
+
+/* The line down the left says these three are one thing firing, not three
+   things running side by side. */
+.hd-spine {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* Short connector from the box into the line that holds the rows. */
+.hd-spine::after {
+  content: "";
+  position: absolute;
+  right: -0.9rem;
+  top: 50%;
+  width: 0.9rem;
+  height: 1px;
+  background: var(--color-border);
+}
+
+.hd-box {
+  display: block;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: var(--color-surface);
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  line-height: 1.5;
+  color: var(--color-link);
+  text-align: right;
+}
+
+.hd-box em {
+  display: block;
+  font-style: normal;
+  font-size: 0.72rem;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--color-ink);
+}
+
+/* The line belongs to the rows: it starts at the first tick and stops at the
+   last one. Where the last one is depends on how tall the board is, so the
+   figure measures it and sets --tail. */
+.hd-rows {
+  position: relative;
+  display: grid;
+  gap: 0.45rem;
+  padding-left: 0.9rem;
+  cursor: ew-resize;
+  touch-action: none;
+  user-select: none;
+}
+
+.hd-rows::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.65rem;
+  bottom: var(--tail, 0px);
+  width: 1px;
+  background: var(--color-border);
+}
+
+.hd-row {
+  display: grid;
+  grid-template-columns: 5rem minmax(0, 1fr);
+  gap: 0.7rem;
+  align-items: start;
+  position: relative;
+}
+
+/* The tick that joins each row back to the boundary it sits behind. */
+.hd-row::before {
+  content: "";
+  position: absolute;
+  left: -0.9rem;
+  top: 0.6rem;
+  width: 0.6rem;
+  height: 1px;
+  background: var(--color-border);
+}
+
+.hd-name {
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  line-height: 1.5;
+  color: var(--color-link);
+  padding-top: 0.25rem;
+}
+
+.hd-name em {
+  display: block;
+  font-style: normal;
+  opacity: 0.75;
+}
+
+.hd-row[data-c="text"] .hd-name { color: var(--text); }
+.hd-row[data-c="sound"] .hd-name { color: var(--sound); }
+.hd-row[data-c="draw"] .hd-name { color: var(--draw); }
+
+.hd-words {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+/* Not emitted yet: still there, so nothing shifts when it is. */
+.hd-w {
+  color: transparent;
+  padding: 0.1em 0.08em;
+  border-radius: 3px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.hd-row[data-c="text"] .hd-w.is-out { color: var(--text); }
+.hd-row[data-c="sound"] .hd-w.is-out { color: var(--sound); }
+
+.hd-row[data-c="text"] .hd-w.is-now { color: var(--text); background: color-mix(in srgb, var(--text) 15%, transparent); }
+.hd-row[data-c="sound"] .hd-w.is-now { color: var(--sound); background: color-mix(in srgb, var(--sound) 17%, transparent); }
+
+.hd-board { max-width: 5.6rem; }
+.hd-board svg { width: 100%; height: auto; display: block; }
+
+.hd-stroke {
+  fill: none;
+  stroke: var(--draw);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke-dashoffset 0.5s ease-out;
+}
+
+.hd-cap {
+  margin: 0.6rem 0 0;
+  font-size: 0.76rem;
+  color: var(--color-muted);
+}
+
+.hd .cb-controls { padding-left: 0; margin-top: 0.5rem; }
+
+@media (max-width: 640px) {
+  .hd-body { grid-template-columns: minmax(0, 1fr); gap: 0.8rem; }
+  .hd-spine { justify-content: flex-start; padding-right: 0; }
+  .hd-spine::after, .hd-row::before { display: none; }
+  .hd-rows { padding-left: 0; }
+  .hd-rows::before { display: none; }
+  .hd-row { grid-template-columns: minmax(0, 1fr); gap: 0.2rem; }
+  .hd-words { font-size: 0.92rem; }
 }
 
 /* Where the frames come from. The waveform, the cuts the codec makes in it, and

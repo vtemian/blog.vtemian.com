@@ -98,7 +98,7 @@
         document.querySelectorAll('[data-note-id]').forEach(function (n) {
             notes[n.getAttribute('data-note-id')] = n;
         });
-        document.querySelectorAll('.pencil').forEach(function (btn) {
+        document.querySelectorAll('.pencil, .arrow').forEach(function (btn) {
             var note = notes[btn.getAttribute('data-note')];
             if (!note) return;
             pairs.push([btn, note]);
@@ -108,6 +108,101 @@
                 if (open) place(btn, note);
             });
         });
+
+        // The arrows themselves. One drawn mark per phrase, living in the
+        // article body rather than inside the paragraph, so it can hang in the
+        // margin without the text reflowing around it. It points from whichever
+        // side has the room, and is re-aimed whenever the words move.
+        var marks = [];
+        document.querySelectorAll('.arrow').forEach(function (btn) {
+            var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('class', 'arrow-mark');
+            svg.setAttribute('viewBox', '0 0 110 42');
+            svg.setAttribute('aria-hidden', 'true');
+            // Drawn, not stroked: the shaft is a filled outline that starts thin
+            // at the tail and thickens into the head, the way a pen leaves a
+            // line. The two barbs are unequal on purpose, and the whole thing
+            // sits at a slight angle, because a hand does not draw level.
+            svg.innerHTML =
+                '<path d="M4.2 14.6 C10 11.4 18 9.4 27 8.9 C41 8.1 56 10.8 68 14.4 ' +
+                'C80 18 90.6 21.4 99.4 24.2 L98 27.4 C89 24.4 78.6 21 66.6 17.4 ' +
+                'C55 13.9 41 11.2 27.4 11.9 C19 12.3 11.4 14 5.6 17 Z" fill="currentColor"/>' +
+                '<path d="M99.4 24.2 L79.9 28.8 M99.4 24.2 L87.7 11.9" fill="none" stroke="currentColor" ' +
+                'stroke-width="2.5" stroke-linecap="round"/>';
+            svg.addEventListener('click', function () { btn.click(); });
+            // Kept out of the paragraph on purpose. Measuring where a line of
+            // text ends means measuring the paragraph's contents, and a mark
+            // living inside it would be measured too: it would read its own
+            // position back and walk off to the right, one aim at a time.
+            (document.querySelector('.article-body') || document.body).appendChild(svg);
+            marks.push([btn, svg]);
+        });
+
+        // What the mark's left and top are measured against: the nearest
+        // positioned ancestor, or the document if there is none. offsetTop is
+        // no use here, since it answers for a different element than the one
+        // the absolute mark is placed inside.
+        function base(el) {
+            var n = el.parentElement;
+            while (n) {
+                if (getComputedStyle(n).position !== 'static') {
+                    var r = n.getBoundingClientRect();
+                    return { top: r.top, left: r.left };
+                }
+                n = n.parentElement;
+            }
+            return { top: -window.scrollY, left: -window.scrollX };
+        }
+
+        // Where the text on a given line actually ends. A paragraph box runs to
+        // the column edge whether or not the last line reaches it, so pinning a
+        // mark to the box leaves a hole the width of whatever did not fit.
+        function lineEnd(col, frag) {
+            var range = document.createRange();
+            range.selectNodeContents(col);
+            var lines = range.getClientRects(), best = null;
+            for (var i = 0; i < lines.length; i++) {
+                var q = lines[i];
+                var overlap = Math.min(q.bottom, frag.bottom) - Math.max(q.top, frag.top);
+                if (overlap > frag.height * 0.5 && (!best || q.right > best.right)) best = q;
+            }
+            return best ? best.right : col.getBoundingClientRect().right;
+        }
+
+        function aim() {
+            marks.forEach(function (m) {
+                var btn = m[0], svg = m[1];
+                var colEl = btn.closest('p, li') || btn.parentNode;
+                var frags = btn.getClientRects();
+                var col = colEl.getBoundingClientRect();
+                if (!frags.length || !col.width) { svg.style.opacity = '0'; return; }
+                svg.style.opacity = '';
+                var o = base(svg);
+                var whole = btn.getBoundingClientRect();
+                // The mark hangs in the margin beside the column, never over the
+                // words: it points at the line the phrase is on, and the red
+                // underline says which phrase on that line.
+                var fromLeft = whole.left + whole.width / 2 < col.left + col.width * 0.6;
+                // A phrase can wrap. Aim at the fragment on the side the mark
+                // comes from, so the tip lands on a line the phrase is on.
+                var frag = fromLeft ? frags[0] : frags[frags.length - 1];
+                svg.style.top = (frag.top + frag.height / 2 - 24 - o.top) + 'px';
+                svg.style.left = ((fromLeft ? col.left - 116 : lineEnd(colEl, frag) + 10) - o.left) + 'px';
+                svg.style.transform = fromLeft ? '' : 'scaleX(-1)';
+            });
+        }
+
+        function settle() { requestAnimationFrame(aim); setTimeout(aim, 120); setTimeout(aim, 420); }
+        window.addEventListener('resize', aim);
+        document.addEventListener('transitionend', aim);
+        document.addEventListener('click', settle);
+        if (window.ResizeObserver) {
+            var body = document.querySelector('.article-body') || document.body;
+            new ResizeObserver(function () { requestAnimationFrame(aim); }).observe(body);
+        }
+        aim();
+        if (document.fonts && document.fonts.ready) document.fonts.ready.then(aim);
+        setTimeout(aim, 400);
     })();
 </script>
 

@@ -1,0 +1,164 @@
+{{- /* One position, three heads. Every tick the model emits once per stream: the
+       text head writes the next word of its own speech, the audio head voices a
+       word it wrote a few positions ago, the drawing head puts down the stroke
+       that word asked for. Same clock, three outputs, and the monologue always
+       out in front. */ -}}
+<figure class="hd" aria-label="One position feeding three heads: the inner monologue runs ahead of the speech, and the drawing follows both">
+  <div class="hd-body">
+    <div class="hd-spine">
+      <span class="hd-box">one position<em class="hd-t">t = 0</em></span>
+    </div>
+    <div class="hd-rows">
+      <div class="hd-row" data-c="text">
+        <span class="hd-name">text head</span>
+        <p class="hd-words" data-c="text" aria-hidden="true"></p>
+      </div>
+      <div class="hd-row" data-c="sound">
+        <span class="hd-name">audio head</span>
+        <p class="hd-words" data-c="sound" aria-hidden="true"></p>
+      </div>
+      <div class="hd-row" data-c="draw">
+        <span class="hd-name">draw head</span>
+        <div class="hd-board">
+          <svg viewBox="20 20 160 180" role="img" aria-label="A right triangle with a square on each side, drawn one piece at a time">
+            <polyline class="hd-stroke" points="70,130 130,130 70,90 70,130"/>
+            <polyline class="hd-stroke" points="70,130 70,90 30,90 30,130 70,130"/>
+            <polyline class="hd-stroke" points="70,130 130,130 130,190 70,190 70,130"/>
+            <polyline class="hd-stroke" points="130,130 70,90 110,30 170,70 130,130"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="hd-cap">Same sentence in both rows, seven positions apart. Nobody hears the top one.</p>
+  <div class="cb-controls">
+    <button class="cb-btn" data-act="toggle" aria-label="Play or pause">▶</button>
+    <button class="cb-btn" data-act="replay" aria-label="Replay from the start">↺</button>
+    <span class="cb-hint">drag to move the position</span>
+  </div>
+</figure>
+<script>
+(() => {
+  const fig = [...document.querySelectorAll('.hd')].find(e => !e.dataset.ready);
+  if (!fig) return;
+  fig.dataset.ready = '1';
+
+  const WORDS = 'Square the two short sides, add them up, and you get the long one.'.split(' ');
+  const MS = 400;
+  const SAY = 7;    // positions between writing a word and voicing it
+  const DRAW = 10;  // and between writing it and the stroke landing
+  const STROKE_AT = [0, 3, 4, 11];   // which word each stroke belongs to
+  const RUN = WORDS.length + DRAW;
+
+  const rows = {};
+  for (const ch of ['text', 'sound']) {
+    const box = fig.querySelector(`.hd-words[data-c="${ch}"]`);
+    rows[ch] = WORDS.map(w => {
+      const el = document.createElement('span');
+      el.className = 'hd-w';
+      el.textContent = w;
+      box.appendChild(el);
+      box.appendChild(document.createTextNode(' '));
+      return el;
+    });
+  }
+
+  const strokes = [...fig.querySelectorAll('.hd-stroke')].map(el => {
+    const len = el.getTotalLength();
+    el.style.strokeDasharray = len;
+    el.style.strokeDashoffset = len;
+    return { el, len };
+  });
+
+  const clock = fig.querySelector('.hd-t');
+  const controls = fig.querySelector('.cb-controls');
+  const toggle = controls.querySelector('[data-act="toggle"]');
+
+  let tick = 0, playing = false, acc = 0, lastNow = 0;
+  const render = t => {
+    tick = Math.max(0, Math.min(RUN, t));
+    const p = Math.floor(tick);
+
+    // Same position for all three. Only the content differs: the text head is
+    // already on the word the audio head will voice four positions from now.
+    const heads = { text: p, sound: p - SAY };
+    for (const ch of ['text', 'sound']) {
+      const at = heads[ch];
+      rows[ch].forEach((el, i) => {
+        el.className = 'hd-w' + (i < at ? ' is-out' : i === at ? ' is-now' : '');
+      });
+    }
+    strokes.forEach((s, i) => {
+      const at = p - DRAW - STROKE_AT[i] >= 0;
+      s.el.style.strokeDashoffset = at ? 0 : s.len;
+    });
+
+    clock.textContent = 't = ' + Math.max(0, Math.min(WORDS.length, p));
+  };
+
+  const setPlaying = on => {
+    playing = on;
+    toggle.textContent = on ? '❚❚' : '▶';
+    toggle.setAttribute('aria-label', on ? 'Pause' : 'Play');
+  };
+  const play = from => {
+    if (from != null) render(from);
+    if (tick >= RUN) render(0);
+    acc = tick * MS;
+    setPlaying(true);
+  };
+  let touched = false;
+  toggle.addEventListener('click', () => { touched = true; playing ? setPlaying(false) : play(); });
+  controls.querySelector('[data-act="replay"]').addEventListener('click', () => { touched = true; play(0); });
+
+  const strip = fig.querySelector('.hd-rows');
+  const tickAt = x => {
+    const r = fig.querySelector('.hd-words[data-c="text"]').getBoundingClientRect();
+    return Math.max(0, Math.min(RUN, (x - r.left) / r.width * RUN));
+  };
+  let dragging = false;
+  strip.addEventListener('pointerdown', e => {
+    touched = true;
+    setPlaying(false);
+    dragging = true;
+    try { strip.setPointerCapture(e.pointerId); } catch (_) {}
+    render(tickAt(e.clientX));
+    e.preventDefault();
+  });
+  strip.addEventListener('pointermove', e => { if (dragging) render(tickAt(e.clientX)); });
+  for (const t of ['pointerup', 'pointercancel', 'pointerleave']) {
+    strip.addEventListener(t, () => { dragging = false; });
+  }
+
+  const frame = now => {
+    if (playing) {
+      acc += Math.min(now - lastNow, 200);   // only the time this tab spent drawing
+      const t = acc / MS;
+      if (t >= RUN) { render(RUN); setPlaying(false); } else render(t);
+    }
+    lastNow = now;
+    requestAnimationFrame(frame);
+  };
+  requestAnimationFrame(now => { lastNow = now; frame(now); });
+
+  // Where the line down the left should stop: at the last tick, not at the
+  // bottom of the board that happens to sit in the last row.
+  const tail = () => {
+    const rows = fig.querySelectorAll('.hd-row');
+    const last = rows[rows.length - 1];
+    fig.style.setProperty('--tail', Math.max(0, last.offsetHeight - 12) + 'px');
+  };
+  window.addEventListener('resize', tail);
+  tail();
+
+  render(0);
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) render(RUN);
+  else {
+    new IntersectionObserver((es, obs) => {
+      if (!es.some(e => e.intersectionRatio > 0.5)) return;
+      obs.disconnect();
+      if (!touched) play(0);
+    }, { threshold: [0, 0.5, 1] }).observe(fig);
+  }
+})();
+</script>
