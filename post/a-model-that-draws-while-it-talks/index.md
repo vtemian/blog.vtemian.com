@@ -31,11 +31,17 @@ Interactive is where a model gets interesting. An article cannot hold up its end
 **Sources:** [Chi & Wylie 2014](https://files.eric.ed.gov/fulltext/EJ1044018.pdf) is the framework, free full text. [Freeman et al. 2014](https://www.pnas.org/doi/10.1073/pnas.1319030111) is the meta-analysis behind the underlying claim, 225 studies, engagement against lecture. [Kim, Reinecke & Hullman 2017](https://doi.org/10.1145/3025453.3025592) is the evidence for predict-then-reveal specifically.
 {{< /deeper >}}
 
-Just prompt your favorite frontier model, ask it to generate HTML and JS with interactive elements and you will get a pretty fun learning exercise.
+Just prompt your favorite frontier model, ask it to {{< note text="generate HTML and JS" >}}The reason this works better than asking for an explanation: the model doesn't have to be right, it has to write something that runs, and you can watch it run. A wrong sentence reads exactly like a correct one. A wrong simulation usually just looks broken.{{< /note >}} with interactive elements and you will get a pretty fun learning exercise.
 
-But still, it doesn't feel like a tutor, like a teacher. If you want to get the full experience, you need to combine certain prompts with certain tools for text-to-speech and text-to-image.
+But still, it doesn't feel like a tutor, {{< note text="like a teacher" >}}Bloom put a number on that gap in 1984. Students taught one to one, with mastery checks along the way, ended up about two standard deviations above the same material taught to a class. He was not selling tutoring, he was asking how to get a class near it, since one tutor per child is not a thing anyone can pay for.
 
-And that's not how humans explain concepts. Look at Khan Academy or {{< note text="3Blue1Brown" >}}Grant Sanderson draws those animations with Manim, a Python library he wrote for the purpose.{{< /note >}}. It feels more natural, easier to follow and understand if somebody is {{< pencil "together" >}}speaking to us while they draw on a board{{< /pencil >}} and correlate it with their speech and their drawing.
+The number itself has not held up at that size. The mechanism has. A tutor watches you work, catches the specific thing you have wrong, and changes what happens next. No amount of quality in the explanation gets you that, because the explanation was written before you started.
+
+**Source:** [Bloom 1984](https://doi.org/10.3102/0013189X013006004).{{< /note >}}. If you want to get the full experience, you need to combine certain prompts with certain tools for text-to-speech and text-to-image.
+
+And that's not how humans explain concepts. Look at Khan Academy or {{< note text="3Blue1Brown" >}}Those animations are Python. Sanderson wrote Manim to make them, so each picture is the output of a program rather than a drawing someone made by hand.
+
+That is the same shape as what a model like this has to produce. Not pixels: instructions, which something else turns into the picture. The people who explain best on video had already reduced their drawing to code, which means there is less for the model to invent.{{< /note >}}. It feels more natural, easier to follow and understand if somebody is {{< arrow "together" >}}speaking to us while they draw on a board{{< /arrow >}} and correlate it with their speech and their drawing.
 
 {{< deeper "Why saying it while drawing it works" "together" >}}
 Two halves of the same explanation, arriving at the same moment, land better than the same two halves one after the other. Richard Mayer's group has been measuring this for decades, and the finding they keep getting is about timing: <mark>the narration and the picture it describes have to arrive together.</mark> Split them and the learner spends their effort holding the first half in mind while the second one plays.
@@ -72,7 +78,7 @@ Four independent streams, and nothing in the protocol says where in the audio th
 **Reference:** [OpenAI Realtime conversations](https://developers.openai.com/api/docs/guides/realtime-conversations)
 {{< /deeper >}}
 
-If you think about it, when you start to explain and draw something, you already have an inner monologue that usually is {{< pencil "ahead" >}}a little bit ahead of your drawing and speech{{< /pencil >}}.
+If you think about it, when you start to explain and draw something, you already have an inner monologue that usually is {{< arrow "ahead" >}}a little bit ahead of your drawing and speech{{< /arrow >}}.
 
 {{< deeper "The hand starts before the word" "ahead" >}}
 This is not only a feeling you have about yourself. It has been filmed and measured.
@@ -84,11 +90,11 @@ How big the gap is depends on the word: **familiarity predicts it**. That is the
 **Source:** [Morrel-Samuels & Krauss 1992](https://doi.org/10.1037/0278-7393.18.3.615). The earlier version of the same work is titled, plainly, <u>Gestures precede speech</u>.
 {{< /deeper >}}
 
-{{< monologue >}}
-
 Now how can we translate something like that to a model?
 
-You put everything on one clock. The sound gets cut into equal slices, {{< note text="about twelve of them a second" >}}12.5, exactly. One slice every 80 milliseconds.{{< /note >}}. The words go on the slices they start in. One position in the sequence means one moment in time, and it means that for both of them at once.
+You put everything on one clock. The sound gets cut into equal slices, {{< note text="one clock" >}}The clock is not free. At every position the model emits every stream it carries, whether or not that stream has anything to say. Silence costs a token, exactly like a word does.
+
+That is the trade you are making. You buy alignment, which nothing else gives you, and you pay for it in tokens that carry nothing, at every frame, for as long as the model runs.{{< /note >}}, about twelve of them a second. The words go on the slices they start in. One position in the sequence means one moment in time, and it means that for both of them at once.
 
 {{< fold "Where that clock comes from" "4 min" >}}
 
@@ -114,7 +120,9 @@ Real time is just arithmetic. <mark>At 12.5 frames a second the model has 80 mil
 
 Going low costs you something though. A frame is the <u>smallest thing you can point at</u>. At 12.5 a second you can't place a word more precisely than 80 milliseconds, so everything gets rounded to the nearest frame. A faster codec would let you line things up more finely, if you could afford to generate it.
 
-The other cost is that every token has to carry more sound. Mimi uses 8 {{< note text="codebooks" >}}Eight learned tables. A frame is stored as eight indexes into them, one per table, coarse to fine.{{< /note >}} per frame, 2048 entries each, and fits a second of speech into about 1.1 kilobits.
+The other cost is that every token has to carry more sound. Mimi uses 8 {{< note text="codebooks" >}}Eight learned tables, and the order of them matters. The first one picks the closest match it has to the frame, which is rough. The second stores what the first one missed. The third stores what the two of them still miss, and so on down.
+
+So the eight are not eight equal shares. Most of the meaning sits in the first one or two, which is why you can drop the last few and still understand the speech, just not enjoy it.{{< /note >}} per frame, 2048 entries each, and fits a second of speech into about 1.1 kilobits.
 
 **Reference:** [Mimi is introduced inside the Moshi paper](https://arxiv.org/abs/2410.00037), section 3.3. [EnCodec](https://arxiv.org/abs/2210.13438), [DAC](https://arxiv.org/abs/2306.06546) and [SoundStream](https://arxiv.org/abs/2107.03312) for the rest.
 {{< /deeper >}}
@@ -137,7 +145,9 @@ But there is a slot for every tick, and words don't fill every slot. The empty o
 
 {{< align >}}
 
-Now the text ticks at the same rate as the audio. That is what {{< note text="Moshi" >}}Kyutai's speech model, 2024. It listens and talks at the same time, which is what the shared clock buys you.{{< /note >}} calls the {{< pencil "monologue" >}}inner monologue{{< /pencil >}}.
+Now the text ticks at the same rate as the audio. That is what {{< note text="Moshi" >}}Kyutai's speech model, 2024. The unusual part is not that it speaks, it is that it does not take turns: it models both sides of the conversation at once, its own voice and yours, and keeps generating while you are still talking.
+
+That is what the shared clock is for. Turn-taking is a rule you have to impose on a system that can only attend to one thing at a time. Put both sides on one clock and the model can be interrupted, because it never stopped listening.{{< /note >}} calls the {{< pencil "monologue" >}}inner monologue{{< /pencil >}}.
 
 {{< deeper "What the inner monologue is for" "monologue" >}}
 It's not a transcript for us to read. <mark>It's a plan that the voice follows.</mark>
@@ -153,10 +163,12 @@ This is Moshi's technique, not something everybody does. Most speech models don'
 
 Now two tokens need the same position. On frame 13 there is a text token and an audio token. The model has to take both.
 
-This doesn't need a different kind of transformer. A transformer doesn't work with tokens directly. Every token becomes a vector first, and that vector is built before the model sees it. You are {{< pencil "summing" >}}already building it out of more than one thing{{< /pencil >}}.
+This doesn't need a different kind of transformer. A transformer doesn't work with tokens directly. Every token becomes a vector first, and that vector is built before the model sees it. You are {{< arrow "summing" >}}already building it out of more than one thing{{< /arrow >}}.
 
 {{< deeper "One position, several embeddings" "summing" >}}
-In {{< note text="nanoGPT" >}}Karpathy's teaching implementation of GPT-2. About 300 lines, and the one most people read first.{{< /note >}}, the input to the first block is this:
+In {{< note text="nanoGPT" >}}Karpathy's teaching implementation of GPT-2, about three hundred lines. The reason everybody reads it first is that nothing hides behind a library call: the forward pass **is** the architecture.
+
+Which is why those two lines settle the question. If what a transformer reads at each position is a sum, then adding a stream is addition, and none of the parts underneath have to change.{{< /note >}}, the input to the first block is this:
 
 ```python
 tok_emb = self.transformer.wte(idx)   # what the token is
@@ -173,7 +185,9 @@ Getting them back out works the same way <u>in reverse</u>. The model produces o
 
 {{< endfold >}}
 
-Once two streams share that clock, a third one costs almost nothing. {{< pencil "others" >}}The model doesn't care what is in it{{< /pencil >}}. Somebody already put facial motion on that clock. Somebody else put robot actions on it.
+Once two streams share that clock, a third one {{< note text="costs almost nothing" >}}Inside the model, near enough nothing: one more embedding table to add in, one more head to read back out. Both are rounding errors next to the transformer they hang off.
+
+The bill arrives in the data. Every example you train on now needs that third stream, aligned to the same frames as the other two, and there is nothing you can download that has it. You record it or you generate it. That, rather than anything about the architecture, is why a third stream is rare.{{< /note >}}. {{< arrow "others" >}}The model doesn't care what is in it{{< /arrow >}}. Somebody already put facial motion on that clock. Somebody else put robot actions on it.
 
 {{< deeper "What else people have put on it" "others" >}}
 Two of them, both real.
@@ -188,4 +202,6 @@ Neither is doing anything the drawing stream will not. <u>The slot does not care
 {{< /deeper >}}
 
 We put drawing commands on it.
+
+{{< heads >}}
 
