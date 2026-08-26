@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - content
+  # GitHub dropped the push event for a8e9f01 and the site sat a commit behind
+  # with no way to ask for a build. This is that way.
+  workflow_dispatch:
 
 jobs:
   build-deploy:
