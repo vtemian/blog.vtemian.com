@@ -1,0 +1,17 @@
+{{- /* Where the frames come from, as one thing you can poke at. The waveform,
+       the cuts the codec makes in it, and the tokens those slices become, all
+       on screen at once. Click any frame to see the slice of sound it was cut
+       from and the seconds it covers. */ -}}
+<figure class="al" aria-label="A waveform cut into 12.5 slices per second, each slice a token you can inspect">
+  <div class="al-stage">
+    <span class="al-word">a word</span>
+    <svg class="al-wave" viewBox="0 0 300 62" preserveAspectRatio="none" role="img">
+      <rect class="al-slice" y="1" height="60" width="0" x="0"></rect>
+      <path class="al-env"></path>
+      <g class="al-cuts"></g>
+    </svg>
+    <div class="al-cells"></div>
+    <div class="al-ruler"></div>
+  </div>
+  <p class="al-cap"></p>
+</figure>

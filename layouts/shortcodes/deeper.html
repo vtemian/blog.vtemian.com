@@ -1,0 +1,101 @@
+{{- /* A note laid on the page, and one you can draw on. Given an id it starts
+       hidden and is opened by the pencil-marked phrase that names it. */ -}}
+{{- $id := .Get 1 -}}
+<aside class="deeper"{{ with $id }} data-note-id="{{ . }}"{{ end }}>
+  <button type="button" class="deeper-tool" data-tool="clear" aria-label="Clear the drawing" title="Clear the drawing">
+    <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 13h10M4.5 10.5l6-6a1.6 1.6 0 0 1 2.3 0l.7.7a1.6 1.6 0 0 1 0 2.3l-6 6H4.5z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+  </button>
+  <p class="deeper-title">{{ .Get 0 | default "Note" }}</p>
+  <div class="deeper-body">
+    {{ .Inner | markdownify }}
+  </div>
+  <canvas class="deeper-canvas"></canvas>
+</aside>
+<script>
+(() => {
+  // Claim the next one that has not been set up yet. Scripts run in document
+  // order and so do the elements, so the Nth script gets the Nth element. Ids
+  // from .Ordinal collide once shortcodes nest, and previousElementSibling
+  // breaks the moment a wrapper is markdownified around them.
+  const note = [...document.querySelectorAll('.deeper')].find(e => !e.dataset.ready);
+  if (!note) return;
+  note.dataset.ready = '1';
+  const cv = note.querySelector('.deeper-canvas');
+  const ctx = cv.getContext('2d');
+  const strokes = [];        // normalised, so a resize redraws rather than wipes
+  let live = null, w = 0, h = 0;
+
+  // No ResizeObserver here. Observing the note and then writing to the canvas
+  // inside the callback is a feedback loop: it fired, the write changed the
+  // box, it fired again, and the backing store doubled until the tab froze.
+  // A window listener plus a size check on each paint is enough.
+  // Size and hit-test against the same rect, the canvas's own. Measuring the
+  // note and drawing on the canvas put the strokes wherever the note's padding
+  // happened to be, which is why the ink sat away from the cursor.
+  const measure = () => {
+    const r = cv.getBoundingClientRect();
+    if (r.width < 2 || r.height < 2) return false;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    // Clamp hard. If anything ever feeds the backing store back into the
+    // measurement, this stops it at a size the browser can still allocate
+    // rather than letting it double until the tab dies.
+    const nw = Math.min(Math.round(r.width * dpr), 4000);
+    const nh = Math.min(Math.round(r.height * dpr), 4000);
+    if (nw !== cv.width) cv.width = nw;
+    if (nh !== cv.height) cv.height = nh;
+    w = r.width; h = r.height;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return true;
+  };
+
+  const paint = () => {
+    if (!measure()) return;
+    ctx.clearRect(0, 0, w, h);
+    // A marker, not a pen. The blending that matters happens between the canvas
+    // and the note underneath, which is a CSS mix-blend-mode: compositing inside
+    // the canvas only blends strokes with each other, so the text stayed hidden.
+    ctx.globalAlpha = 0.55;
+    ctx.strokeStyle = (getComputedStyle(note).getPropertyValue('--marker') || '#ffd84d').trim();
+    ctx.lineWidth = 15;
+    ctx.lineCap = ctx.lineJoin = 'round';
+    for (const s of strokes) {
+      if (s.length < 2) continue;
+      ctx.beginPath();
+      ctx.moveTo(s[0][0] * w, s[0][1] * h);
+      for (const [x, y] of s.slice(1)) ctx.lineTo(x * w, y * h);
+      ctx.stroke();
+    }
+  };
+
+  const point = e => {
+    const r = cv.getBoundingClientRect();
+    return [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height];
+  };
+
+  cv.addEventListener('pointerdown', e => {
+    live = [point(e)];
+    strokes.push(live);
+    try { cv.setPointerCapture(e.pointerId); } catch (_) {}
+    e.preventDefault();
+  });
+  cv.addEventListener('pointermove', e => {
+    if (!live) return;
+    live.push(point(e));
+    paint();
+  });
+  const stop = () => { live = null; };
+  for (const t of ['pointerup', 'pointercancel', 'pointerleave']) cv.addEventListener(t, stop);
+
+  note.querySelector('[data-tool="clear"]').addEventListener('click', () => {
+    strokes.length = 0;
+    paint();
+  });
+
+  window.addEventListener('resize', paint);
+  // The note may be hidden when this runs; paint again the first time it is not.
+  const settle = () => { if (!measure()) requestAnimationFrame(settle); else paint(); };
+  requestAnimationFrame(settle);
+  note.addEventListener('transitionend', paint);
+  document.addEventListener('click', e => { if (e.target.closest('.pencil')) requestAnimationFrame(paint); });
+})();
+</script>

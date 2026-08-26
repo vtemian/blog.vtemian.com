@@ -1,0 +1,253 @@
+{{- /* The article in one object. One narration script drives three things at
+       once: the words appearing in the chat, the text channel lighting up, and
+       the ink arriving on the board. They cannot drift, because they are read
+       from the same array. 250 frames at 12.5 Hz is twenty seconds. */ -}}
+<figure class="cb" aria-label="A tutor answering in chat while drawing the answer on a board, with both channels shown frame by frame">
+  <div class="cb-top">
+    <div class="cb-board">
+      <div class="cb-surface"><svg viewBox="0 0 340 190" role="img">
+      <defs>
+        {{- /* Chalk does not travel in straight lines. Low-frequency noise
+              displaces every stroke a little so the geometry stays exact while
+              the ink looks drawn; a second, much finer pass mottles it so the
+              stroke is not a solid ribbon of colour. Tune SCALE for wobble and
+              GRAIN's slope for dustiness. */ -}}
+        <filter id="cb-chalk-{{ .Ordinal }}" x="-8%" y="-8%" width="116%" height="116%" color-interpolation-filters="sRGB">
+          <feTurbulence type="fractalNoise" baseFrequency="0.028" numOctaves="3" seed="11" result="wob"/>
+          <feDisplacementMap in="SourceGraphic" in2="wob" scale="2.4"
+                             xChannelSelector="R" yChannelSelector="G"/>
+        </filter>
+      </defs>
+      <g class="cb-ink" filter="url(#cb-chalk-{{ .Ordinal }})"></g>
+    </svg></div>
+      <div class="cb-tray" aria-hidden="true">
+        <span class="cb-eraser"></span>
+        <span class="cb-stick"></span>
+      </div>
+    </div>
+    <aside class="cb-chat">
+      <div class="cb-bar" aria-hidden="true">
+        <span class="cb-dot"></span><span class="cb-dot"></span><span class="cb-dot"></span>
+      </div>
+      <div class="cb-thread">
+      <div class="cb-msg cb-msg-you">
+        <span class="cb-who">you</span>
+        <p>why does a² + b² = c² ?</p>
+      </div>
+      <div class="cb-msg cb-msg-bot">
+        <span class="cb-who">chalkboard</span>
+        <p class="cb-say"></p>
+      </div>
+      </div>
+    </aside>
+  </div>
+  <div class="cb-grid">
+    <div class="cb-row"><span class="cb-ch" data-c="sound" role="img" aria-label="sound channel"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6h2.4L8.6 3v10L5.4 10H3z" fill="currentColor"/><path d="M10.8 5.6a3.2 3.2 0 0 1 0 4.8M12.8 3.6a6 6 0 0 1 0 8.8" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></span><div class="cb-cells" data-c="sound"></div></div>
+    <div class="cb-row"><span class="cb-ch" data-c="text" role="img" aria-label="text channel"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 4h11M2.5 8h11M2.5 12h6.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span><div class="cb-cells" data-c="text"></div></div>
+    <div class="cb-row"><span class="cb-ch" data-c="draw" role="img" aria-label="draw channel"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M11.2 2.4l2.4 2.4-8 8L2.4 14l1.2-3.2z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M10 3.6l2.4 2.4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></span><div class="cb-cells" data-c="draw"></div></div>
+    <div class="cb-head"></div>
+  </div>
+  <div class="cb-controls">
+    <button class="cb-btn" data-act="toggle" aria-label="Play or pause">▶</button>
+    <button class="cb-btn" data-act="replay" aria-label="Replay from the start">↺</button>
+    <span class="cb-frame"></span>
+    <span class="cb-hint">drag the frames</span>
+  </div>
+</figure>
+<script>
+(() => {
+  // Claim the next one that has not been set up yet. Scripts run in document
+  // order and so do the elements, so the Nth script gets the Nth element. Ids
+  // from .Ordinal collide once shortcodes nest, and previousElementSibling
+  // breaks the moment a wrapper is markdownified around them.
+  const fig = [...document.querySelectorAll('.cb')].find(e => !e.dataset.ready);
+  if (!fig) return;
+  fig.dataset.ready = '1';
+  const svg = fig.querySelector('svg');
+  const ink = fig.querySelector('.cb-ink');   // filtered: all drawing lands here
+  const NS = 'http://www.w3.org/2000/svg';
+  const CHALK = '#ffffff';
+  const FRAMES = 240, MS = 80;   // 19 s. One cell per frame stays legible while
+                                 // the row can still fit them: at this width that
+                                 // is about 300, past which the gaps starve them.   // 9 s. One cell per frame has to stay legible:
+                                 // past ~130 frames the gaps exceed the row width
+                                 // and every cell collapses to nothing.
+
+  // The narration, and the only place timing is written down. Each word is
+  // [start frame, word]; its length comes from its spelling the way the corpus
+  // bills speech. Words land just before the ink they announce.
+  const SAY = [
+    [3,'Take'],[8,'a'],[12,'right'],[18,'triangle.'],
+    [28,'The'],[32,'two'],[36,'short'],[42,'sides'],[48,'are'],[52,'a'],[56,'and'],[60,'b.'],
+    [70,'The'],[74,'long'],[79,'one,'],[84,'opposite'],[92,'the'],[96,'right'],[102,'angle,'],[109,'is'],[113,'c.'],
+    [123,'Now'],[127,'put'],[131,'a'],[135,'square'],[141,'on'],[145,'each'],[150,'side.'],
+    [160,'The'],[164,'two'],[168,'small'],[174,'squares,'],[181,'added'],[187,'together,'],
+    [196,'cover'],[202,'exactly'],[209,'the'],[213,'same'],[218,'area'],[223,'as'],[227,'the'],[231,'big'],[235,'one.'],
+  ];
+
+  const wordFrames = w => Math.max(3, Math.round(w.replace(/[^a-z0-9]/gi, '').length / 1.1));
+
+  // The figure: a right triangle with a square on each side. The two small
+  // squares fill in first, the big one last, so the animation says what the
+  // sentence says. Every coordinate is computed from the triangle, including
+  // the square on the hypotenuse, which sits along the outward normal.
+  const C = [125, 124], A = [125, 79], B = [185, 124];      // right angle at C
+  const nx = 0.6, ny = -0.8, HYP = 75;                       // unit normal, outward
+
+  const el = (tag, attrs, text) => {
+    const n = document.createElementNS(NS, tag);
+    for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v);
+    if (text != null) n.textContent = text;
+    ink.appendChild(n);
+    return n;
+  };
+  const line = (d, w, o) => el('path', { d, fill: 'none', stroke: CHALK, 'stroke-width': w,
+    'stroke-linecap': 'round', 'stroke-linejoin': 'round', opacity: o ?? 1 });
+  const fill = d => el('path', { d, fill: CHALK, 'fill-opacity': 0.2, stroke: 'none', opacity: 0 });
+  const words = (x, y, size, anchor) => el('text', { x, y, fill: CHALK, opacity: 0,
+    'font-size': size, 'font-family': 'ui-monospace, monospace', 'text-anchor': anchor || 'middle' });
+
+  const tri = line(`M${C[0]} ${C[1]} L${A[0]} ${A[1]} L${B[0]} ${B[1]} Z`, 2.4);
+  const rightAngle = line(`M${C[0] + 11} ${C[1]} V${C[1] - 11} H${C[0]}`, 1.2, 0.7);
+
+  const sqA = line(`M${C[0]} ${C[1]} H80 V79 H${A[0]} Z`, 1.9);
+  const sqB = line(`M${C[0]} ${C[1]} V184 H${B[0]} V${B[1]} Z`, 1.9);
+  const hypD = `M${A[0]} ${A[1]} L${B[0]} ${B[1]} L${(B[0] + nx * HYP).toFixed(1)} ${(B[1] + ny * HYP).toFixed(1)} L${(A[0] + nx * HYP).toFixed(1)} ${(A[1] + ny * HYP).toFixed(1)} Z`;
+  const sqC = line(hypD, 2.1);
+
+  const fillA = fill(`M${C[0]} ${C[1]} H80 V79 H${A[0]} Z`);
+  const fillB = fill(`M${C[0]} ${C[1]} V184 H${B[0]} V${B[1]} Z`);
+  const fillC = fill(hypD);
+
+  const la = words(102, 107, 12); la.textContent = 'a';
+  const lb = words(155, 140, 12); lb.textContent = 'b';
+  const lc = words(177, 82, 12); lc.textContent = 'c';
+  // Clear of the b square, which reaches x=185 and down to y=184.
+  const eq = words(332, 166, 14, 'end'); eq.textContent = 'a² + b² = c²';
+
+  // The text channel is derived from the script, so the two cannot disagree.
+  const blocks = {
+    sound: [[2, 22], [27, 38], [69, 50], [122, 34], [159, 38], [195, 45]],
+    text: SAY.map(([s, w]) => [s, wordFrames(w)]),
+    draw: [[4, 23], [52, 12], [96, 15], [113, 12], [128, 23], [152, 23], [176, 25],
+           [166, 0], [218, 19], [226, 15]],
+  };
+  for (const [ch, list] of Object.entries(blocks)) {
+    const box = fig.querySelector(`.cb-cells[data-c="${ch}"]`);
+    for (let i = 0; i < FRAMES; i++) box.appendChild(document.createElement('i'));
+    const cells = [...box.children];
+    for (const [s, len] of list) {
+      if (s > 0 && cells[s - 1]) cells[s - 1].classList.add('is-commit');
+      for (let i = s; i < s + len && i < FRAMES; i++) cells[i].classList.add('is-on');
+      if (cells[s + len]) cells[s + len].classList.add('is-end');
+    }
+  }
+
+  // One span per word, revealed as the playhead reaches it.
+  const say = fig.querySelector('.cb-say');
+  const bot = fig.querySelector('.cb-msg-bot');
+  const spans = SAY.map(([, w]) => {
+    const s = document.createElement('span');
+    s.textContent = w + ' ';
+    say.appendChild(s);
+    return s;
+  });
+
+  for (const p of [tri, rightAngle, sqA, sqB, sqC]) {
+    p.dataset.len = p.getTotalLength();
+    p.style.strokeDasharray = p.dataset.len;
+    p.style.strokeDashoffset = p.dataset.len;
+  }
+
+  const at = (fr, a, b) => fr <= a ? 0 : fr >= b ? 1 : (fr - a) / (b - a);
+  const head = fig.querySelector('.cb-head');
+  const cells = [...fig.querySelectorAll('.cb-cells i')];
+
+  // Each stroke is timed to the words that name it: the right-angle mark is
+  // drawn on "opposite the right angle", not at the start with the triangle.
+  const spans_ = [[tri, 4, 26], [rightAngle, 96, 110], [sqA, 128, 150], [sqB, 152, 174], [sqC, 176, 200]];
+
+  const show = fr => {
+    for (const [p, a, b] of spans_) p.style.strokeDashoffset = p.dataset.len * (1 - at(fr, a, b));
+    la.setAttribute('opacity', at(fr, 52, 62));
+    lb.setAttribute('opacity', at(fr, 60, 70));
+    lc.setAttribute('opacity', at(fr, 113, 124));
+    // The two small squares shade while the words name them.
+    fillA.setAttribute('opacity', at(fr, 166, 180));
+    fillB.setAttribute('opacity', at(fr, 182, 196));
+    // And the big one lands on "the big one", not a moment before.
+    fillC.setAttribute('opacity', at(fr, 218, 236));
+    eq.setAttribute('opacity', at(fr, 226, 240));
+    bot.classList.toggle('is-live', fr >= SAY[0][0]);
+    spans.forEach((s, i) => s.classList.toggle('is-said', fr >= SAY[i][0]));
+    cells.forEach((c, i) => c.classList.toggle('is-past', (i % FRAMES) <= fr));
+    head.style.setProperty('--f', fr);
+  };
+
+  // Playback. The turn runs once and stops on the last frame, because the
+  // finished board is the thing worth leaving on screen. Scrubbing pauses,
+  // since fighting the reader for the playhead is never the right call.
+  const controls = fig.querySelector('.cb-controls');
+  const toggle = controls.querySelector('[data-act="toggle"]');
+  const readout = controls.querySelector('.cb-frame');
+  const track = fig.querySelector('.cb-cells');
+  const grid = fig.querySelector('.cb-grid');
+
+  let frame = 0, playing = false, t0 = 0, last = -1;
+
+  const render = fr => {
+    frame = fr;
+    show(fr);
+    readout.textContent = `${String(fr).padStart(3, ' ')} / ${FRAMES}`;
+  };
+  const setPlaying = on => {
+    playing = on;
+    // Always play or pause here. Parked at the end it used to turn into a
+    // replay glyph, which put two identical buttons side by side; pressing play
+    // at the end already starts over.
+    toggle.textContent = on ? '❚❚' : '▶';
+    toggle.setAttribute('aria-label', on ? 'Pause' : 'Play');
+  };
+  const play = from => {
+    if (from != null) render(from);
+    if (frame >= FRAMES) render(0);
+    t0 = performance.now() - frame * MS;
+    last = -1;
+    setPlaying(true);
+  };
+
+  toggle.addEventListener('click', () => (playing ? setPlaying(false) : play()));
+  controls.querySelector('[data-act="replay"]').addEventListener('click', () => play(0));
+
+  const frameAt = clientX => {
+    const r = track.getBoundingClientRect();
+    return Math.max(0, Math.min(FRAMES, Math.round((clientX - r.left) / r.width * FRAMES)));
+  };
+  grid.addEventListener('pointerdown', e => {
+    setPlaying(false);
+    grid.setPointerCapture(e.pointerId);
+    grid.classList.add('is-scrubbing');
+    render(frameAt(e.clientX));
+    e.preventDefault();
+  });
+  grid.addEventListener('pointermove', e => {
+    if (grid.hasPointerCapture(e.pointerId)) render(frameAt(e.clientX));
+  });
+  const release = e => { grid.classList.remove('is-scrubbing'); setPlaying(false); };
+  grid.addEventListener('pointerup', release);
+  grid.addEventListener('pointercancel', release);
+
+  const tick = now => {
+    if (playing) {
+      const fr = Math.floor((now - t0) / MS);
+      if (fr >= FRAMES) { render(FRAMES); setPlaying(false); }
+      else if (fr !== last) { last = fr; render(fr); }
+    }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { render(FRAMES); setPlaying(false); }
+  else { render(0); play(0); }
+})();
+</script>

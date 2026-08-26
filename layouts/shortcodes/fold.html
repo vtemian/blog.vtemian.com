@@ -1,0 +1,5 @@
+{{- /* Opens a folded section. Everything between this and &lbrace;&lbrace;< endfold >}} is
+       collected into it at runtime. Markers rather than a wrapper on purpose:
+       anything nested inside a shortcode gets markdown-processed again, and that
+       mangles the JavaScript of any widget in there. */ -}}
+<div class="fold-mark" data-title="{{ .Get 0 }}" data-meta="{{ .Get 1 }}"></div>

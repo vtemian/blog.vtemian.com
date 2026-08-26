@@ -1,0 +1,6 @@
+{{- /* Let a block reach past the reading column. Only does anything in an
+       article with `width:` set in front matter.
+       &lbrace;&lbrace;< wide >}} markdown &lbrace;&lbrace;< /wide >}}   or  &lbrace;&lbrace;< wide "full" >}} */ -}}
+<div class="w-{{ .Get 0 | default "wide" }}">
+{{ .Inner | markdownify }}
+</div>

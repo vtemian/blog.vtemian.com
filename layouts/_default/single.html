@@ -1,16 +1,25 @@
 {{ define "content" }}
-<div class="mx-auto flex max-w-2xl flex-col gap-12 px-5 py-12">
+{{- /* Page width is per-article: `width: wide` or `width: wider` in front
+       matter. The classes are spelled out so Tailwind's scanner can see them.
+       A wide page does not mean wide text: the reading column stays narrow and
+       the rest becomes margin, which is where annotations live and what figures
+       break out into. */ -}}
+{{- $widths := dict "wide" "max-w-5xl" "wider" "max-w-6xl" -}}
+{{- $shell := index $widths (.Params.width | default "") | default "max-w-2xl" -}}
+{{- $body := "flex flex-col gap-4 article-body" -}}
+{{- if .Params.width }}{{ $body = "article-body is-grid" }}{{ end -}}
+<div class="mx-auto flex {{ $shell }} flex-col gap-12 px-5 py-12">
     <a href="/" class="font-mono text-xs tracking-wide text-muted">Back</a>
-    <article class="flex flex-col gap-12">
-        <header class="flex flex-col gap-2">
+    <article class="flex flex-col gap-12{{ if .Params.width }} is-wide{{ end }}">
+        <header class="flex flex-col gap-2 prose-measure">
             <h1 class="text-2xl">{{ .Title }}</h1>
             <p class="text-xs text-link">{{ .Date.Format "January 2006" }}</p>
         </header>
-        <div class="flex flex-col gap-4">
+        <div class="{{ $body }}">
             {{ .Content }}
         </div>
     </article>
-    {{ partial "footer" .}}
+    <div class="prose-measure">{{ partial "footer" .}}</div>
 </div>
 
 <script type="module">
@@ -65,6 +74,206 @@
         } else {
             register();
         }
+    })();
+</script>
+
+
+<script>
+    // A pencil-marked phrase opens the note that shares its id. Notes go into a
+    // map rather than a built-up attribute selector: Hugo reads the quotes
+    // inside one as markup and refuses the page.
+    (function () {
+        // Line the note up with the phrase. Both share the article body as
+        // their offset parent, so one subtraction is enough, and it is redone
+        // on resize because the phrase moves when the text rewraps.
+        function place(btn, note) {
+            if (getComputedStyle(note).position !== 'absolute') return;
+            note.style.top = (btn.offsetTop - 6) + 'px';
+        }
+        var pairs = [];
+        window.addEventListener('resize', function () {
+            pairs.forEach(function (p) { if (p[1].classList.contains('is-open')) place(p[0], p[1]); });
+        });
+        var notes = {};
+        document.querySelectorAll('[data-note-id]').forEach(function (n) {
+            notes[n.getAttribute('data-note-id')] = n;
+        });
+        document.querySelectorAll('.pencil').forEach(function (btn) {
+            var note = notes[btn.getAttribute('data-note')];
+            if (!note) return;
+            pairs.push([btn, note]);
+            btn.addEventListener('click', function () {
+                var open = note.classList.toggle('is-open');
+                btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+                if (open) place(btn, note);
+            });
+        });
+    })();
+</script>
+
+
+<script>
+    // Build the folded sections. Everything between a fold marker and its end
+    // marker is moved into one collapsible block. The elements are moved rather
+    // than re-rendered, so any widget in there keeps the state and listeners it
+    // set up when the page parsed.
+    (function () {
+        document.querySelectorAll('.fold-mark').forEach(function (mark) {
+            var sec = document.createElement('section');
+            sec.className = 'dp';
+
+            var head = document.createElement('button');
+            head.type = 'button';
+            head.className = 'dp-head';
+            head.setAttribute('aria-expanded', 'false');
+            head.innerHTML = '<span class="dp-chev" aria-hidden="true"></span>';
+            var title = document.createElement('span');
+            title.className = 'dp-title';
+            title.textContent = mark.dataset.title || '';
+            head.appendChild(title);
+            if (mark.dataset.meta) {
+                var meta = document.createElement('span');
+                meta.className = 'dp-meta';
+                meta.textContent = mark.dataset.meta;
+                head.appendChild(meta);
+            }
+
+            var body = document.createElement('div');
+            body.className = 'dp-body';
+            body.hidden = true;
+
+            mark.parentNode.insertBefore(sec, mark);
+            // Elements only. The body is a grid, and a stray whitespace text node
+            // becomes an anonymous grid item that gets auto-placed into the first
+            // track, dragging everything after it out of the reading column.
+            var n = mark.nextSibling;
+            while (n && !(n.nodeType === 1 && n.classList.contains('fold-end'))) {
+                var next = n.nextSibling;
+                if (n.nodeType === 1) {
+                    body.appendChild(n);
+                } else if (n.nodeType === 3 && n.textContent.trim()) {
+                    // Loose text can happen when markdown folds a paragraph into a
+                    // raw HTML block. Keep it rather than dropping it on the floor.
+                    var para = document.createElement('p');
+                    para.textContent = n.textContent.trim();
+                    body.appendChild(para);
+                    n.parentNode.removeChild(n);
+                } else {
+                    n.parentNode.removeChild(n);
+                }
+                n = next;
+            }
+            if (n) n.remove();
+            mark.remove();
+            sec.appendChild(head);
+            sec.appendChild(body);
+
+            head.addEventListener('click', function () {
+                var open = body.hasAttribute('hidden');
+                body.toggleAttribute('hidden', !open);
+                head.setAttribute('aria-expanded', open ? 'true' : 'false');
+                // Anything that measured itself while it had no size gets to try again.
+                if (open) requestAnimationFrame(function () { window.dispatchEvent(new Event('resize')); });
+            });
+        });
+    })();
+</script>
+
+
+<script>
+    // The alignment widget's behaviour lives here rather than beside its markup.
+    // A script inside a shortcode gets markdown-processed when anything wraps it,
+    // and moved around when a folded section is assembled; both break it. The
+    // markup is inert, this finds it wherever it ended up.
+    (function () {
+        document.querySelectorAll('.al').forEach(function (fig) {
+            if (fig.dataset.ready) return;
+            fig.dataset.ready = '1';
+
+            var FPS = 12.5, SPAN = 2.4, N = Math.round(SPAN * FPS);
+            var W = 300, SLICE = W / N;
+
+            // Real words with the seconds they occupy. Everything else is silence,
+            // and silence still gets a token, which is the point of the figure.
+            var WORDS = [
+                ['so', 0.10, 0.30], ['we', 0.34, 0.52], ['slice', 0.60, 0.94],
+                ['it', 1.04, 1.24], ['into', 1.32, 1.58], ['frames', 1.66, 2.12]
+            ];
+            var onset = {};
+            WORDS.forEach(function (w) { onset[Math.floor(w[1] * FPS)] = w[0]; });
+
+            function amp(x) {
+                var t = x / W * SPAN;
+                for (var i = 0; i < WORDS.length; i++) {
+                    var a = WORDS[i][1], b = WORDS[i][2];
+                    if (t < a || t > b) continue;
+                    var u = (t - a) / (b - a);
+                    return Math.pow(Math.sin(Math.PI * u), 0.62) *
+                           (0.74 + 0.26 * Math.sin(t * 41) * Math.sin(t * 13));
+                }
+                return 0.02;
+            }
+            var top = '', bot = '';
+            for (var x = 0; x <= W; x += 2) top += (x === 0 ? 'M' : 'L') + x + ' ' + (31 - amp(x) * 26) + ' ';
+            for (var x2 = W; x2 >= 0; x2 -= 2) bot += 'L' + x2 + ' ' + (31 + amp(x2) * 26) + ' ';
+            fig.querySelector('.al-env').setAttribute('d', top + bot + 'Z');
+
+            var cuts = fig.querySelector('.al-cuts');
+            for (var i2 = 1; i2 < N; i2++) {
+                var l = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                l.setAttribute('x1', i2 * SLICE); l.setAttribute('x2', i2 * SLICE);
+                l.setAttribute('y1', 2); l.setAttribute('y2', 60);
+                cuts.appendChild(l);
+            }
+
+            var cap = fig.querySelector('.al-cap');
+            var slice = fig.querySelector('.al-slice');
+            var cells = fig.querySelector('.al-cells');
+            var boxes = [], picked = null;
+            var IDLE = 'Every frame carries a token. A word where one starts, silence everywhere else.';
+
+            function lookAt(i) {
+                if (i === null) { slice.setAttribute('width', 0); cap.textContent = IDLE; }
+                else {
+                    slice.setAttribute('x', i * SLICE);
+                    slice.setAttribute('width', SLICE);
+                    cap.textContent = boxes[i].dataset.label;
+                }
+                boxes.forEach(function (c, k) { c.classList.toggle('is-picked', k === i); });
+            }
+
+            for (var i3 = 0; i3 < N; i3++) {
+                (function (i) {
+                    var c = document.createElement('button');
+                    c.type = 'button';
+                    var word = onset[i];
+                    var span = (i / FPS).toFixed(2) + 's to ' + ((i + 1) / FPS).toFixed(2) + 's';
+                    c.dataset.label = 'frame ' + i + '  ·  ' + span + '  ·  ' +
+                                      (word ? '"' + word + '"' : 'silence');
+                    c.setAttribute('aria-label', c.dataset.label);
+                    c.innerHTML = word
+                        ? '<span class="al-tok">' + word + '</span>'
+                        : '<span class="al-pad">\u00b7</span>';
+                    if (word) c.classList.add('is-on');
+                    c.addEventListener('pointerenter', function () { if (picked === null) lookAt(i); });
+                    c.addEventListener('pointerleave', function () { if (picked === null) lookAt(null); });
+                    c.addEventListener('click', function () { picked = picked === i ? null : i; lookAt(picked); });
+                    cells.appendChild(c); boxes.push(c);
+                })(i3);
+            }
+
+            var ruler = fig.querySelector('.al-ruler');
+            for (var s = 0; s <= SPAN + 0.001; s += 0.4) {
+                var tk = document.createElement('span');
+                tk.style.left = (s / SPAN * 100) + '%';
+                tk.textContent = s.toFixed(1) + 's';
+                ruler.appendChild(tk);
+            }
+
+            var wl = fig.querySelector('.al-word');
+            if (wl) wl.remove();          // every frame is labelled now
+            cap.textContent = IDLE;
+        });
     })();
 </script>
 

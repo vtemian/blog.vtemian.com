@@ -1,0 +1,9 @@
+{{- /* Margin annotation, hidden until you reach for it.
+       &lbrace;&lbrace;< note text="the phrase" >}}gloss&lbrace;&lbrace;< /note >}}  marks the phrase
+       &lbrace;&lbrace;< note >}}gloss&lbrace;&lbrace;< /note >}}                     bare number
+       Hover on a pointer device, tap or keyboard-focus otherwise. No JS. */ -}}
+{{- /* Keyed by content, not by .Ordinal: ordinals restart inside a nesting
+       shortcode, so a note in a post-it can collide with one in the article and
+       then the two toggle each other. */ -}}
+{{- $id := printf "sn-%s" (substr (md5 (printf "%v|%v" (.Get "text") .Inner)) 0 10) -}}
+<span class="anno"><label for="{{ $id }}" class="anno-mark" tabindex="0">{{ with .Get "text" }}{{ . }}{{ end }}</label><input type="checkbox" id="{{ $id }}" class="anno-toggle"><span class="sidenote">{{ .Inner | markdownify | replaceRE `^<p>(.*)</p>\s*$` "$1" | safeHTML }}</span></span>
