@@ -146,7 +146,7 @@ So the eight are unequal shares of the sound. Most of the meaning sits in the fi
 
 These tokens come out one after another, 12.5 of them every second. Position 13 is always 1.04 seconds in. The position now tells you when, on top of telling you what came first.
 
-Anything else you want lined up with the audio has to sit on those same positions. The words are what we want lined up with it. Words don't come with positions though, {{< pencil "times" >}}they come with start times{{< /pencil >}}. So you divide the start time by the frame rate. A word that starts at 1.04 seconds goes on frame 13.
+Anything else you want lined up with the audio has to sit on those same positions. The words are what we want lined up with it. Words don't come with positions though, {{< arrow "times" >}}they come with start times{{< /arrow >}}. So you divide the start time by the frame rate. A word that starts at 1.04 seconds goes on frame 13.
 
 {{< deeper "Where the start times come from" "times" >}}
 A transcript gives you the words in order and nothing about when each one starts.
