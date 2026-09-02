@@ -100,9 +100,11 @@ If you think about it, when you start to explain and draw something, you already
 {{< deeper "The hand starts before the word" "ahead" >}}
 Morrel-Samuels and Krauss filmed it, so this is more than something you notice about yourself.
 
-They recorded people describing photographs and had a separate group mark which word each gesture belonged to. That gave them two times for every gesture, and they measured the distance between them. <mark>The gesture starts first. The word it belongs to follows.</mark>
+They recorded people describing photographs and had a separate group mark which word each gesture belonged to. That gave them two times for every gesture, and they measured the distance between them. <mark>Your hand moves before the word it goes with leaves your mouth.</mark>
 
 How big the gap is depends on the word: **familiarity predicts it**. A word you know well leaves a short gap, and one you have to search for leaves a long one, so the gap measures how long the word took to find.
+
+Nobody can film a monologue, so what they caught is the hand running ahead of the voice, not a thought running ahead of both. The second result is what connects the two. If the gap grows exactly when the word is hard to find, then at the moment the hand set off, the sentence had been decided and the word had not.
 
 **Source:** [Morrel-Samuels & Krauss 1992](https://doi.org/10.1037/0278-7393.18.3.615). The earlier version of the same work is titled, plainly, <u>Gestures precede speech</u>.
 {{< /deeper >}}
