@@ -95,7 +95,7 @@ Three independent streams, and nothing in the protocol says where in the audio t
 **Reference:** [OpenAI Realtime conversations](https://developers.openai.com/api/docs/guides/realtime-conversations)
 {{< /deeper >}}
 
-If you think about it, when you start to explain and draw something, you already have an inner monologue that usually is {{< arrow "ahead" >}}a little bit ahead of your drawing and speech{{< /arrow >}}.
+If you think about it, when you start to explain and draw something, you already have an inner monologue that usually is {{< arrow "ahead" "right" >}}a little bit ahead of your drawing and speech{{< /arrow >}}.
 
 {{< deeper "The hand starts before the word" "ahead" >}}
 Morrel-Samuels and Krauss filmed it, so this is more than something you notice about yourself.

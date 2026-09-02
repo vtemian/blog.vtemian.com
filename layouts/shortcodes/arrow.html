@@ -1,5 +1,7 @@
 {{- /* The other way into a note: a red arrow drawn in the margin, pointing at
        the word. Same behaviour as the pencil, different mark, so a page can use
        both without turning into a page of circled phrases.
-       &lbrace;&lbrace;< arrow "noteid" >}}the phrase&lbrace;&lbrace;< /arrow >}} */ -}}
-<span role="button" tabindex="0" class="arrow" data-note="{{ .Get 0 }}" aria-expanded="false">{{ .Inner }}</span>
+       &lbrace;&lbrace;< arrow "noteid" >}}the phrase&lbrace;&lbrace;< /arrow >}}
+       A second argument, "left" or "right", pins the side the arrow comes
+       from. Without it the mark picks whichever margin has the room. */ -}}
+<span role="button" tabindex="0" class="arrow" data-note="{{ .Get 0 }}"{{ with .Get 1 }} data-side="{{ . }}"{{ end }} aria-expanded="false">{{ .Inner }}</span>

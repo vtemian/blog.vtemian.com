@@ -192,10 +192,20 @@
                 // The mark hangs in the margin beside the column, never over the
                 // words: it points at the line the phrase is on, and the red
                 // underline says which phrase on that line.
-                var fromLeft = whole.left + whole.width / 2 < col.left + col.width * 0.6;
+                // data-side pins the margin; without it, whichever has the room.
+                var side = btn.getAttribute('data-side');
+                var fromLeft = side ? side === 'left'
+                    : whole.left + whole.width / 2 < col.left + col.width * 0.6;
                 // A phrase can wrap. Aim at the fragment on the side the mark
-                // comes from, so the tip lands on a line the phrase is on.
-                var frag = fromLeft ? frags[0] : frags[frags.length - 1];
+                // comes from, so the tip lands on a line the phrase is on. From
+                // the right that means the line reaching furthest right, since a
+                // short last line would put the mark in among the words.
+                var frag = frags[0];
+                if (!fromLeft) {
+                    for (var i = 1; i < frags.length; i++) {
+                        if (frags[i].right > frag.right) frag = frags[i];
+                    }
+                }
                 svg.style.top = (frag.top + frag.height / 2 - 24 - o.top) + 'px';
                 svg.style.left = ((fromLeft ? col.left - 116 : lineEnd(colEl, frag) + 10) - o.left) + 'px';
                 svg.style.transform = fromLeft ? '' : 'scaleX(-1)';
