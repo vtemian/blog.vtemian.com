@@ -63,9 +63,9 @@ That is the same shape as what a model like this has to produce. The output is i
 {{< deeper "Why saying it while drawing it works" "together" >}}
 Richard Mayer's group has spent decades measuring what happens when words and pictures arrive at different times. <mark>The narration and the picture it describes have to arrive together.</mark> Split them and the learner spends their effort holding the first half in mind while the second one plays.
 
-There is a second finding, and it is the one that rules out subtitles. **Say** the words out loud. Printing them next to the drawing costs you the effect, because the eyes are already busy with the picture and anything written has to queue behind it. Speech comes in through hearing, which at that moment has nothing else to do.
+Mayer's second result rules out subtitles. **Say** the words out loud instead of printing them next to the drawing. A learner reading printed words has to take their eyes off the picture to read them. Spoken words leave the eyes where they were.
 
-That is the whole Khan Academy format, and 3Blue1Brown's. One hand drawing while one voice explains it, <u>at the same time</u>.
+Khan Academy and 3Blue1Brown both work this way. One hand draws <u>while one voice explains</u>.
 
 **Source:** [Mayer & Moreno 2003](https://www.uky.edu/~gmswan3/544/9_ways_to_reduce_CL.pdf), nine ways to reduce cognitive load, for both the timing and the spoken-over-printed findings.
 {{< /deeper >}}
@@ -90,7 +90,7 @@ response.output_audio_transcript.delta   the words being said
 response.function_call_arguments.delta   draw_line({ ... })
 ```
 
-Four independent streams, and nothing in the protocol says where in the audio that `draw_line` belongs. <mark>There is no field for it, because there is no shared clock.</mark> Lining them up is the client's job, <u>forever</u>.
+Three independent streams, and nothing in the protocol says where in the audio that `draw_line` belongs. <mark>There is no field for it, because there is no shared clock.</mark> Lining them up is the client's job, <u>forever</u>.
 
 **Reference:** [OpenAI Realtime conversations](https://developers.openai.com/api/docs/guides/realtime-conversations)
 {{< /deeper >}}
@@ -98,11 +98,11 @@ Four independent streams, and nothing in the protocol says where in the audio th
 If you think about it, when you start to explain and draw something, you already have an inner monologue that usually is {{< arrow "ahead" >}}a little bit ahead of your drawing and speech{{< /arrow >}}.
 
 {{< deeper "The hand starts before the word" "ahead" >}}
-This has been filmed and measured, so it is more than a feeling you have about yourself.
+Morrel-Samuels and Krauss put a camera on it, so this is more than something you notice about yourself.
 
-Morrel-Samuels and Krauss recorded people describing photographs, then had a separate group mark which word each gesture belonged to. With both in hand they could time the gap. <mark>The gesture starts first. The word it belongs to follows.</mark>
+They recorded people describing photographs and had a separate group mark which word each gesture belonged to. That gave them two times for every gesture, and they measured the distance between them. <mark>The gesture starts first. The word it belongs to follows.</mark>
 
-How big the gap is depends on the word: **familiarity predicts it**. That is the useful part, because it shows the lead time is the planning showing through rather than a habit, and a word that takes longer to find leaves a longer trace of it.
+How big the gap is depends on the word: **familiarity predicts it**. A word you know well leaves a short gap, and one you have to search for leaves a long one, so the gap measures how long the word took to find.
 
 **Source:** [Morrel-Samuels & Krauss 1992](https://doi.org/10.1037/0278-7393.18.3.615). The earlier version of the same work is titled, plainly, <u>Gestures precede speech</u>.
 {{< /deeper >}}
@@ -111,7 +111,7 @@ Now how can we translate something like that to a model?
 
 You put everything on one clock. The sound gets cut into equal slices, {{< note text="one clock" >}}The clock is not free. At every position the model emits every stream it carries, whether or not that stream has anything to say. Silence costs a token, exactly like a word does.
 
-That is the trade you are making. You buy alignment, which nothing else gives you, and the price is a stream of tokens that carry nothing, paid at every frame for as long as the model runs.{{< /note >}}, about twelve of them a second. The words go on the slices they start in. One position in the sequence means one moment in time, and it means that for both of them at once.
+You get alignment, which nothing else gives you. In exchange, every frame where a stream has nothing to say still costs you one token, for as long as the model runs.{{< /note >}}, about twelve of them a second. The words go on the slices they start in. One position in the sequence means one moment in time, and it means that for both of them at once.
 
 {{< fold "Where that clock comes from" "4 min" >}}
 
@@ -122,7 +122,7 @@ into slices and maps each slice to a symbol. Mimi chops 12.5 slices per second, 
 There are {{< pencil "codecs" >}} more granular codecs{{< /pencil >}} out there, with different upsides and downsides.
 
 {{< deeper "Codecs Frequency" "codecs" >}}
-Chopping the waveform at different frequencies is a choice that impacts everything downstream.
+The frequency you chop the waveform at decides everything that comes after it.
 
 The rate depends on the codec and on how it is set up.
 
@@ -133,11 +133,11 @@ The rate depends on the codec and on how it is set up.
 | SoundStream | 50 or 75, depending on the sample rate it was built for |
 | **Mimi** | **12.5** |
 
-Real time is just arithmetic. <mark>At 12.5 frames a second the model has 80 milliseconds to produce each position. At 86 it has 11.</mark> Eleven milliseconds is out of reach on hardware you can afford, and no amount of engineering around it changes that.
+<mark>At 12.5 frames a second the model has 80 milliseconds to produce each position. At 86 it has 11.</mark> Eleven milliseconds is out of reach on hardware you can afford, and no amount of engineering around it changes that.
 
-Going low costs you something though. A frame is the <u>smallest thing you can point at</u>. At 12.5 a second you can't place a word more precisely than 80 milliseconds, so everything gets rounded to the nearest frame. A faster codec would let you line things up more finely, if you could afford to generate it.
+A low rate costs you precision. A frame is the <u>smallest thing you can point at</u>, so at 12.5 a second you can't place a word closer than 80 milliseconds and everything rounds to the nearest frame. A faster codec would let you line things up more finely, if you could afford to generate it.
 
-The other cost is that every token has to carry more sound. Mimi uses 8 {{< note text="codebooks" >}}Eight learned tables, and the order of them matters. The first one picks the closest match it has to the frame, which is rough. Every table after it stores what the ones before it still got wrong.
+A low rate also means every token has to carry more sound. Mimi uses 8 {{< note text="codebooks" >}}Eight learned tables, and the order of them matters. The first one picks the closest match it has to the frame, which is rough. Every table after it stores what the ones before it still got wrong.
 
 So the eight are unequal shares of the sound. Most of the meaning sits in the first one or two, which is why you can drop the last few and still make out the speech, at some cost to how it sounds.{{< /note >}} per frame, 2048 entries each, and fits a second of speech into about 1.1 kilobits.
 
@@ -149,9 +149,9 @@ These tokens come out one after another, 12.5 of them every second. Position 13 
 Anything else you want lined up with the audio has to sit on those same positions. The words are what we want lined up with it. Words don't come with positions though, {{< pencil "times" >}}they come with start times{{< /pencil >}}. So you divide the start time by the frame rate. A word that starts at 1.04 seconds goes on frame 13.
 
 {{< deeper "Where the start times come from" "times" >}}
-Something has to tell you that a word starts at 1.04 seconds, and a transcript on its own will not. It gives you the words in order and nothing about when.
+A transcript gives you the words in order and nothing about when each one starts.
 
-What gives you the times is **forced alignment**: you take audio you already have the words for, and work out where each one sits. Whisper is the usual way in. Out of the box it timestamps a segment at a time, a sentence or so; <mark>word-level times come from reading its attention, which is what the `word_timestamps` option does</mark>, or from running a separate aligner over the pair.
+**Forced alignment** gives you the times: you take audio you already have the words for, and work out where each one sits. Whisper is the usual way in. Out of the box it timestamps a segment at a time, a sentence or so; <mark>word-level times come from reading its attention, which is what the `word_timestamps` option does</mark>, or from running a separate aligner over the pair.
 
 <u>The times are the whole dataset.</u> Get them wrong by two frames and you have taught the model to speak slightly after it writes.
 
@@ -162,14 +162,14 @@ But there is a slot for every tick, and words don't fill every slot. The empty o
 
 {{< align >}}
 
-Now the text ticks at the same rate as the audio. That is what {{< note text="Moshi" >}}Kyutai's speech model, 2024. What makes it unusual is that it does not take turns: it models both sides of the conversation at once, its own voice and yours, and keeps generating while you are still talking.
+Now the text ticks at the same rate as the audio. That is what {{< note text="Moshi" >}}Kyutai's speech model, 2024. Unusually, it does not take turns: it models both sides of the conversation at once, its own voice and yours, and keeps generating while you are still talking.
 
 That is what the shared clock is for. Turn-taking is a rule you have to impose on a system that can only attend to one thing at a time. Put both sides on one clock and the model can be interrupted, because it never stopped listening.{{< /note >}} calls the {{< pencil "monologue" >}}inner monologue{{< /pencil >}}.
 
 {{< deeper "What the inner monologue is for" "monologue" >}}
 <mark>The text stream is a plan that the voice follows</mark>, rather than a transcript for us to read.
 
-An audio model on its own **drifts**. It generates something that sounds like speech but doesn't mean anything. The text stream keeps it on track. Moshi's own words: modelling the text of its own speech gives "a scaffolding that increases the linguistic quality of its generation".
+An audio model on its own **drifts**. It generates something that sounds like speech but doesn't mean anything. The text stream stops the drift. Moshi's own words: modelling the text of its own speech gives "a scaffolding that increases the linguistic quality of its generation".
 
 They measured it by taking the text stream away. Without it the scores drop to <u>about a third</u>.
 
@@ -183,9 +183,9 @@ Now two tokens need the same position. On frame 13 there is a text token and an 
 This doesn't need a different kind of transformer. A transformer doesn't work with tokens directly. Every token becomes a vector first, and that vector is built before the model sees it. You are {{< arrow "summing" >}}already building it out of more than one thing{{< /arrow >}}.
 
 {{< deeper "One position, several embeddings" "summing" >}}
-In {{< note text="nanoGPT" >}}Karpathy's teaching implementation of GPT-2, about three hundred lines. The reason everybody reads it first is that nothing hides behind a library call: the forward pass **is** the architecture.
+In {{< note text="nanoGPT" >}}Karpathy's teaching implementation of GPT-2, about three hundred lines. Everybody reads it first because nothing hides behind a library call: the forward pass **is** the architecture.
 
-Which is why those two lines settle the question. If what a transformer reads at each position is a sum, then adding a stream is addition, and none of the parts underneath have to change.{{< /note >}}, the input to the first block is this:
+If what a transformer reads at each position is a sum, then adding a stream is one more thing to add, and none of the parts underneath have to change.{{< /note >}}, the input to the first block is this:
 
 ```python
 tok_emb = self.transformer.wte(idx)   # what the token is
@@ -202,18 +202,16 @@ Getting them back out works the same way <u>in reverse</u>. The model produces o
 
 {{< endfold >}}
 
-Once two streams share that clock, a third one {{< note text="costs almost nothing" >}}Inside the model, near enough nothing. The stream needs an embedding table on the way in and a head on the way out, and next to the transformer they hang off both are rounding errors.
+Once two streams share that clock, a third one {{< note text="costs almost nothing" >}}Inside the model, near enough nothing. The stream needs an embedding table on the way in and a head on the way out, and both are tiny next to the transformer they hang off.
 
-The bill arrives in the data. Every example you train on now needs that third stream, aligned to the same frames as the other two, and there is nothing you can download that has it. You record it or you generate it. The cost of building that data is why a third stream is rare.{{< /note >}}. {{< arrow "others" >}}The model doesn't care what is in it{{< /arrow >}}. Somebody already put facial motion on that clock. Somebody else put robot actions on it.
+The hard part is the data. Every example you train on now needs that third stream, aligned to the same frames as the other two, and there is nothing you can download that has it. You record it or you generate it. The cost of building that data is why a third stream is rare.{{< /note >}}. {{< arrow "others" >}}The model doesn't care what is in it{{< /arrow >}}. Somebody already put facial motion on that clock. Somebody else put robot actions on it.
 
 {{< deeper "What else people have put on it" "others" >}}
-Two of them, both real.
-
 **RT-2** puts robot actions into the sequence by writing them as text. Its own words: to fit language and actions into one format, it expresses <mark>the actions as text tokens, in the same training set as the language.</mark> One model reads the instruction and moves the arm.
 
 **Audio to Photoreal Embodiment** does it with people. Give it the speech from a conversation and it produces the body that goes with it, face and hands included, quantised into a codebook the way audio is, so the motion lands on the same timeline as the sound that caused it.
 
-Neither is doing anything the drawing stream will not. <u>The slot does not care what you put in it.</u>
+Neither is doing anything the drawing stream will not. <u>The stream will hold any kind of token.</u>
 
 **Sources:** [RT-2](https://arxiv.org/abs/2307.15818) and [From Audio to Photoreal Embodiment](https://arxiv.org/abs/2401.01885).
 {{< /deeper >}}
