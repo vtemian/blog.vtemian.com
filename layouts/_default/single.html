@@ -170,13 +170,19 @@
         function lineEnd(col, frag) {
             var range = document.createRange();
             range.selectNodeContents(col);
+            var edge = col.getBoundingClientRect().right;
             var lines = range.getClientRects(), best = null;
             for (var i = 0; i < lines.length; i++) {
                 var q = lines[i];
+                // A margin note lives inside the paragraph and floats out into
+                // the gutter. It is not text on the line, so a rect that starts
+                // past the column's edge is left out, or the mark would be
+                // aimed at the note whenever one is open.
+                if (q.left >= edge - 1) continue;
                 var overlap = Math.min(q.bottom, frag.bottom) - Math.max(q.top, frag.top);
                 if (overlap > frag.height * 0.5 && (!best || q.right > best.right)) best = q;
             }
-            return best ? best.right : col.getBoundingClientRect().right;
+            return best ? best.right : edge;
         }
 
         function aim() {
