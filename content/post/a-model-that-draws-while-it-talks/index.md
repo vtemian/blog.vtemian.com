@@ -66,7 +66,7 @@ That is the same shape as what a frontier model produces. The output is instruct
 {{< deeper "Why saying it while drawing it works" "together" >}}
 In 1991, Richard Mayer sat students in front of a short animation of how a bicycle pump works, with a voice explaining it. He split his students into two groups: one heard the voice while the animation played, and the other heard the whole explanation first and had to keep it in their heads until the animation came. Afterwards everyone got new problems about pumps to solve. <mark>The students who heard and saw at the same time solved about half again as many.</mark>
 
-His second result rules out subtitles. If the words are printed next to the drawing, you have to look away from it to read them, and you miss the stroke you were watching. If you **hear** them instead, your eyes never leave the picture.
+In 1998 he ran it again with a different split. Everyone watched an animation of how lightning forms, and everyone got the same words. One group **heard** them spoken, and the other read them, printed on the screen beside the animation. Reading meant looking away from the picture every few seconds to catch the next line, and on the test afterwards the group that listened did much better. That is why subtitles under a drawing do not work.
 
 That is why Khan Academy and 3Blue1Brown are easy to follow. One hand draws <u>while one voice explains</u>, and you never have to look in two places.
 
