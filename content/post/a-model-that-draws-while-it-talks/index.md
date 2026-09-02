@@ -30,25 +30,26 @@ width: wide
 Learning and explaining complex concepts have gotten way cheaper and easier using LLMs. Is not just text or audio. You can get personalized, interactive demos that are tailored to your level of understanding, are fun and {{< pencil "icap" >}}accelerate learning{{< /pencil >}}.
 
 {{< deeper "How people actually learn" "icap" >}}
-There is a big difference between **reading** something and **doing** something with it. Chi and Wylie's ICAP framework ranks four learning modes and predicts outcomes in that order:
+There is a big difference between **reading** something and **doing** something with it. Chi and Wylie's ICAP framework ranks four learning modes and predicts learning performance in that order:
 
-**Passive.** You receive information and produce nothing: read or watch a video.
+**PASSIVE** You receive information and produce nothing: read an article or watch a video.
 
-**Active.** You manipulate it without adding anything: drag a slider or underline a line.
+**ACTIVE** You manipulate received information without recreating it: drag a slider or underline a line.
 
-**Constructive.** You produce something that was not there: explain it back, predict what happens next.
+**CONSTRUCTIVE** You produce something new based on previously received information: explain it back, predict what happens next.
 
-**Interactive.** A dialogue where both sides build on each other.
+**INTERACTIVE** You hold a dialogue and build on top of internalized information.
 
-Using LLMs, you can improve from <mark>Passive to Active by generating interactive widgets</mark>, fidgetable elements.
-Moving from Active to Constructive can be done by allowing someone to predict what a slider will do <u>BEFORE</u> they move it.
+Using LLMs, you can easily improve from <u>PASSIVE</u> to <u>ACTIVE</u> by generating interactive widgets, fidgetable elements.
 
-Where a model gets interesting is when it starts to ask you questions, notice what you got wrong, generate fidgetable elements and push just past what you already know. That's the <u>Interactive</u> mode.
+Moving from <u>ACTIVE</u> to <u>CONSTRUCTIVE</u> can be achieved by allowing someone to predict what a slider will do before they move it.
+
+Where a model gets even more interesting is when it starts to ask you questions, notice what you got wrong, generate fidgetable elements and push just past what you already know. That's the <u>INTERACTIVE</u> mode.
 
 **Sources:** [Chi & Wylie 2014](https://files.eric.ed.gov/fulltext/EJ1044018.pdf) is the framework, free full text. The underlying claim rests on [Freeman et al. 2014](https://www.pnas.org/doi/10.1073/pnas.1319030111), a meta-analysis over 225 studies comparing engagement against lecture. For predict-then-reveal specifically, see [Kim, Reinecke & Hullman 2017](https://doi.org/10.1145/3025453.3025592).
 {{< /deeper >}}
 
-Go and test it if you didn't have the chance. Just prompt your favorite frontier model, ask it to explain how derivatives work and to {{< note text="generate HTML and JS" >}}. You get to "play" with the elements, visualize how a function accelerates or decelerates at a given point, instead of just reading out an explanation. Also, detecting a wrong explanation is harder than detecting a wrong visualization.{{< /note >}} with interactive elements and you will get a pretty fun learning exercise.
+Go and test it if you didn't have the chance. Just prompt your favorite frontier model, ask it to explain how derivatives work and to {{< note text="generate HTML and JS" >}}. You get to "play" with the elements, visualize how a function accelerates or decelerates at a given point, instead of just reading out an explanation. Also, detecting a wrong explanation is harder than detecting a wrong visualization.{{< /note >}} with interactive elements. You will get a pretty neat learning exercise.
 
 But still, it doesn't feel like a tutor, {{< note text="like a teacher" >}}In 1984 Bloom measured how much better one tutor does than a classroom. Students taught one to one, with mastery checks along the way, ended up about two standard deviations above the same material taught to a class. His question was how to get a class near that number, since one tutor per child is not a thing anyone can pay for.
 
