@@ -61,11 +61,11 @@ You need to do an entire dance of prompting and tool use, but there should be a 
 That is the same shape as what a model like this has to produce. The output is instructions rather than pixels, and something else turns them into the picture. The people who explain best on video had already reduced their drawing to code, which means there is less for the model to invent.{{< /note >}}. It feels more natural, easier to follow and understand if somebody is {{< arrow "together" >}}speaking to you while they draw on a board{{< /arrow >}} and correlate it with their speech and their drawing.
 
 {{< deeper "Why saying it while drawing it works" "together" >}}
-Richard Mayer's group has spent decades measuring what happens when words and pictures arrive at different times. <mark>The narration and the picture it describes have to arrive together.</mark> Split them and the learner spends their effort holding the first half in mind while the second one plays.
+Richard Mayer's group has spent decades measuring what happens when the words and the picture reach you at different times. <mark>The narration and the picture it describes have to arrive together.</mark> Split them and you spend your effort holding the first half in your head while you wait for the second.
 
-Mayer's second result rules out subtitles. **Say** the words out loud instead of printing them next to the drawing. A learner reading printed words has to take their eyes off the picture to read them. Spoken words leave the eyes where they were.
+His second result rules out subtitles. Print the words next to the drawing and you have to look away from it to read them, which costs you the stroke you were watching. **Say** them out loud and nothing moves your eyes.
 
-Khan Academy and 3Blue1Brown both work this way. One hand draws <u>while one voice explains</u>.
+That is why Khan Academy and 3Blue1Brown are easy to follow. One hand draws <u>while one voice explains</u>, and you never have to look in two places.
 
 **Source:** [Mayer & Moreno 2003](https://www.uky.edu/~gmswan3/544/9_ways_to_reduce_CL.pdf), nine ways to reduce cognitive load, for both the timing and the spoken-over-printed findings.
 {{< /deeper >}}
@@ -167,7 +167,7 @@ Now the text ticks at the same rate as the audio. That is what {{< note text="Mo
 That is what the shared clock is for. Turn-taking is a rule you have to impose on a system that can only attend to one thing at a time. Put both sides on one clock and the model can be interrupted, because it never stopped listening.{{< /note >}} calls the {{< pencil "monologue" >}}inner monologue{{< /pencil >}}.
 
 {{< deeper "What the inner monologue is for" "monologue" >}}
-<mark>The text stream is a plan that the voice follows</mark>, rather than a transcript for us to read.
+<mark>The text stream is a plan that the voice follows</mark>, rather than a transcript for you to read.
 
 An audio model on its own **drifts**. It generates something that sounds like speech but doesn't mean anything. The text stream stops the drift. Moshi's own words: modelling the text of its own speech gives "a scaffolding that increases the linguistic quality of its generation".
 
