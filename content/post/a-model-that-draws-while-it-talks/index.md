@@ -64,7 +64,7 @@ That is the same shape as what a frontier model produces. The output is instruct
 {{< /note >}}. It feels more natural, easier to follow and understand if somebody is {{< arrow "together" >}}speaking to you while they draw on a board{{< /arrow >}} and correlates it with their speech and their drawing.
 
 {{< deeper "Why saying it while drawing it works" "together" >}}
-Richard Mayer's group ran the same experiment many times over. Students watched a short animation of how a bicycle pump works, with a voice explaining it. Some heard the voice while the animation played, and the rest heard the whole explanation first and then watched the animation on its own. Afterwards everyone got new problems about pumps to solve. <mark>The students who heard and saw at the same time solved about half again as many.</mark> When the two come apart, you have to hold the words in your head until the picture arrives, and you have less left over for understanding it.
+Richard Mayer sat students in front of a short animation of how a bicycle pump works, with a voice explaining it. Some heard the voice while the animation played. The rest heard the whole explanation first and had to keep it in their heads until the animation came. Afterwards everyone got new problems about pumps to solve. <mark>The students who heard and saw at the same time solved about half again as many.</mark>
 
 His second result rules out subtitles. If the words are printed next to the drawing, you have to look away from it to read them, and you miss the stroke you were watching. If you **hear** them instead, your eyes never leave the picture.
 
