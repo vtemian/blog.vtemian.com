@@ -85,7 +85,7 @@ You can define different shapes as tools or use existing drawing libraries and e
 Now, this approach can work most of the time, but you will end up with different **synchronization problems**: narration can go faster or slower than the drawing.
 You'll have to account for this in the client's implementation, use some heuristics for them, or prompt the frontier model to do so.
 
-The API confirms the shape of the problem. A realtime session with both modalities on "will respond with both audio and text content", and a tool call arrives as its own output item, `type: "function_call"`:
+Try it with OpenAI's realtime API. You open a session, ask for voice and text, and give the model a `draw_line` tool. What comes back is three separate streams of events:
 
 ```
 response.output_audio.delta              the voice
@@ -93,7 +93,7 @@ response.output_audio_transcript.delta   the words being said
 response.function_call_arguments.delta   draw_line({ ... })
 ```
 
-Three independent streams, and nothing in the protocol says where in the audio that `draw_line` belongs. <mark>There is no field for it, because there is no shared clock.</mark> Lining them up is the client's job, <u>forever</u>.
+The audio arrives in chunks and the transcript in words. The drawing arrives on its own, whenever the model decides to call the tool, and nothing says which chunk of audio it goes with. <mark>There is no field for it, because there is no shared clock.</mark> Lining them up is the client's job, <u>forever</u>.
 
 **Reference:** [OpenAI Realtime conversations](https://developers.openai.com/api/docs/guides/realtime-conversations)
 {{< /deeper >}}
