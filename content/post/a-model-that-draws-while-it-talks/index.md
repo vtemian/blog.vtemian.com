@@ -64,11 +64,11 @@ That is the same shape as what a frontier model produces. The output is instruct
 {{< /note >}}. It feels more natural, easier to follow and understand if somebody is {{< arrow "together" >}}speaking to you while they draw on a board{{< /arrow >}} and correlates it with their speech and their drawing.
 
 {{< deeper "Why saying it while drawing it works" "together" >}}
-In 1991, Richard Mayer sat students in front of a short animation of how a bicycle pump works, with a voice explaining it. He split his students into two groups: one heard the voice while the animation played, and the other heard the whole explanation first and had to keep it in their heads until the animation came. Afterwards everyone got new problems about pumps to solve. <mark>The students who heard and saw at the same time solved about half again as many.</mark>
+In 1991, Richard Mayer sat students in front of a short animation of how a bicycle pump works, with a voice explaining it. He split his students into two groups: one heard the voice while the animation played, and the other heard the whole explanation first and had to <u>keep it in their heads</u> until the animation came. Afterwards everyone got new problems about pumps to solve. <mark>The students who heard and saw at the same time solved about half again as many.</mark>
 
-In 1998 he ran it again with a different split. Everyone watched an animation of how lightning forms, and everyone got the same words. One group **heard** them spoken, and the other read them, printed on the screen beside the animation. Reading meant looking away from the picture every few seconds to catch the next line, and on the test afterwards the group that listened did much better. That is why subtitles under a drawing do not work.
+In 1998 he ran it again with a different split. Everyone watched an animation of how lightning forms, and everyone got the same words. One group **heard** them spoken, and the other read them, printed on the screen beside the animation. Reading meant <u>looking away from the picture</u> every few seconds to catch the next line, and on the test afterwards the group that listened did much better. That is why <u>subtitles under a drawing do not work</u>.
 
-That is why Khan Academy and 3Blue1Brown are easy to follow. One hand draws <u>while one voice explains</u>, and you never have to look in two places.
+Khan Academy and 3Blue1Brown are easy to follow for the same reason. One hand draws <u>while one voice explains</u>, and you never have to look in two places.
 
 **Source:** [Mayer & Moreno 2003](https://www.uky.edu/~gmswan3/544/9_ways_to_reduce_CL.pdf), nine ways to reduce cognitive load, for both the timing and the spoken-over-printed findings.
 {{< /deeper >}}
