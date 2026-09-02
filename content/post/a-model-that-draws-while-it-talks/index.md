@@ -43,12 +43,12 @@ There is a big difference between **reading** something and **doing** something 
 Using LLMs, you can improve from <mark>Passive to Active by generating interactive widgets</mark>, fidgetable elements.
 Moving from Active to Constructive can be done by allowing someone to predict what a slider will do <u>BEFORE</u> they move it.
 
-Where a model gets interesting is when it starts ask you question, notice what you got wrong, generates fidgetable elements and push just past what you already know. That's the <u>Interactive</u> mode.
+Where a model gets interesting is when it starts to ask you questions, notice what you got wrong, generate fidgetable elements and push just past what you already know. That's the <u>Interactive</u> mode.
 
 **Sources:** [Chi & Wylie 2014](https://files.eric.ed.gov/fulltext/EJ1044018.pdf) is the framework, free full text. The underlying claim rests on [Freeman et al. 2014](https://www.pnas.org/doi/10.1073/pnas.1319030111), a meta-analysis over 225 studies comparing engagement against lecture. For predict-then-reveal specifically, see [Kim, Reinecke & Hullman 2017](https://doi.org/10.1145/3025453.3025592).
 {{< /deeper >}}
 
-Go and test it if you didn't had the chance. Just prompt your favorite frontier model, ask it to explain how derivatives work and to {{< note text="generate HTML and JS" >}}. You get to "play" with the elements, vizualize how a function accelerate or deccelerate in a given point, instead of just reading out an explanation. Also, detecting a wrong explanation is harder than detecting a wrong vizualization.{{< /note >}} with interactive elements and you will get a pretty fun learning exercise.
+Go and test it if you didn't have the chance. Just prompt your favorite frontier model, ask it to explain how derivatives work and to {{< note text="generate HTML and JS" >}}. You get to "play" with the elements, visualize how a function accelerates or decelerates at a given point, instead of just reading out an explanation. Also, detecting a wrong explanation is harder than detecting a wrong visualization.{{< /note >}} with interactive elements and you will get a pretty fun learning exercise.
 
 But still, it doesn't feel like a tutor, {{< note text="like a teacher" >}}In 1984 Bloom measured how much better one tutor does than a classroom. Students taught one to one, with mastery checks along the way, ended up about two standard deviations above the same material taught to a class. His question was how to get a class near that number, since one tutor per child is not a thing anyone can pay for.
 
@@ -58,7 +58,7 @@ Later work has not reproduced a gap that large, though what produces it still ho
 
 You need to do an entire dance of prompting and tool use, but there should be a better way. Look at Khan Academy or {{< note text="3Blue1Brown" >}}Those animations are Python. Sanderson wrote Manim to make them, so each picture is the output of a program rather than a drawing someone made by hand.
 
-That is the same shape as what a model like this has to produce. The output is instructions rather than pixels, and something else turns them into the picture. The people who explain best on video had already reduced their drawing to code, which means there is less for the model to invent.{{< /note >}}. It feels more natural, easier to follow and understand if somebody is {{< arrow "together" >}}speaking to you while they draw on a board{{< /arrow >}} and correlate it with their speech and their drawing.
+That is the same shape as what a model like this has to produce. The output is instructions rather than pixels, and something else turns them into the picture. The people who explain best on video had already reduced their drawing to code, which means there is less for the model to invent.{{< /note >}}. It feels more natural, easier to follow and understand if somebody is {{< arrow "together" >}}speaking to you while they draw on a board{{< /arrow >}} and correlates it with their speech and their drawing.
 
 {{< deeper "Why saying it while drawing it works" "together" >}}
 Richard Mayer's group has spent decades measuring what happens when the words and the picture reach you at different times. <mark>The narration and the picture it describes have to arrive together.</mark> If you split them, you spend your effort holding the first half in your head while you wait for the second.
@@ -72,7 +72,7 @@ That is why Khan Academy and 3Blue1Brown are easy to follow. One hand draws <u>w
 
 ## One model to rule them all
 
-This correlation between speech and drawing, speech-to-draw, is hard to get it right using {{< pencil "toolcalls" >}}other techniques{{< /pencil >}}.
+This correlation between speech and drawing, speech-to-draw, is hard to get right using {{< pencil "toolcalls" >}}other techniques{{< /pencil >}}.
 
 {{< deeper "Why tool calls drift" "toolcalls" >}}
 One such technique is **tool-use**. You can have a frontier model acting like a tutor model that can output both voice and text. Inside the text output, you can have different tool calls that a client can interpret and draw.
@@ -80,7 +80,7 @@ One such technique is **tool-use**. You can have a frontier model acting like a 
 You can define different shapes as tools or use existing drawing libraries and expose their API as tools to the frontier model.
 
 Now, this approach can work most of the time, but you will end up with different **synchronization problems**: narration can go faster or slower than the drawing.
-You'll have to account for this in client's implementation, use some heuristics for them, or hint the frontier model to do so.
+You'll have to account for this in the client's implementation, use some heuristics for them, or hint the frontier model to do so.
 
 The API confirms the shape of the problem. A realtime session with both modalities on "will respond with both audio and text content", and a tool call arrives as its own output item, `type: "function_call"`:
 
@@ -117,8 +117,8 @@ You get alignment, which nothing else gives you. In exchange, every frame where 
 
 {{< fold "Where that clock comes from" "4 min" >}}
 
-Inside a text LLM, a token doesn't have the concept of duration. The only relationship between tokens is that one token come after another, in a sequence.
-What adds this dimension of time is the audio codec. You can't tokenize sound, without deciding how much sound one token covers. The codec chops the waveform
+Inside a text LLM, a token doesn't have the concept of duration. The only relationship between tokens is that one token comes after another, in a sequence.
+What adds this dimension of time is the audio codec. You can't tokenize sound without deciding how much sound one token covers. The codec chops the waveform
 into slices and maps each slice to a symbol. Mimi chops 12.5 slices per second, creating tokens that cover 80 milliseconds.
 
 There are {{< pencil "codecs" >}} more granular codecs{{< /pencil >}} out there, with different upsides and downsides.
@@ -157,7 +157,7 @@ A transcript gives you the words in order and nothing about when each one starts
 
 <u>The times are the whole dataset.</u> If you get them wrong by two frames, you have taught the model to speak slightly after it writes.
 
-**Sources:** [Whisper](https://arxiv.org/abs/2212.04356) for the recogniser. [Moshi](https://arxiv.org/abs/2410.00037), section 3.4.4, for what it does with the alignment once it has it.
+**Sources:** [Whisper](https://arxiv.org/abs/2212.04356) for the recognizer. [Moshi](https://arxiv.org/abs/2410.00037), section 3.4.4, for what it does with the alignment once it has it.
 {{< /deeper >}}
 
 But there is a slot for every tick, and words don't fill every slot. The empty ones still need a token. That token means "silent here". Most of what the model has to learn is when to stay quiet.
@@ -171,7 +171,7 @@ That is what the shared clock is for. Turn-taking is a rule you have to impose o
 {{< deeper "What the inner monologue is for" "monologue" >}}
 <mark>The text stream is a plan that the voice follows</mark>, rather than a transcript for you to read.
 
-An audio model on its own **drifts**. It generates something that sounds like speech but doesn't mean anything. The text stream stops the drift. Moshi's own words: modelling the text of its own speech gives "a scaffolding that increases the linguistic quality of its generation".
+An audio model on its own **drifts**. It generates something that sounds like speech but doesn't mean anything. The text stream stops the drift. Moshi's own words: modeling the text of its own speech gives "a scaffolding that increases the linguistic quality of its generation".
 
 They measured it by taking the text stream away. Without it the scores drop to <u>about a third</u>.
 
@@ -211,7 +211,7 @@ The hard part is the data. Every example you train on now needs that third strea
 {{< deeper "What else people have put on it" "others" >}}
 **RT-2** puts robot actions into the sequence by writing them as text. Its own words: to fit language and actions into one format, it expresses <mark>the actions as text tokens, in the same training set as the language.</mark> One model reads the instruction and moves the arm.
 
-**Audio to Photoreal Embodiment** does it with people. If you give it the speech from a conversation, it produces the body that goes with it, face and hands included, quantised into a codebook the way audio is, so the motion lands on the same timeline as the sound that caused it.
+**Audio to Photoreal Embodiment** does it with people. If you give it the speech from a conversation, it produces the body that goes with it, face and hands included, quantized into a codebook the way audio is, so the motion lands on the same timeline as the sound that caused it.
 
 Neither is doing anything the drawing stream will not. <u>The stream will hold any kind of token.</u>
 
