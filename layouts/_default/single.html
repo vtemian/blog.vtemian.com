@@ -107,6 +107,16 @@
                 btn.setAttribute('aria-expanded', open ? 'true' : 'false');
                 if (open) place(btn, note);
             });
+            // The arrow is a span, so that a long phrase can break across
+            // lines. A span brings no keyboard activation with it.
+            if (btn.tagName === 'SPAN') {
+                btn.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        btn.click();
+                    }
+                });
+            }
         });
 
         // The arrows themselves. One drawn mark per phrase, living in the

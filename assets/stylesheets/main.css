@@ -474,6 +474,13 @@ article div :not(pre) > code {
    word goes round twice and does not meet its own start. Both loops paint over
    the letters instead of politely around them, which is the whole difference
    between a drawn mark and a border. */
+/* A circled phrase cannot survive a line break, so the pencil stays a box and
+   the line can break after it. Asking for a tidier last line keeps a stray
+   full stop from landing there alone. */
+.article-body p {
+  text-wrap: pretty;
+}
+
 .pencil {
   position: relative;
   display: inline-block;
