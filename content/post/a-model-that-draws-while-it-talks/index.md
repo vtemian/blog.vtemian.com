@@ -50,7 +50,7 @@ Where a model gets interesting is when it starts ask you question, notice what y
 
 Go and test it if you didn't had the chance. Just prompt your favorite frontier model, ask it to explain how derivatives work and to {{< note text="generate HTML and JS" >}}. You get to "play" with the elements, vizualize how a function accelerate or deccelerate in a given point, instead of just reading out an explanation. Also, detecting a wrong explanation is harder than detecting a wrong vizualization.{{< /note >}} with interactive elements and you will get a pretty fun learning exercise.
 
-But still, it doesn't feel like a tutor, {{< note text="like a teacher" >}}Bloom put a number on that gap in 1984. Students taught one to one, with mastery checks along the way, ended up about two standard deviations above the same material taught to a class. His question was how to get a class near that number, since one tutor per child is not a thing anyone can pay for.
+But still, it doesn't feel like a tutor, {{< note text="like a teacher" >}}In 1984 Bloom measured how much better one tutor does than a classroom. Students taught one to one, with mastery checks along the way, ended up about two standard deviations above the same material taught to a class. His question was how to get a class near that number, since one tutor per child is not a thing anyone can pay for.
 
 Later work has not reproduced a gap that large, though what produces it still holds. A tutor watches you work and changes what comes next according to the specific thing you have wrong. No amount of quality in the explanation gets you that, because the explanation was written before you started.
 
@@ -98,7 +98,7 @@ Three independent streams, and nothing in the protocol says where in the audio t
 If you think about it, when you start to explain and draw something, you already have an inner monologue that usually is {{< arrow "ahead" >}}a little bit ahead of your drawing and speech{{< /arrow >}}.
 
 {{< deeper "The hand starts before the word" "ahead" >}}
-Morrel-Samuels and Krauss put a camera on it, so this is more than something you notice about yourself.
+Morrel-Samuels and Krauss filmed it, so this is more than something you notice about yourself.
 
 They recorded people describing photographs and had a separate group mark which word each gesture belonged to. That gave them two times for every gesture, and they measured the distance between them. <mark>The gesture starts first. The word it belongs to follows.</mark>
 
@@ -151,7 +151,7 @@ Anything else you want lined up with the audio has to sit on those same position
 {{< deeper "Where the start times come from" "times" >}}
 A transcript gives you the words in order and nothing about when each one starts.
 
-**Forced alignment** gives you the times: you take audio you already have the words for, and work out where each one sits. Whisper is the usual way in. Out of the box it timestamps a segment at a time, a sentence or so; <mark>word-level times come from reading its attention, which is what the `word_timestamps` option does</mark>, or from running a separate aligner over the pair.
+**Forced alignment** gives you the times: you take audio you already have the words for, and work out where each one sits. Whisper is the usual tool for it. Out of the box it timestamps a segment at a time, a sentence or so; <mark>word-level times come from reading its attention, which is what the `word_timestamps` option does</mark>, or from running a separate aligner over the pair.
 
 <u>The times are the whole dataset.</u> If you get them wrong by two frames, you have taught the model to speak slightly after it writes.
 
