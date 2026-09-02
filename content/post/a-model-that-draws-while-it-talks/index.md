@@ -57,12 +57,14 @@ Having a personal tutor for every child is not economically viable, and Bloom an
 
 **Source:** [Bloom 1984](https://doi.org/10.3102/0013189X013006004).{{< /note >}}. If you want to get the full experience, you need to know how to combine certain prompts with certain tools for text-to-speech and text-to-image.
 
-You need to do an entire dance of prompting and tool use, but there should be a better way. Look at Khan Academy or {{< note text="3Blue1Brown" >}}Those animations are Python. Sanderson wrote Manim to make them, so each picture is the output of a program rather than a drawing someone made by hand.
+You need to do an entire dance of prompting and tool use, but there should be a better way. Look at Khan Academy or {{< note text="3Blue1Brown" >}}Those animations are actually Python code. Sanderson wrote a Python framework called Manim to make them, so each video is the output of a program rather than an animation that someone made by hand.
 
-That is the same shape as what a model like this has to produce. The output is instructions rather than pixels, and something else turns them into the picture. The people who explain best on video had already reduced their drawing to code, which means there is less for the model to invent.{{< /note >}}. It feels more natural, easier to follow and understand if somebody is {{< arrow "together" >}}speaking to you while they draw on a board{{< /arrow >}} and correlates it with their speech and their drawing.
+That is the same shape as what a frontier model produces. The output is instructions rather than pixels, and something else turns them into the picture. The people who explain best on video had already transformed their drawing into code, which means there is less for the model to invent.
+
+{{< /note >}}. It feels more natural, easier to follow and understand if somebody is {{< arrow "together" >}}speaking to you while they draw on a board{{< /arrow >}} and correlates it with their speech and their drawing.
 
 {{< deeper "Why saying it while drawing it works" "together" >}}
-Richard Mayer's group has spent decades measuring what happens when the words and the picture reach you at different times. <mark>The narration and the picture it describes have to arrive together.</mark> If you split them, you spend your effort holding the first half in your head while you wait for the second.
+Richard Mayer's group ran the same experiment many times over. Students watched a short animation of how a bicycle pump works, with a voice explaining it. Some heard the voice while the animation played, and the rest heard the whole explanation first and then watched the animation on its own. Afterwards everyone got new problems about pumps to solve. <mark>The students who heard and saw at the same time solved about half again as many.</mark> When the two come apart, you have to hold the words in your head until the picture arrives, and you have less left over for understanding it.
 
 His second result rules out subtitles. If the words are printed next to the drawing, you have to look away from it to read them, and you miss the stroke you were watching. If you **hear** them instead, your eyes never leave the picture.
 
