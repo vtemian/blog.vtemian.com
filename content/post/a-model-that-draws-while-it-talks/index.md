@@ -61,9 +61,9 @@ You need to do an entire dance of prompting and tool use, but there should be a 
 That is the same shape as what a model like this has to produce. The output is instructions rather than pixels, and something else turns them into the picture. The people who explain best on video had already reduced their drawing to code, which means there is less for the model to invent.{{< /note >}}. It feels more natural, easier to follow and understand if somebody is {{< arrow "together" >}}speaking to you while they draw on a board{{< /arrow >}} and correlate it with their speech and their drawing.
 
 {{< deeper "Why saying it while drawing it works" "together" >}}
-Richard Mayer's group has spent decades measuring what happens when the words and the picture reach you at different times. <mark>The narration and the picture it describes have to arrive together.</mark> Split them and you spend your effort holding the first half in your head while you wait for the second.
+Richard Mayer's group has spent decades measuring what happens when the words and the picture reach you at different times. <mark>The narration and the picture it describes have to arrive together.</mark> If you split them, you spend your effort holding the first half in your head while you wait for the second.
 
-His second result rules out subtitles. Print the words next to the drawing and you have to look away from it to read them, which costs you the stroke you were watching. **Say** them out loud and nothing moves your eyes.
+His second result rules out subtitles. If the words are printed next to the drawing, you have to look away from it to read them, and you miss the stroke you were watching. If you **hear** them instead, your eyes never leave the picture.
 
 That is why Khan Academy and 3Blue1Brown are easy to follow. One hand draws <u>while one voice explains</u>, and you never have to look in two places.
 
@@ -153,7 +153,7 @@ A transcript gives you the words in order and nothing about when each one starts
 
 **Forced alignment** gives you the times: you take audio you already have the words for, and work out where each one sits. Whisper is the usual way in. Out of the box it timestamps a segment at a time, a sentence or so; <mark>word-level times come from reading its attention, which is what the `word_timestamps` option does</mark>, or from running a separate aligner over the pair.
 
-<u>The times are the whole dataset.</u> Get them wrong by two frames and you have taught the model to speak slightly after it writes.
+<u>The times are the whole dataset.</u> If you get them wrong by two frames, you have taught the model to speak slightly after it writes.
 
 **Sources:** [Whisper](https://arxiv.org/abs/2212.04356) for the recogniser. [Moshi](https://arxiv.org/abs/2410.00037), section 3.4.4, for what it does with the alignment once it has it.
 {{< /deeper >}}
@@ -164,7 +164,7 @@ But there is a slot for every tick, and words don't fill every slot. The empty o
 
 Now the text ticks at the same rate as the audio. That is what {{< note text="Moshi" >}}Kyutai's speech model, 2024. Unusually, it does not take turns: it models both sides of the conversation at once, its own voice and yours, and keeps generating while you are still talking.
 
-That is what the shared clock is for. Turn-taking is a rule you have to impose on a system that can only attend to one thing at a time. Put both sides on one clock and the model can be interrupted, because it never stopped listening.{{< /note >}} calls the {{< pencil "monologue" >}}inner monologue{{< /pencil >}}.
+That is what the shared clock is for. Turn-taking is a rule you have to impose on a system that can only attend to one thing at a time. If both sides are on one clock, the model can be interrupted, because it never stopped listening.{{< /note >}} calls the {{< pencil "monologue" >}}inner monologue{{< /pencil >}}.
 
 {{< deeper "What the inner monologue is for" "monologue" >}}
 <mark>The text stream is a plan that the voice follows</mark>, rather than a transcript for you to read.
@@ -209,7 +209,7 @@ The hard part is the data. Every example you train on now needs that third strea
 {{< deeper "What else people have put on it" "others" >}}
 **RT-2** puts robot actions into the sequence by writing them as text. Its own words: to fit language and actions into one format, it expresses <mark>the actions as text tokens, in the same training set as the language.</mark> One model reads the instruction and moves the arm.
 
-**Audio to Photoreal Embodiment** does it with people. Give it the speech from a conversation and it produces the body that goes with it, face and hands included, quantised into a codebook the way audio is, so the motion lands on the same timeline as the sound that caused it.
+**Audio to Photoreal Embodiment** does it with people. If you give it the speech from a conversation, it produces the body that goes with it, face and hands included, quantised into a codebook the way audio is, so the motion lands on the same timeline as the sound that caused it.
 
 Neither is doing anything the drawing stream will not. <u>The stream will hold any kind of token.</u>
 
