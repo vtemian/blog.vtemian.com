@@ -100,7 +100,7 @@ If you think about it, when you start to explain and draw something, you already
 {{< deeper "The hand starts before the word" "ahead" >}}
 Morrel-Samuels and Krauss filmed it, so this is more than something you notice about yourself.
 
-They recorded people describing photographs and had a separate group mark which word each gesture belonged to. That gave them two times for every gesture, and they measured the distance between them. <mark>Your hand moves before the word it goes with leaves your mouth.</mark>
+They sat people in front of photographs and filmed them describing what they saw. A second group watched the tape afterwards and marked, for every movement of the hand, which word it went with. That left two moments to compare for each gesture: when the hand set off, and when the word was said. <mark>Your hand starts before your voice does.</mark>
 
 How big the gap is depends on the word: **familiarity predicts it**. A word you know well leaves a short gap, and one you have to search for leaves a long one, so the gap measures how long the word took to find.
 
