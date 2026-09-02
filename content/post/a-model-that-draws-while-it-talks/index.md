@@ -101,7 +101,7 @@ Three independent streams, and nothing in the protocol says where in the audio t
 If you think about it, when you start to explain and draw something, you already have an inner monologue that usually is {{< arrow "ahead" "right" >}}a little bit ahead of your drawing and speech{{< /arrow >}}.
 
 {{< deeper "The hand starts before the word" "ahead" >}}
-Morrel-Samuels and Krauss filmed it, so this is more than something you notice about yourself.
+In 1992, Morrel-Samuels and Krauss filmed it, so this is more than something you notice about yourself.
 
 They sat people in front of photographs and filmed them describing what they saw. A second group watched the tape afterwards and marked, for every movement of the hand, which word it went with. That left two moments to compare for each gesture: when the hand set off, and when the word was said. <mark>Your hand starts before your voice does.</mark>
 
