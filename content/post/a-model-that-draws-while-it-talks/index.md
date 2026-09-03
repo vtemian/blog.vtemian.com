@@ -93,7 +93,7 @@ response.output_audio_transcript.delta   the words being said
 response.function_call_arguments.delta   draw_line({ ... })
 ```
 
-The audio arrives in chunks and the transcript in words. The drawing arrives on its own, whenever the model decides to call the tool, and nothing says which chunk of audio it goes with. <mark>There is no field for it, because there is no shared clock.</mark> Lining them up is the client's job, <u>forever</u>.
+You get the audio in small chunks and the transcript word by word. The `draw_line` call comes separately, whenever the model decides to make it, and nothing on it says which chunk of audio it belongs to. <mark>The API has no timestamp for it, because the model has no clock to take one from.</mark> You have to <u>line them up yourself</u>, on the client, for every response.
 
 **Reference:** [OpenAI Realtime conversations](https://developers.openai.com/api/docs/guides/realtime-conversations)
 {{< /deeper >}}
