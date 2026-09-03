@@ -112,11 +112,9 @@ You cannot film a thought, but look at what that gap means. For the hand to star
 
 Now how can we translate something like that to a model?
 
-Well, we can do that by inventing "a clock". That clock has a certain tick rate, and once we have a tick rate we can put multiple streams on it and make sure that some run ahead and some run behind.
+Well, we can do that by inventing "a clock". That clock has a certain {{< note text="tick rate" >}}The clock is not free. At every position the model emits every stream it carries, whether or not that stream has anything to say. Silence costs a token, exactly like a word does.
 
-How do we do that? The sound gets cut into equal slices, {{< note text="one clock" >}}The clock is not free. At every position the model emits every stream it carries, whether or not that stream has anything to say. Silence costs a token, exactly like a word does.
-
-You get alignment, which nothing else gives you. In exchange, every frame where a stream has nothing to say still costs you one token, for as long as the model runs.{{< /note >}}, about twelve of them a second, and that is the tick rate. The words go on the slices they start in. One position in the sequence means one moment in time, and it means that for both of them at once. That stream of words is the model's inner monologue, and because it shares the clock with the sound, you can run it a few slices ahead on purpose.
+You get alignment, which nothing else gives you. In exchange, every frame where a stream has nothing to say still costs you one token, for as long as the model runs.{{< /note >}}, and once we have a tick rate we can put multiple streams on it and make sure that some run ahead and some run behind.
 
 {{< fold "Where that clock comes from" "4 min" >}}
 
