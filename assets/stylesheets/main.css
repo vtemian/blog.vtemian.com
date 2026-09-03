@@ -1029,6 +1029,11 @@ article { counter-reset: sidenote-counter; }
 .is-wide .article-body > figure,
 .is-wide .article-body > .w-wide { grid-column: wide; }
 
+/* The heads figure only grows to the left, where the position box sits out
+   past the reading column. Its rows, caption and controls stop where the
+   text does. */
+.is-wide .article-body > .hd { grid-column: wide-start / text-end; }
+
 /* A folded section spans the shell, and lays its own contents out on the same
    tracks as the article. Without this a widget inside it is stuck at the
    reading measure, which is not what any of them were built for. */
