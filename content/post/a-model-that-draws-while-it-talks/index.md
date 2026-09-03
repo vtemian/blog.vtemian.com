@@ -205,14 +205,35 @@ Getting them back out works the same way <u>in reverse</u>. The model produces o
 
 {{< endfold >}}
 
-Once those two streams share a clock, a third one {{< note text="costs almost nothing" >}}Adding a stream to the model is cheap. You give it one more table to turn the new tokens into vectors on the way in, and one more small head to read them back out at the end. Next to the transformer in the middle, both are tiny.
+Once those two streams share a clock, a third one {{< pencil "cost" >}}costs almost nothing{{< /pencil >}}. {{< arrow "others" >}}The model doesn't care what is in it{{< /arrow >}}. Somebody already put [facial motion](https://arxiv.org/abs/2401.01885) on that clock. Somebody else put [robot actions](https://arxiv.org/abs/2307.15818) on it.
 
-The data is where it gets expensive. Every training example now needs the drawing as well, sitting on the same ticks as the voice and the words, and no dataset like that exists. You either record people drawing while they talk, or you generate it. That is why so few models have a third stream.{{< /note >}}. {{< arrow "others" >}}The model doesn't care what is in it{{< /arrow >}}. Somebody already put [facial motion](https://arxiv.org/abs/2401.01885) on that clock. Somebody else put [robot actions](https://arxiv.org/abs/2307.15818) on it.
+{{< deeper "What a third stream costs" "cost" >}}
+Adding a stream to the model is cheap. In code it is one more embedding table on the way in and one more head on the way out:
+
+```python
+self.text_emb  = nn.Embedding(text_vocab,  d)
+self.audio_emb = nn.Embedding(audio_vocab, d)
+self.draw_emb  = nn.Embedding(draw_vocab,  d)  # new
+
+x = (self.text_emb(text)
+     + self.audio_emb(audio)
+     + self.draw_emb(draw))                    # new term
+h = self.transformer(x)                       # unchanged
+
+text_logits  = self.text_head(h)
+audio_logits = self.audio_head(h)
+draw_logits  = self.draw_head(h)              # new
+```
+
+Two lines marked new, and <mark>the transformer in the middle does not change</mark>. Next to it, both additions are tiny.
+
+The data is where it gets expensive. Every training example now needs the drawing as well, sitting on the same ticks as the voice and the words, and <u>no dataset like that exists</u>. You either record people drawing while they talk, or you generate it. That is why so few models have a third stream.
+{{< /deeper >}}
 
 {{< deeper "What else people have put on it" "others" >}}
 **RT-2** puts robot actions into the sequence by writing them as text. Its own words: to fit language and actions into one format, it expresses <mark>the actions as text tokens, in the same training set as the language.</mark> One model reads the instruction and moves the arm.
 
-**Audio to Photoreal Embodiment** does it with people. If you give it the speech from a conversation, it produces the body that goes with it, face and hands included, quantized into a codebook the way audio is, so the motion lands on the same timeline as the sound that caused it.
+**Audio to Photoreal Embodiment** does it with people. A team at Meta recorded pairs of people talking, with cameras capturing how their bodies moved, face and hands included. Then they turned those movements into tokens, the same way a codec turns sound into tokens, and trained a model that takes the sound of a conversation and writes out the movement that goes with it, tick by tick. If you give it a recording of someone talking, it produces a body that gestures and moves its lips in time with the words.
 
 Neither is doing anything the drawing stream will not. <u>The stream will hold any kind of token.</u>
 
