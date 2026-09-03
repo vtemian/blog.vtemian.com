@@ -402,13 +402,16 @@ article div :not(pre) > code {
   text-underline-offset: 3px;
 }
 
-/* Highlighter, in a colour the paper is not. */
+/* Highlighter, in a colour the paper is not. The same pen in the running
+   text, so a highlighted line there does not come out browser-yellow. */
+.article-body mark,
 .deeper-body mark {
   background: linear-gradient(transparent 12%, #b7e3d8 12%, #b7e3d8 88%, transparent 88%);
   color: inherit;
   padding: 0 0.15em;
 }
 
+.dark .article-body mark,
 .dark .deeper-body mark {
   background: linear-gradient(transparent 12%, #2f5b52 12%, #2f5b52 88%, transparent 88%);
 }
