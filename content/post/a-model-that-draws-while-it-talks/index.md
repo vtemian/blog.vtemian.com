@@ -101,13 +101,11 @@ You get the audio in small chunks and the transcript word by word. The `draw_lin
 If you think about it, when you start to explain and draw something, you already have an inner monologue that usually is {{< arrow "ahead" "right" >}}a little bit ahead of your drawing and speech{{< /arrow >}}.
 
 {{< deeper "The hand starts before the word" "ahead" >}}
-In 1992, Morrel-Samuels and Krauss filmed it, so this is more than something you notice about yourself.
+In 1992, Morrel-Samuels and Krauss filmed people describing photographs. Then a second group watched the tape and wrote down, for each movement of the hand, which word it went with. That gave them a gap to measure, from the hand starting to the word being said. <mark>Your hand starts moving before you say the word</mark>, about a second before on average.
 
-They sat people in front of photographs and filmed them describing what they saw. A second group watched the tape afterwards and marked, for every movement of the hand, which word it went with. That left two moments to compare for each gesture: when the hand set off, and when the word was said. <mark>Your hand starts before your voice does.</mark>
+The gap is not the same for every word. For a common word it is short. For a rare word, one you have to search for, it is long. <u>The longer the word takes to find, the earlier the hand starts.</u>
 
-How big the gap is depends on the word: **familiarity predicts it**. A word you know well leaves a short gap, and one you have to search for leaves a long one, so the gap measures how long the word took to find.
-
-Nobody can film a monologue, so what they caught is the hand running ahead of the voice, not a thought running ahead of both. The second result is what connects the two. If the gap grows exactly when the word is hard to find, then at the moment the hand set off, the sentence had been decided and the word had not.
+Nobody can film a thought. But the hand can only start early if the word has already been chosen, and the gap is longest exactly when choosing it is hardest. So by the time your hand moves, something has already decided what you are going to say, and your voice is still catching up.
 
 **Source:** [Morrel-Samuels & Krauss 1992](https://doi.org/10.1037/0278-7393.18.3.615). The earlier version of the same work is titled, plainly, <u>Gestures precede speech</u>.
 {{< /deeper >}}
