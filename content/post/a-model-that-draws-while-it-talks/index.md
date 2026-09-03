@@ -114,7 +114,7 @@ Now how can we translate something like that to a model?
 
 Well, we can do that by inventing "a clock". That clock has a certain {{< note text="tick rate" >}}The clock is not free. At every position the model emits every stream it carries, whether or not that stream has anything to say. Silence costs a token, exactly like a word does.
 
-You get alignment, which nothing else gives you. In exchange, every frame where a stream has nothing to say still costs you one token, for as long as the model runs.{{< /note >}}, and once we have a tick rate we can put multiple streams on it and make sure that some run ahead and some run behind. The first two streams are the voice and the words it is about to say, the inner monologue, which runs a few ticks ahead.
+You get alignment, which nothing else gives you. In exchange, every frame where a stream has nothing to say still costs you one token, for as long as the model runs.{{< /note >}}, and once we have a tick rate we can put multiple streams on it and make sure that some run ahead and some run behind. The first two streams are the voice and the words it is about to say, the inner monologue. At every tick the model writes the word first and then voices it.
 
 {{< fold "Where that clock comes from" "4 min" >}}
 

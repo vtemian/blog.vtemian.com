@@ -1,9 +1,11 @@
-{{- /* One position, three heads. Every tick the model emits once per stream: the
-       text head writes the next word of its own speech, the audio head voices a
-       word it wrote a few positions ago, the drawing head puts down the stroke
-       that word asked for. Same clock, three outputs, and the monologue always
-       out in front. */ -}}
-<figure class="hd" aria-label="One position feeding three heads: the inner monologue runs ahead of the speech, and the drawing follows both">
+{{- /* One position, three heads. Every tick the model emits once per stream,
+       in a fixed order inside the tick: the text head writes the word, the audio
+       head voices it, the drawing head puts down the stroke that word asked
+       for. Same position for all three; the monologue is first only in the
+       order of writing, not by any number of ticks. That matches the trained
+       model, where text and audio share the frame and the ink lands on the
+       sentence it narrates. */ -}}
+<figure class="hd" aria-label="One position feeding three heads: the text head writes the word, the audio head voices it, the draw head puts down the stroke, all at the same position">
   <div class="hd-body">
     <div class="hd-spine">
       <span class="hd-box">one position<em class="hd-t">t = 0</em></span>
@@ -30,7 +32,7 @@
       </div>
     </div>
   </div>
-  <p class="hd-cap">The text head writes each word seven positions before the audio head says it, and only the audio head is heard.</p>
+  <p class="hd-cap">At every position the text head writes the word, then the audio head voices it, then the draw head puts down the stroke, before the clock moves on. Only the audio head is heard.</p>
   <div class="cb-controls">
     <button class="cb-btn" data-act="toggle" aria-label="Play or pause">▶</button>
     <button class="cb-btn" data-act="replay" aria-label="Replay from the start">↺</button>
@@ -44,11 +46,13 @@
   fig.dataset.ready = '1';
 
   const WORDS = 'Square the two short sides, add them up, and you get the long one.'.split(' ');
-  const MS = 400;
-  const SAY = 7;    // positions between writing a word and voicing it
-  const DRAW = 10;  // and between writing it and the stroke landing
+  const MS = 600;
+  // Inside one tick, in order: the word is written, then voiced, then drawn.
+  // Fractions of a tick, so the order shows while the position stays the same.
+  const SAY = 1 / 3;
+  const DRAW = 2 / 3;
   const STROKE_AT = [0, 3, 4, 11];   // which word each stroke belongs to
-  const RUN = WORDS.length + DRAW;
+  const RUN = WORDS.length + 1;
 
   const rows = {};
   for (const ch of ['text', 'sound']) {
@@ -79,9 +83,9 @@
     tick = Math.max(0, Math.min(RUN, t));
     const p = Math.floor(tick);
 
-    // Same position for all three. Only the content differs: the text head is
-    // already on the word the audio head will voice four positions from now.
-    const heads = { text: p, sound: p - SAY };
+    // Same position for all three. The audio head reaches the word a third of
+    // a tick after the text head wrote it, and the stroke lands after both.
+    const heads = { text: p, sound: Math.floor(tick - SAY) };
     for (const ch of ['text', 'sound']) {
       const at = heads[ch];
       rows[ch].forEach((el, i) => {
@@ -89,7 +93,7 @@
       });
     }
     strokes.forEach((s, i) => {
-      const at = p - DRAW - STROKE_AT[i] >= 0;
+      const at = tick - DRAW - STROKE_AT[i] >= 0;
       s.el.style.strokeDashoffset = at ? 0 : s.len;
     });
 
