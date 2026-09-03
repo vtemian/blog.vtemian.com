@@ -101,7 +101,7 @@ You get the audio in small chunks and the transcript word by word. The `draw_lin
 If you think about it, when you start to explain and draw something, you already have an inner monologue that usually is {{< arrow "ahead" "right" >}}a little bit ahead of your drawing and speech{{< /arrow >}}.
 
 {{< deeper "The hand starts before the word" "ahead" >}}
-In 1992, two psychologists, Morrel-Samuels and Krauss, wanted to know which comes first when you talk with your hands, the gesture or the word. So they sat people in front of photographs and filmed them describing what they saw. The tapes went to a second group, who wrote down, every time a hand moved, which word that movement went with. Now they could put the two on a timeline and look at the gap. <mark>The hand starts moving before you say the word</mark>, about a second before on average.
+In 1992, two psychologists, Morrel-Samuels and Krauss, wanted to know which comes first when you talk with your hands, the gesture or the word. So they sat people in front of photographs and filmed them describing what they saw. Afterwards, the tapes went to a second group, who wrote down every time a hand moved, which word that movement was associated with. Now they could put the two on a timeline and conclude that <mark>the hand starts moving before you say the word</mark>, about a second before on average.
 
 Then they sorted the words by how common they were. When the word was an everyday one the gap was short, but when it was a rare one, the kind you have to hunt for, the hand set off much earlier, <u>and the harder the word was to find, the bigger the head start</u>.
 
