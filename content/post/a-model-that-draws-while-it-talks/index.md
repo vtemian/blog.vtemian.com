@@ -240,6 +240,6 @@ Neither is doing anything the drawing stream will not. <u>The stream will hold a
 **Sources:** [RT-2](https://arxiv.org/abs/2307.15818) and [From Audio to Photoreal Embodiment](https://arxiv.org/abs/2401.01885).
 {{< /deeper >}}
 
-We put drawing commands on it.
+We put drawing commands on it, and give the model a third head to write them.
 
 {{< heads >}}
