@@ -205,9 +205,9 @@ Getting them back out works the same way <u>in reverse</u>. The model produces o
 
 {{< endfold >}}
 
-Once those two streams share a clock, a third one {{< note text="costs almost nothing" >}}Inside the model, near enough nothing. The stream needs an embedding table on the way in and a head on the way out, and both are tiny next to the transformer they hang off.
+Once those two streams share a clock, a third one {{< note text="costs almost nothing" >}}Adding a stream to the model is cheap. You give it one more table to turn the new tokens into vectors on the way in, and one more small head to read them back out at the end. Next to the transformer in the middle, both are tiny.
 
-The hard part is the data. Every example you train on now needs that third stream, aligned to the same frames as the other two, and there is nothing you can download that has it. You record it or you generate it. The cost of building that data is why a third stream is rare.{{< /note >}}. {{< arrow "others" >}}The model doesn't care what is in it{{< /arrow >}}. Somebody already put [facial motion](https://arxiv.org/abs/2401.01885) on that clock. Somebody else put [robot actions](https://arxiv.org/abs/2307.15818) on it.
+The data is where it gets expensive. Every training example now needs the drawing as well, sitting on the same ticks as the voice and the words, and no dataset like that exists. You either record people drawing while they talk, or you generate it. That is why so few models have a third stream.{{< /note >}}. {{< arrow "others" >}}The model doesn't care what is in it{{< /arrow >}}. Somebody already put [facial motion](https://arxiv.org/abs/2401.01885) on that clock. Somebody else put [robot actions](https://arxiv.org/abs/2307.15818) on it.
 
 {{< deeper "What else people have put on it" "others" >}}
 **RT-2** puts robot actions into the sequence by writing them as text. Its own words: to fit language and actions into one format, it expresses <mark>the actions as text tokens, in the same training set as the language.</mark> One model reads the instruction and moves the arm.
