@@ -1382,13 +1382,16 @@ article { counter-reset: sidenote-counter; }
   transition: stroke-dashoffset 0.5s ease-out;
 }
 
+/* Caption and controls line up with the head labels, not with the position
+   box, which stays out to the left on its own: spine column, grid gap, then
+   the rows' own left padding. */
 .hd-cap {
-  margin: 0.6rem 0 0;
+  margin: 0.6rem 0 0 calc(5rem + 0.9rem + 0.9rem);
   font-size: 0.76rem;
   color: var(--color-muted);
 }
 
-.hd .cb-controls { padding-left: 0; margin-top: 0.5rem; }
+.hd .cb-controls { padding-left: 0; margin-top: 0.5rem; margin-left: calc(5rem + 0.9rem + 0.9rem); }
 
 @media (max-width: 640px) {
   .hd-body { grid-template-columns: minmax(0, 1fr); gap: 0.8rem; }
@@ -1396,6 +1399,7 @@ article { counter-reset: sidenote-counter; }
   .hd-spine::after, .hd-row::before { display: none; }
   .hd-rows { padding-left: 0; }
   .hd-rows::before { display: none; }
+  .hd-cap, .hd .cb-controls { margin-left: 0; }
   .hd-row { grid-template-columns: minmax(0, 1fr); gap: 0.2rem; }
   .hd-words { font-size: 0.92rem; }
 }
