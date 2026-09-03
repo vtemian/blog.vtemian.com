@@ -114,7 +114,7 @@ Now how can we translate something like that to a model?
 
 Well, we can do that by inventing "a clock". That clock has a certain {{< note text="tick rate" >}}The clock is not free. At every position the model emits every stream it carries, whether or not that stream has anything to say. Silence costs a token, exactly like a word does.
 
-You get alignment, which nothing else gives you. In exchange, every frame where a stream has nothing to say still costs you one token, for as long as the model runs.{{< /note >}}, and once we have a tick rate we can put multiple streams on it and make sure that some run ahead and some run behind.
+You get alignment, which nothing else gives you. In exchange, every frame where a stream has nothing to say still costs you one token, for as long as the model runs.{{< /note >}}, and once we have a tick rate we can put multiple streams on it and make sure that some run ahead and some run behind. The first two streams are the voice and the words it is about to say, the inner monologue, which runs a few ticks ahead.
 
 {{< fold "Where that clock comes from" "4 min" >}}
 
@@ -205,7 +205,7 @@ Getting them back out works the same way <u>in reverse</u>. The model produces o
 
 {{< endfold >}}
 
-Once two streams share that clock, a third one {{< note text="costs almost nothing" >}}Inside the model, near enough nothing. The stream needs an embedding table on the way in and a head on the way out, and both are tiny next to the transformer they hang off.
+Once those two streams share a clock, a third one {{< note text="costs almost nothing" >}}Inside the model, near enough nothing. The stream needs an embedding table on the way in and a head on the way out, and both are tiny next to the transformer they hang off.
 
 The hard part is the data. Every example you train on now needs that third stream, aligned to the same frames as the other two, and there is nothing you can download that has it. You record it or you generate it. The cost of building that data is why a third stream is rare.{{< /note >}}. {{< arrow "others" >}}The model doesn't care what is in it{{< /arrow >}}. Somebody already put facial motion on that clock. Somebody else put robot actions on it.
 
