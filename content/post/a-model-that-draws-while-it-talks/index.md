@@ -112,9 +112,9 @@ You cannot film a thought, but look at what that gap means. For the hand to star
 
 Now how can we translate something like that to a model?
 
-You put everything on one clock. The sound gets cut into equal slices, {{< note text="one clock" >}}The clock is not free. At every position the model emits every stream it carries, whether or not that stream has anything to say. Silence costs a token, exactly like a word does.
+For one stream to run a little ahead of another, both have to be on the same clock, or "a little ahead" means nothing. So you put everything on one clock. The sound gets cut into equal slices, {{< note text="one clock" >}}The clock is not free. At every position the model emits every stream it carries, whether or not that stream has anything to say. Silence costs a token, exactly like a word does.
 
-You get alignment, which nothing else gives you. In exchange, every frame where a stream has nothing to say still costs you one token, for as long as the model runs.{{< /note >}}, about twelve of them a second. The words go on the slices they start in. One position in the sequence means one moment in time, and it means that for both of them at once.
+You get alignment, which nothing else gives you. In exchange, every frame where a stream has nothing to say still costs you one token, for as long as the model runs.{{< /note >}}, about twelve of them a second. The words go on the slices they start in. One position in the sequence means one moment in time, and it means that for both of them at once. That stream of words is the model's inner monologue, and because it shares the clock with the sound, you can run it a few slices ahead on purpose.
 
 {{< fold "Where that clock comes from" "4 min" >}}
 
