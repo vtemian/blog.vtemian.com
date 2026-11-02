@@ -189,7 +189,7 @@ Getting them back out works the same way <u>in reverse</u>. The model produces o
 
 {{< endfold >}}
 
-Once those two streams share a clock, a third one {{< pencil "cost" >}}costs almost nothing{{< /pencil >}}. {{< arrow "others" >}}The model doesn't care what is in it{{< /arrow >}}. Somebody already put [facial motion](https://arxiv.org/abs/2401.01885) on that clock. Somebody else put [robot actions](https://arxiv.org/abs/2307.15818) on it.
+Once those two streams share a clock, a third one {{< pencil "cost" >}}costs almost nothing{{< /pencil >}}. {{< arrow "others" "right" >}}The model doesn't care what is in it{{< /arrow >}}. Somebody already put [facial motion](https://arxiv.org/abs/2401.01885) on that clock. Somebody else put [robot actions](https://arxiv.org/abs/2307.15818) on it.
 
 {{< deeper "What a third stream costs" "cost" >}}
 Adding a stream to the model is cheap. In code it is one more embedding table on the way in and one more head on the way out:

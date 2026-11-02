@@ -31,6 +31,7 @@ Each post is available as markdown at `{url}index.md` for LLM consumption.
 
 Each talk is available as markdown at `{url}index.md` for LLM consumption.
 
+- [The One-Person Product Team](https://blog.vtemian.com/talk/the-one-person-product-team/) ([md](https://blog.vtemian.com/talk/the-one-person-product-team/index.md)) (AGENTIC.tm x Indie TM · prow 2026 side event): The intro talk from the AGENTIC.tm x Indie TM side event at prow 2026: how models went from writing LinkedIn posts to running loops, and why the environment around the agent matters more than the agent.
 - [Why I Think Software Development Will Be Automated by 2030](https://blog.vtemian.com/talk/why-i-think-software-development-will-be-automated-by-2030/) ([md](https://blog.vtemian.com/talk/why-i-think-software-development-will-be-automated-by-2030/index.md)): My PRO argument from a live debate in Timisoara, fact-checked with verified references.
 - [Riding Existing Waves: My Indie Hacking Journey with Sisif.ai](https://blog.vtemian.com/talk/indie-hacking-update/) ([md](https://blog.vtemian.com/talk/indie-hacking-update/index.md)): How I went from 0 to growing MRR by abandoning traditional marketing and riding existing distribution waves. A former CTO's lesson in Platform-Led Growth.
 - [Technical Debt is Cheap](https://blog.vtemian.com/talk/technical-debt-is-cheap/) ([md](https://blog.vtemian.com/talk/technical-debt-is-cheap/index.md)): Can AI tools tackle a 2,000-line legacy Laravel controller in 3 hours? A case study in AI-driven refactoring and modernizing technical debt.
