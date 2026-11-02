@@ -3357,7 +3357,9 @@ I asked it to split the fixes between agents. <img src="boss.png" alt="boss" sty
 
 Data analysis, product calls, five pull requests, a deploy and QA. <mark>That used to take a team.</mark> In the deck I drew it as a factory building a rocket, because that's what **one person** can build now.
 
-That's what the talk was about: *The One-Person Product Team*. It was a meetup where two local Timișoara communities came together, as a [prow 2026](https://prow.ro) side event.
+That's what the talk was about: *The One-Person Product Team*. It was a meetup where two local Timișoara communities came together, as a [prow 2026](https://prow.ro) side event. More than 70 people showed up.
+
+![The title slide, with the room at Haufe](photo-title.jpg)
 
 The first one is **[AGENTIC.tm](https://www.linkedin.com/company/agentictm/)**, which I organize. We're the robots on the factory floor: we talk about code generated with AI, and how to produce it as well and as cleanly as possible. Talking to people there, almost everyone has a side project, and most of them built it with AI. <mark>Code got so cheap that building stopped being the hard part.</mark> A while ago I called what we make [disposable tools](/post/disposable-tools-manifesto/): you build exactly what you need, in an afternoon, and move on.
 
@@ -3459,11 +3461,19 @@ A role is three things: **context**, what it needs to know; **tools**, what it c
   <source src="s12-roles.mp4" type="video/mp4">
 </video>
 
+![The room during the talk, the toolbox slide on the side screens](photo-room.jpg)
+
 The human doesn't work on the line anymore. The human builds the environment and runs several factories in parallel.
 
 <mark>That's the one-person product team.</mark>
 
+![Hands up at the start of the talk](photo-hands.jpg)
+
+*Photos: [prow 2026](https://prow.ro).*
+
 ---
+
+**The full talk**, all fourteen slides with what I said over each one, is [here](/decks/the-one-person-product-team/). The other two talks of the evening are online too: [Raul Popadineti's](https://raulp.co/talks/one-person-product-team/#0) and [Mircea Rilă's](https://zerotofail.com/talks/one-person-product-team/#/1/1).
 
 Thanks to Haufe Group for the room, and to everyone who came. Find me at [@vtemian](https://twitter.com/vtemian).
 

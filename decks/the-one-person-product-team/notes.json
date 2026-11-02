@@ -1,0 +1,211 @@
+[
+ {
+  "title": "Title",
+  "paras": [
+   [
+    "Hi, I'm Vlad. Welcome, and thanks to Haufe for the room."
+   ],
+   [
+    "Tonight is about people who now build alone what used to take a whole team. Real examples, with real numbers. And I'll start with my own, which is a bit embarrassing."
+   ]
+  ]
+ },
+ {
+  "title": "AGENTIC.tm",
+  "paras": [
+   [
+    "Two communities put this evening together. The first one is AGENTIC.tm. We're the people on the shop floor: how code actually gets made with AI. Meetups, demos, Cafe Cursor, and a few evenings that were mostly beer."
+   ]
+  ]
+ },
+ {
+  "title": "Indie TM",
+  "paras": [
+   [
+    "The second one is Indie TM. That's the shop window: people who build products and sell them, and tell you the real numbers. What worked, and what didn't."
+   ],
+   [
+    "For a long time these were two different conversations. In the last year, they turned into the same one. That's why we're in one room tonight."
+   ]
+  ]
+ },
+ {
+  "title": "How the evening goes",
+  "paras": [
+   [
+    "Here's the plan. I talk for about fifteen minutes. At seven, Raul. Then a short break. At quarter to eight, Mircea. Then drinks."
+   ],
+   [
+    "House rules: no pitching, real numbers, and you can ask questions anytime. Interrupt them, they agreed to it."
+   ]
+  ]
+ },
+ {
+  "title": "2024 vs 2026",
+  "paras": [
+   [
+    "So, my embarrassing example."
+   ],
+   [
+    "In 2024, this is how I used AI. Emails. LinkedIn posts. \"I'm humbled to announce.\" I'm not proud of it."
+   ],
+   [
+    "In 2026, the same kind of model does this. It logs in, finds my invoices, downloads them, and sends them to my accountant. Same model family. Light years apart."
+   ],
+   [
+    "I won't tell you why yet. Just look at the distance."
+   ]
+  ]
+ },
+ {
+  "title": "Text became action",
+  "paras": [
+   [
+    "Here's what changed. Look at the left. Ask a chatbot \"why did our signups drop\" and you get this: \"Signups can drop for many reasons, seasonality...\" Text. Correct, and useless."
+   ],
+   [
+    "Now give the same model a terminal. It reads, it decides, it runs one command, it reads the result, it decides again.",
+    "It queries PostHog: signups down 38 percent, on mobile.",
+    "It reads the logs: 500 errors on /signup.",
+    "It greps the code: signup.ts, line 42.",
+    "It deploys a fix. Signups come back."
+   ],
+   [
+    "Four steps. Each one depends on what the last one found. That's the whole trick. Text became action."
+   ]
+  ]
+ },
+ {
+  "title": "The garage",
+  "paras": [
+   [
+    "And the toolbox kept growing."
+   ],
+   [
+    "2023: it could read, edit, and delete files. Code only.",
+    "2024: a shell. Now it can run things.",
+    "2025: a browser, and the whole computer. It clicks, scrolls, logs in.",
+    "Also 2025: MCP. It talks to your other systems: your analytics, your billing, your CRM.",
+    "2026: other agents. It hands work to its friends."
+   ],
+   [
+    "Here's the part people miss. The models are now trained, with reinforcement learning, directly on these loops. That's why it keeps getting better, month after month."
+   ],
+   [
+    "Let me show you."
+   ]
+  ]
+ },
+ {
+  "title": "The accountant",
+  "paras": [
+   [
+    "This is a real message from my accountant. Every month. \"Hi Vlad, could you send me this month's RunPod invoices, please?\""
+   ],
+   [
+    "Every month I forget. So I gave it to a bot."
+   ]
+  ]
+ },
+ {
+  "title": "Demo 1, invoices",
+  "paras": [
+   [
+    "It gets a cloud VM. Its own machine.",
+    "It opens a browser.",
+    "It logs in.",
+    "It finds the invoices and downloads them.",
+    "It writes the email and sends it."
+   ],
+   [
+    "That's the fun part. Now the scary part."
+   ]
+  ]
+ },
+ {
+  "title": "2,000 PRs",
+  "paras": [
+   [
+    "Tool use without verification is a junior with admin rights. Fast, confident, and sometimes very wrong."
+   ],
+   [
+    "So how do people run this at scale? Lauren Tan, in a talk this September: \"last month I did something pretty crazy. I shipped 2,000 pull requests to production.\""
+   ],
+   [
+    "It doesn't work because the agent is careful. It works because of the environment around it.",
+    "One: the agent checks its own work.",
+    "Two: separate verifiers sign off the merge. Not the same agent.",
+    "Three: every mistake that happens twice becomes a rule in the environment. Not a note in a prompt. A rule."
+   ],
+   [
+    "Because if you keep writing the same instruction to the agent, the instruction is the symptom. The real fix lives in the environment."
+   ]
+  ]
+ },
+ {
+  "title": "Guardrails",
+  "paras": [
+   [
+    "This is what that looks like. Deterministic guardrails. Small units, put together, checked by rules that don't have opinions."
+   ],
+   [
+    "The work goes through lint.",
+    "Then static analysis.",
+    "Then import rules: who is allowed to talk to whom.",
+    "Then tests.",
+    "Then a verifier on the pull request."
+   ],
+   [
+    "If you're a human, coding like this would be awful. You'd quit in a week. But the environment isn't built for us. It's built for the agent."
+   ]
+  ]
+ },
+ {
+  "title": "Demo 2, funnel to production",
+  "paras": [
+   [
+    "Second demo. Same idea, bigger loop."
+   ],
+   [
+    "The bot pulls data from PostHog and Stripe.",
+    "It builds the funnel.",
+    "It finds where users drop off.",
+    "It proposes fixes and opens pull requests."
+   ],
+   [
+    "Five pull requests. And now each of them goes through the gates you just saw."
+   ]
+  ]
+ },
+ {
+  "title": "One role = one line",
+  "paras": [
+   [
+    "So here's the bridge to the rest of the evening."
+   ],
+   [
+    "A role is three things. Context: what it needs to know. Tools: what it can touch. Verification: how you know it did it right."
+   ],
+   [
+    "Put that loop on repeat and you have a production line. One line for code. One for data. One for support. One for content."
+   ],
+   [
+    "The human doesn't do the work anymore. The human builds the environment, and runs several factories in parallel."
+   ],
+   [
+    "That's the one-person product team."
+   ]
+  ]
+ },
+ {
+  "title": "Handover",
+  "paras": [
+   [
+    "And now, someone who actually lives this. Not my slides, the real thing."
+   ],
+   [
+    "The first Journey tonight. The story, the honest version. Please welcome Raul Popadineti."
+   ]
+  ]
+ }
+]
