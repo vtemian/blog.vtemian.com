@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The One-Person Product Team · full talk</title>
+<meta name="description" content="The full intro talk from the AGENTIC.tm x Indie TM prow 2026 side event: every slide, and what I said over it.">
+<link rel="canonical" href="https://blog.vtemian.com/decks/the-one-person-product-team/">
+<style>
+  :root { --paper: #ece6d8; --ink: #1d1b18; --muted: #6f6858; --red: #d3302a; --line: #d6cdb9; --stage: #111; }
+  @media (prefers-color-scheme: dark) { :root { --paper: #17160f; --ink: #ece6d8; --muted: #a39b88; --line: #34312a; --stage: #000; } }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--paper); color: var(--ink); }
+  body { font: 17px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 24px 16px 64px; }
+  .mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+  a { color: inherit; }
+  header { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 18px; }
+  header a { text-decoration: none; }
+  h1 { font-size: 26px; line-height: 1.2; margin: 6px 0 0; }
+  .stage { position: relative; background: var(--stage); aspect-ratio: 16 / 9; width: 100%; }
+  .stage video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+  .bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .bar button { font: inherit; font-size: 15px; background: none; border: 1px solid var(--line); color: var(--ink); border-radius: 999px; padding: 6px 16px; cursor: pointer; }
+  .bar button:hover { border-color: var(--ink); }
+  .bar button:disabled { opacity: .35; cursor: default; }
+  .now { text-align: center; flex: 1; }
+  .now strong { display: block; font-size: 17px; }
+  .notes { max-width: 680px; margin: 22px auto 0; }
+  .notes p { margin: 0 0 14px; }
+  .notes .label { margin-bottom: 10px; }
+  .chapters { display: flex; flex-wrap: wrap; gap: 8px; margin: 36px auto 0; max-width: 680px; }
+  .chapters button { font: inherit; font-size: 13px; background: none; border: 1px solid var(--line); color: var(--muted); border-radius: 999px; padding: 4px 12px; cursor: pointer; }
+  .chapters button.on { color: var(--paper); background: var(--ink); border-color: var(--ink); }
+  footer { max-width: 680px; margin: 40px auto 0; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 15px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="mono">AGENTIC.tm × Indie TM · prow 2026 side event · 28 Oct 2026</div>
+      <h1>The One-Person Product Team</h1>
+    </div>
+    <a class="mono" href="/talk/the-one-person-product-team/">Read the write-up →</a>
+  </header>
+
+  <div class="stage"><video id="v" playsinline muted autoplay></video></div>
+
+  <div class="bar">
+    <button id="prev" aria-label="Previous slide">←</button>
+    <div class="now"><span class="mono" id="count"></span><strong id="title"></strong></div>
+    <button id="next" aria-label="Next slide">→</button>
+  </div>
+
+  <div class="notes">
+    <div class="mono label">What I said</div>
+    <div id="notes"></div>
+  </div>
+
+  <div class="chapters" id="chapters"></div>
+
+  <footer>
+    Arrow keys or swipe to move between slides. The talk was given in Romanian; this is the English script it was written from, lightly edited.
+    The demos are real recordings, sped up.
+  </footer>
+</div>
+
+<script>
+const SLIDES = [
+  ["s01-launch", true], ["s02a-line", true], ["s02b-shop", true], ["s03-bosses", true],
+  ["s04-hangar", true], ["s05-belt", true], ["s06-garage", true], ["s07a-note", false],
+  ["s07b-demo", false], ["s09-chaos-loop", true], ["s10-gates", true], ["s11-funnel", false],
+  ["s12-roles", true], ["s13-handover", true],
+];
+const v = document.getElementById("v"), $ = id => document.getElementById(id);
+let notes = [], cur = 0;
+
+function esc(s) { return s.replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]); }
+
+function show(i, push = true) {
+  cur = Math.max(0, Math.min(SLIDES.length - 1, i));
+  const [id, loop] = SLIDES[cur];
+  v.loop = loop; v.controls = !loop; v.poster = id + ".jpg"; v.src = id + ".mp4";
+  v.play().catch(() => {});
+  const n = notes[cur] || { title: "", paras: [] };
+  $("count").textContent = (cur + 1) + " / " + SLIDES.length;
+  $("title").textContent = n.title;
+  $("notes").innerHTML = n.paras.map(p => "<p>" + p.map(esc).join("<br>") + "</p>").join("");
+  $("prev").disabled = cur === 0; $("next").disabled = cur === SLIDES.length - 1;
+  document.querySelectorAll("#chapters button").forEach((b, j) => b.classList.toggle("on", j === cur));
+  if (push) history.replaceState(null, "", "#" + (cur + 1));
+  // warm the next film so moving on doesn't stall
+  if (cur + 1 < SLIDES.length) { const l = document.createElement("link"); l.rel = "prefetch"; l.href = SLIDES[cur + 1][0] + ".mp4"; document.head.appendChild(l); }
+}
+
+$("prev").onclick = () => show(cur - 1);
+$("next").onclick = () => show(cur + 1);
+addEventListener("keydown", e => {
+  if (["ArrowRight", "PageDown"].includes(e.key)) { show(cur + 1); e.preventDefault(); }
+  if (["ArrowLeft", "PageUp"].includes(e.key)) { show(cur - 1); e.preventDefault(); }
+});
+let tx = null;
+document.querySelector(".stage").addEventListener("touchstart", e => tx = e.touches[0].clientX, { passive: true });
+document.querySelector(".stage").addEventListener("touchend", e => {
+  if (tx === null) return; const dx = e.changedTouches[0].clientX - tx; tx = null;
+  if (Math.abs(dx) > 40) show(cur + (dx < 0 ? 1 : -1));
+});
+
+fetch("notes.json").then(r => r.json()).then(d => {
+  notes = d;
+  $("chapters").innerHTML = d.map((n, j) => '<button data-j="' + j + '">' + esc(n.title) + "</button>").join("");
+  $("chapters").onclick = e => { const b = e.target.closest("button"); if (b) show(+b.dataset.j); };
+  const h = parseInt(location.hash.slice(1), 10);
+  show(Number.isFinite(h) ? h - 1 : 0, false);
+});
+</script>
+</body>
+</html>
