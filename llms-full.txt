@@ -3345,11 +3345,11 @@ And this is the first step. Exposing myself to the Internet. To the people that 
 - **Summary**: The intro talk from the AGENTIC.tm x Indie TM side event at prow 2026: how models went from writing LinkedIn posts to running loops, and why the environment around the agent matters more than the agent.
 
 
-On the morning of my talk, [sisif.ai](https://sisif.ai) was *losing customers* and I didn't know why. I sent one message, typos included, to the agent I call <img src="boss.png" alt="boss" style="display:inline-block;height:1.6em;width:auto;vertical-align:middle;margin:0 0.15em;border-radius:999px;">: "boss, we need something! ... we're loosing customers. check in posthog and stripe."{{< note >}}My agents have job titles. <img src="boss.png" alt="boss" style="display:inline-block;height:1.6em;width:auto;vertical-align:middle;margin:0 0.15em;border-radius:999px;"> coordinates and talks to me, <img src="kitchen.png" alt="sisif kitchen" style="display:inline-block;height:1.3em;width:auto;vertical-align:middle;margin:0 0.15em;border-radius:999px;"> writes and ships code, <img src="qa.png" alt="qa" style="display:inline-block;height:1.3em;width:auto;vertical-align:middle;margin:0 0.15em;border-radius:999px;"> clicks through production like a user would.{{< /note >}}
+On the morning of my talk, [sisif.ai](https://sisif.ai) was *losing customers* and I didn't know why. I sent one message, typos included, to the Grok Bot agent I call {{< agent "boss" >}}: "boss, we need something! ... we're loosing customers. check in posthog and stripe."{{< note >}}My agents have job titles. {{< agent "boss" >}} coordinates and talks to me, {{< agent "kitchen" >}} writes and ships code, {{< agent "qa" >}} clicks through production like a user would. Next to them sit marketing, seo and commerce, which works on the Shopify app, and plenty of other bots.{{< /note >}}
 
 {{< note text="Sixteen minutes later" >}}The film on this page runs at 100x. The report itself was a full page: the funnel, before and after the outage, country and device splits, Stripe card attempts, errors from the logs and the fixes, ranked.{{< /note >}} I had a report built from PostHog, Stripe and the production logs. Daily sessions had dropped from 29-46 to 4-15 since October 13. **Checkout was broken on Android.** OpenRouter had been down since October 25, so *story orders went to zero*, and when it errored, the photo check rejected good uploads from 166 people. And the part I like most: it told me what *wasn't* the problem. Server errors, at 0.02% of traffic, weren't the cause.
 
-I asked it to split the fixes between agents. <img src="boss.png" alt="boss" style="display:inline-block;height:1.6em;width:auto;vertical-align:middle;margin:0 0.15em;border-radius:999px;"> sent **five pull requests** to <img src="kitchen.png" alt="sisif kitchen" style="display:inline-block;height:1.3em;width:auto;vertical-align:middle;margin:0 0.15em;border-radius:999px;">. They merged, <img src="boss.png" alt="boss" style="display:inline-block;height:1.6em;width:auto;vertical-align:middle;margin:0 0.15em;border-radius:999px;"> caught two that missed the deploy and asked for another, and <img src="qa.png" alt="qa" style="display:inline-block;height:1.3em;width:auto;vertical-align:middle;margin:0 0.15em;border-radius:999px;"> checked every fix on phone and desktop, with screenshots.
+I asked it to split the fixes between agents. {{< agent "boss" >}} sent **five pull requests** to {{< agent "kitchen" >}}. They merged, {{< agent "boss" >}} caught two that missed the deploy and asked for another, and {{< agent "qa" >}} checked every fix on phone and desktop, with screenshots.
 
 <video controls playsinline width="100%" poster="s11-funnel.jpg" style="margin-bottom: 2rem;">
   <source src="s11-funnel.mp4" type="video/mp4">
@@ -3451,7 +3451,7 @@ What the gates don't catch, in Böckeler's words: "Misdiagnosis of issues, overe
 
 {{< endfold >}}
 
-That's how the funnel morning worked. It wasn't one brilliant agent. It was <img src="boss.png" alt="boss" style="display:inline-block;height:1.6em;width:auto;vertical-align:middle;margin:0 0.15em;border-radius:999px;"> splitting the work, kitchen opening pull requests, and <img src="qa.png" alt="qa" style="display:inline-block;height:1.3em;width:auto;vertical-align:middle;margin:0 0.15em;border-radius:999px;"> checking production before I trusted any of it.
+That's how the funnel morning worked. It wasn't one brilliant agent. It was {{< agent "boss" >}} splitting the work, {{< agent "kitchen" >}} opening pull requests, and {{< agent "qa" >}} checking production before I trusted any of it.
 
 ## One role, one line
 
@@ -3466,6 +3466,8 @@ A role is three things: **context**, what it needs to know; **tools**, what it c
 The human doesn't work on the line anymore. The human builds the environment and runs several factories in parallel.
 
 <mark>That's the one-person product team.</mark>
+
+And it's possible today. With Grok Bot, one person can run all of it: boss, kitchen, qa and the rest of the bots are all Grok Bot agents, and that funnel morning was one message from me.
 
 ![Hands up at the start of the talk](photo-hands.jpg)
 
